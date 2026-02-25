@@ -6,6 +6,12 @@ import { committeeContactEntryType } from './committeeContactEntry'
 import { externalLinkType } from './externalLink'
 import { pageType } from './page'
 import { siteSettingsType } from './siteSettings'
+import {
+  voterGuideCandidateType,
+  voterGuideDistrictType,
+  voterGuideRaceType,
+  voterGuideType,
+} from './voterGuide'
 
 export const schemaTypes = [
   siteSettingsType,
@@ -16,4 +22,8 @@ export const schemaTypes = [
   committeeContactEntryType,
   externalLinkType,
   pageType,
+  voterGuideCandidateType,
+  voterGuideDistrictType,
+  voterGuideRaceType,
+  voterGuideType,
 ]

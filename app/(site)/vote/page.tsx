@@ -9,6 +9,12 @@ export const metadata: Metadata = { title: 'Voter Resources' }
 
 const VOTER_LINKS = [
   {
+    label: '2026 Voter Guide',
+    description: 'Review endorsed races, districts, and candidate profiles.',
+    href: '/voter-guide',
+    icon: '📘',
+  },
+  {
     label: 'Register to Vote',
     description: 'Register online through PA Voter Services.',
     href: 'https://www.pavoterservices.pa.gov/pages/VoterRegistrationApplication.aspx',
@@ -80,8 +86,8 @@ export default async function VotePage() {
               <a
                 key={href}
                 href={href}
-                target="_blank"
-                rel="noopener noreferrer"
+                target={href.startsWith('http') ? '_blank' : undefined}
+                rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="flex items-start gap-4 p-4 bg-white rounded-lg border border-[var(--color-border)] hover:border-[var(--color-blue-mid)] hover:shadow-md transition-all group"
               >
                 <span className="text-2xl">{icon}</span>

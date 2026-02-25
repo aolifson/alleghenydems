@@ -105,6 +105,49 @@ export interface PageDocument extends SanityDocument {
   body?: unknown[]
 }
 
+export interface VoterGuideCandidate {
+  _key?: string
+  name: string
+  campaignWebsite?: string
+  facebookUrl?: string
+  instagramUrl?: string
+  xUrl?: string
+  photo?: SanityImage
+  description?: string
+  ballotStatus?: 'listed' | 'alsoAppearing' | 'appearing' | 'endorsed' | 'unknown'
+  displayOrder?: number
+}
+
+export interface VoterGuideDistrict {
+  _key?: string
+  districtLabel: string
+  districtDescription?: string
+  candidates: VoterGuideCandidate[]
+  displayOrder?: number
+}
+
+export interface VoterGuideRace {
+  _key?: string
+  officeTitle: string
+  term?: string
+  annualSalary?: string
+  powersAndDuties?: string[]
+  districts: VoterGuideDistrict[]
+  displayOrder?: number
+}
+
+export interface VoterGuideDocument extends SanityDocument {
+  title: string
+  slug: { current: string }
+  cycleYear: number
+  heroHeadline?: string
+  heroSubhead?: string
+  electionDate?: string
+  intro?: unknown[]
+  races: VoterGuideRace[]
+  sourcePdfTitle?: string
+}
+
 function dedupeMembersByName<T extends CommitteeMember>(members: T[]): T[] {
   const seen = new Set<string>()
   return members.filter((member) => {
@@ -228,5 +271,18 @@ export async function getPageBySlug(slug: string): Promise<PageDocument | null> 
   return client.fetch(
     `*[_type == "page" && slug.current == $slug][0]`,
     { slug }
+  )
+}
+
+export async function getVoterGuideBySlug(slug: string): Promise<VoterGuideDocument | null> {
+  return client.fetch(
+    `*[_type == "voterGuide" && slug.current == $slug][0]`,
+    { slug }
+  )
+}
+
+export async function getLatestVoterGuide(): Promise<VoterGuideDocument | null> {
+  return client.fetch(
+    `*[_type == "voterGuide"] | order(cycleYear desc, _updatedAt desc)[0]`
   )
 }
