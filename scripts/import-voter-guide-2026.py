@@ -42,6 +42,12 @@ STATUS_LISTED = "listed"
 STATUS_ALSO = "alsoAppearing"
 STATUS_APPEARING = "appearing"
 
+LOCAL_ACDC_RACES = {
+    "Representative in Congress",
+    "Senator in the General Assembly",
+    "Representative in the General Assembly",
+}
+
 
 def load_env(path: pathlib.Path) -> dict[str, str]:
     env: dict[str, str] = {}
@@ -586,6 +592,36 @@ def flatten_candidates(race: dict) -> list[dict]:
     return result
 
 
+def flatten_listed_candidates(race: dict) -> list[dict]:
+    result: list[dict] = []
+    for district in race.get("districts", []):
+        for candidate in district.get("candidates", []):
+            if candidate.get("ballotStatus") == STATUS_LISTED:
+                result.append(candidate)
+    return result
+
+
+def apply_acdc_endorsements(races: list[dict]) -> None:
+    # Clear existing flags first.
+    for race in races:
+        for district in race.get("districts", []):
+            for candidate in district.get("candidates", []):
+                candidate["endorsedByAcdc"] = False
+
+    # In the PDF, endorsements are shown for the lead listed candidate in each local district.
+    for race in races:
+        if race.get("officeTitle") not in LOCAL_ACDC_RACES:
+            continue
+        for district in race.get("districts", []):
+            listed = [
+                candidate
+                for candidate in district.get("candidates", [])
+                if candidate.get("ballotStatus") == STATUS_LISTED
+            ]
+            if listed:
+                listed[0]["endorsedByAcdc"] = True
+
+
 def extract_images_by_page(pdf_path: str) -> dict[int, list[bytes]]:
     if PdfReader is None:
         print("  ! pypdf is not installed; skipping photo extraction")
@@ -614,17 +650,17 @@ def apply_photos(token: str, races: list[dict], images_by_page: dict[int, list[b
         return
 
     mapping: list[tuple[int, list[dict], int | None]] = [
-        (3, flatten_candidates(get_race_by_title(races, "Representative in Congress")), None),
-        (4, flatten_candidates(get_race_by_title(races, "Senator in the General Assembly")), None),
-        (5, flatten_candidates(get_race_by_title(races, "Representative in the General Assembly")), None),
+        (3, flatten_listed_candidates(get_race_by_title(races, "Representative in Congress")), None),
+        (4, flatten_listed_candidates(get_race_by_title(races, "Senator in the General Assembly")), None),
+        (5, flatten_listed_candidates(get_race_by_title(races, "Representative in the General Assembly")), None),
         (
             6,
-            flatten_candidates(get_race_by_title(races, "United States Senator"))
-            + flatten_candidates(get_race_by_title(races, "President of the United States")),
+            flatten_listed_candidates(get_race_by_title(races, "United States Senator"))
+            + flatten_listed_candidates(get_race_by_title(races, "President of the United States")),
             None,
         ),
-        (7, flatten_candidates(get_race_by_title(races, "Attorney General")), 4),
-        (8, flatten_candidates(get_race_by_title(races, "State Treasurer")), 1),
+        (7, flatten_listed_candidates(get_race_by_title(races, "Attorney General")), 4),
+        (8, flatten_listed_candidates(get_race_by_title(races, "State Treasurer")), 1),
     ]
 
     for page_num, candidates, max_upload in mapping:
@@ -698,6 +734,7 @@ def main() -> None:
         raise SystemExit(f"ERROR: missing pages in extracted text: {missing_pages}")
 
     races = build_races(pages)
+    apply_acdc_endorsements(races)
     summarize(races)
 
     if args.dry_run:

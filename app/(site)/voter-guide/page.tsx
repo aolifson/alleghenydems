@@ -13,7 +13,6 @@ export const metadata: Metadata = { title: '2026 Voter Guide' }
 export const revalidate = 3600
 
 function candidateStatusLabel(status?: VoterGuideCandidate['ballotStatus']) {
-  if (status === 'endorsed') return 'Endorsed'
   if (status === 'alsoAppearing') return 'Also Appearing On Ballot'
   if (status === 'appearing') return 'Appearing On Ballot'
   return null
@@ -120,6 +119,11 @@ export default async function VoterGuidePage() {
                             const status = candidateStatusLabel(candidate.ballotStatus)
                             return (
                               <div key={candidate._key ?? candidate.name} className="rounded-lg border border-[var(--color-border)] p-4 bg-white">
+                                {candidate.endorsedByAcdc && (
+                                  <div className="mb-3 inline-flex items-center rounded-r-sm bg-[var(--color-navy)] text-white px-3 py-1 text-xs font-bold uppercase tracking-wide">
+                                    Endorsed by ACDC
+                                  </div>
+                                )}
                                 <div className="flex gap-3">
                                   {candidate.photo ? (
                                     <div className="relative h-20 w-20 shrink-0 rounded overflow-hidden border border-[var(--color-border)]">

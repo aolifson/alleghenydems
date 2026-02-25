@@ -55,6 +55,12 @@ export const voterGuideCandidateType = defineType({
       rows: 8,
     }),
     defineField({
+      name: 'endorsedByAcdc',
+      title: 'Endorsed by ACDC',
+      type: 'boolean',
+      initialValue: false,
+    }),
+    defineField({
       name: 'ballotStatus',
       title: 'Ballot Status',
       type: 'string',
@@ -82,6 +88,15 @@ export const voterGuideCandidateType = defineType({
       title: 'name',
       subtitle: 'campaignWebsite',
       media: 'photo',
+      endorsedByAcdc: 'endorsedByAcdc',
+    },
+    prepare({ title, subtitle, media, endorsedByAcdc }) {
+      const suffix = endorsedByAcdc ? 'Endorsed by ACDC' : undefined
+      return {
+        title,
+        subtitle: [subtitle, suffix].filter(Boolean).join(' · '),
+        media,
+      }
     },
   },
 })

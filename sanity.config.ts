@@ -36,6 +36,7 @@ export default defineConfig({
             S.documentTypeListItem('externalLink').title('External Links'),
             S.divider(),
             S.documentTypeListItem('page').title('Pages'),
+            S.documentTypeListItem('voterGuide').title('Voter Guides'),
           ]),
     }),
     visionTool(),

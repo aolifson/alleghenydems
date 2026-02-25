@@ -114,6 +114,7 @@ export interface VoterGuideCandidate {
   xUrl?: string
   photo?: SanityImage
   description?: string
+  endorsedByAcdc?: boolean
   ballotStatus?: 'listed' | 'alsoAppearing' | 'appearing' | 'endorsed' | 'unknown'
   displayOrder?: number
 }
