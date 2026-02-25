@@ -1,21 +1,28 @@
 import type { Metadata } from 'next'
 import { PortableText } from '@portabletext/react'
+import PageHero from '@/components/page-hero'
 import { getPageBySlug } from '@/sanity/lib/queries'
+import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 
 export const metadata: Metadata = { title: 'About' }
 export const revalidate = 86400
 
 export default async function AboutPage() {
   const page = await getPageBySlug('about')
+  const headline = page?.heroHeadline ?? page?.title ?? 'About'
+  const body = stripDuplicatedHeroBlocks(page?.body, headline, page?.heroSubhead)
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
-      <h1 className="font-display text-3xl font-bold text-[var(--color-blue)] mb-6">
-        {page?.title ?? 'About the Allegheny County Democratic Committee'}
-      </h1>
-      {page?.body ? (
+      <PageHero
+        headline={headline}
+        subhead={page?.heroSubhead}
+        image={page?.heroImage}
+      />
+
+      {body ? (
         <div className="prose-content">
-          <PortableText value={page.body as Parameters<typeof PortableText>[0]['value']} />
+          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} />
         </div>
       ) : (
         <div className="prose-content space-y-4 text-[var(--color-text)]">

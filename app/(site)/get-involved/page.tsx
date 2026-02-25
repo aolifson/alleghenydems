@@ -1,24 +1,30 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PortableText } from '@portabletext/react'
+import PageHero from '@/components/page-hero'
 import { getPageBySlug } from '@/sanity/lib/queries'
+import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 
 export const metadata: Metadata = { title: 'Get Involved' }
 export const revalidate = 86400
 
 export default async function GetInvolvedPage() {
   const page = await getPageBySlug('get-involved')
+  const headline = page?.heroHeadline ?? 'Get Involved'
+  const subhead = page?.heroSubhead ?? 'There are many ways to support Democrats in Allegheny County. Find the right fit for you.'
+  const body = stripDuplicatedHeroBlocks(page?.body, headline, subhead)
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
-      <h1 className="font-display text-3xl font-bold text-[var(--color-blue)] mb-2">Get Involved</h1>
-      <p className="text-[var(--color-text-muted)] mb-8">
-        There are many ways to support Democrats in Allegheny County. Find the right fit for you.
-      </p>
+      <PageHero
+        headline={headline}
+        subhead={subhead}
+        image={page?.heroImage}
+      />
 
-      {page?.body ? (
+      {body ? (
         <div className="prose-content">
-          <PortableText value={page.body as Parameters<typeof PortableText>[0]['value']} />
+          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} />
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -29,7 +35,7 @@ export default async function GetInvolvedPage() {
             { label: 'Young Democrats', description: 'Connect with young Democrats in Allegheny County.', href: '/contact', icon: '🌟', external: false },
           ].map(({ label, description, href, icon, external }) => (
             <a
-              key={href}
+              key={label}
               href={href}
               target={external ? '_blank' : undefined}
               rel={external ? 'noopener noreferrer' : undefined}

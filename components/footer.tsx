@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import type { SiteSettings } from '@/sanity/lib/queries'
 
 export default function Footer({ settings }: { settings: SiteSettings | null }) {
@@ -9,9 +10,12 @@ export default function Footer({ settings }: { settings: SiteSettings | null }) 
       <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Brand */}
         <div>
-          <p className="font-display font-bold text-lg mb-2 text-[var(--color-gold)]">
-            Allegheny County Democratic Committee
-          </p>
+          <div className="flex items-center gap-3 mb-3">
+            <Image src="/acdc-seal.png" alt="ACDC Seal" width={48} height={48} className="rounded-full" />
+            <p className="font-display font-bold text-lg text-[var(--color-gold)]">
+              Allegheny County Democratic Committee
+            </p>
+          </div>
           <p className="text-sm text-white/70 leading-relaxed">
             {settings?.footerText ?? 'Fighting for working families in Allegheny County.'}
           </p>
@@ -38,7 +42,7 @@ export default function Footer({ settings }: { settings: SiteSettings | null }) 
             {[
               { label: 'Events', href: '/events' },
               { label: 'News & Updates', href: '/news' },
-              { label: 'Committee Members', href: '/committee' },
+              { label: 'Committee Members', href: '/committee-members' },
               { label: 'Voter Resources', href: '/vote' },
               { label: 'Run for Office', href: '/run-for-office' },
               { label: 'Contact', href: '/contact' },

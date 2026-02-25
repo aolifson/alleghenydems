@@ -19,6 +19,27 @@ export const pageType = defineType({
       validation: (r) => r.required(),
     }),
     defineField({
+      name: 'heroHeadline',
+      title: 'Hero Headline',
+      type: 'string',
+      description: 'Large text shown on the page hero banner.',
+    }),
+    defineField({
+      name: 'heroSubhead',
+      title: 'Hero Subhead',
+      type: 'string',
+      description: 'Short supporting line shown below the hero headline.',
+    }),
+    defineField({
+      name: 'heroImage',
+      title: 'Hero Background Image',
+      type: 'image',
+      options: { hotspot: true },
+      fields: [
+        defineField({ name: 'alt', title: 'Alt Text', type: 'string' }),
+      ],
+    }),
+    defineField({
       name: 'body',
       title: 'Content',
       type: 'array',

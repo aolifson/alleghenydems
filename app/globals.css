@@ -3,9 +3,9 @@
 /* ─── Democratic color palette ──────────────────────────────── */
 @theme {
   /* Primary palette */
-  --color-blue:       #1a3a6b;   /* deep democratic blue */
+  --color-blue:       #2ea3f2;   /* primary blue — matches alleghenydems.com */
   --color-navy:       #0d2240;   /* dark navy */
-  --color-blue-mid:   #2c5fa8;   /* medium blue for links/buttons */
+  --color-blue-mid:   #2ea3f2;   /* primary blue — matches alleghenydems.com */
   --color-blue-light: #e8f0fb;   /* light blue bg for tinted sections */
   --color-red:        #c8102e;   /* democratic red */
   --color-red-dark:   #8b0b1f;   /* deep red for hover */

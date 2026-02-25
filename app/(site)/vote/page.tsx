@@ -1,5 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { PortableText } from '@portabletext/react'
+import PageHero from '@/components/page-hero'
+import { getPageBySlug } from '@/sanity/lib/queries'
+import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 
 export const metadata: Metadata = { title: 'Voter Resources' }
 
@@ -48,43 +52,60 @@ const VOTER_LINKS = [
   },
 ]
 
-export default function VotePage() {
+export default async function VotePage() {
+  const page = await getPageBySlug('vote')
+  const headline = page?.heroHeadline ?? 'Voter Resources'
+  const subhead = page?.heroSubhead ?? 'Everything you need to register and vote in Allegheny County, Pennsylvania.'
+  const body = stripDuplicatedHeroBlocks(page?.body, headline, subhead)
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
-      <h1 className="font-display text-3xl font-bold text-[var(--color-blue)] mb-2">Voter Resources</h1>
-      <p className="text-[var(--color-text-muted)] mb-8">
-        Everything you need to register and vote in Allegheny County, Pennsylvania.
-      </p>
+    <div className="max-w-7xl mx-auto px-4 py-10">
+      <PageHero
+        headline={headline}
+        subhead={subhead}
+        image={page?.heroImage}
+        rounded={false}
+        framedText
+        minHeightClassName="min-h-[340px]"
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
-        {VOTER_LINKS.map(({ label, description, href, icon }) => (
-          <a
-            key={href}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-start gap-4 p-4 bg-white rounded-lg border border-[var(--color-border)] hover:border-[var(--color-blue-mid)] hover:shadow-md transition-all group"
-          >
-            <span className="text-2xl">{icon}</span>
-            <div>
-              <p className="font-semibold text-[var(--color-blue-mid)] group-hover:underline">{label}</p>
-              <p className="text-sm text-[var(--color-text-muted)] mt-0.5">{description}</p>
-            </div>
-          </a>
-        ))}
-      </div>
+      {body ? (
+        <div className="prose-content max-w-4xl">
+          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} />
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
+            {VOTER_LINKS.map(({ label, description, href, icon }) => (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-4 p-4 bg-white rounded-lg border border-[var(--color-border)] hover:border-[var(--color-blue-mid)] hover:shadow-md transition-all group"
+              >
+                <span className="text-2xl">{icon}</span>
+                <div>
+                  <p className="font-semibold text-[var(--color-blue-mid)] group-hover:underline">{label}</p>
+                  <p className="text-sm text-[var(--color-text-muted)] mt-0.5">{description}</p>
+                </div>
+              </a>
+            ))}
+          </div>
 
-      <div className="bg-[var(--color-blue-light)] rounded-lg p-6 border border-[var(--color-border)]">
-        <h2 className="font-bold text-[var(--color-blue)] mb-2">Need Help?</h2>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          Contact the Allegheny County Elections Division at{' '}
-          <a href="https://www.alleghenycounty.us/elections" target="_blank" rel="noopener noreferrer"
-            className="text-[var(--color-blue-mid)] hover:underline">
-            alleghenycounty.us/elections
-          </a>{' '}
-          or call the ACDC office for assistance.
-        </p>
-      </div>
+          <div className="bg-[var(--color-blue-light)] rounded-lg p-6 border border-[var(--color-border)]">
+            <h2 className="font-bold text-[var(--color-blue)] mb-2">Need Help?</h2>
+            <p className="text-sm text-[var(--color-text-muted)]">
+              Contact the Allegheny County Elections Division at{' '}
+              <a href="https://www.alleghenycounty.us/elections" target="_blank" rel="noopener noreferrer"
+                className="text-[var(--color-blue-mid)] hover:underline">
+                alleghenycounty.us/elections
+              </a>{' '}
+              or call the ACDC office for assistance.
+            </p>
+          </div>
+        </>
+      )}
     </div>
   )
 }

@@ -34,6 +34,24 @@ export const committeeMemberType = defineType({
       type: 'string',
     }),
     defineField({
+      name: 'facebookUrl',
+      title: 'Facebook URL',
+      type: 'url',
+      validation: (r) => r.uri({ scheme: ['http', 'https'] }),
+    }),
+    defineField({
+      name: 'instagramUrl',
+      title: 'Instagram URL',
+      type: 'url',
+      validation: (r) => r.uri({ scheme: ['http', 'https'] }),
+    }),
+    defineField({
+      name: 'xUrl',
+      title: 'X (Twitter) URL',
+      type: 'url',
+      validation: (r) => r.uri({ scheme: ['http', 'https'] }),
+    }),
+    defineField({
       name: 'photo',
       title: 'Photo',
       type: 'image',

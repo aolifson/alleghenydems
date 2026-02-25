@@ -1,6 +1,8 @@
 import { eventType } from './event'
 import { newsType } from './news'
 import { committeeMemberType } from './committeeMember'
+import { committeeDirectoryEntryType } from './committeeDirectoryEntry'
+import { committeeContactEntryType } from './committeeContactEntry'
 import { externalLinkType } from './externalLink'
 import { pageType } from './page'
 import { siteSettingsType } from './siteSettings'
@@ -10,6 +12,8 @@ export const schemaTypes = [
   eventType,
   newsType,
   committeeMemberType,
+  committeeDirectoryEntryType,
+  committeeContactEntryType,
   externalLinkType,
   pageType,
 ]

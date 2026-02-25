@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PortableText } from '@portabletext/react'
+import PageHero from '@/components/page-hero'
 import { getPageBySlug } from '@/sanity/lib/queries'
+import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 
 export const metadata: Metadata = { title: 'Run for Office' }
 export const revalidate = 86400
@@ -30,17 +32,21 @@ const RESOURCES = [
 
 export default async function RunForOfficePage() {
   const page = await getPageBySlug('run-for-office')
+  const headline = page?.heroHeadline ?? 'Run for Office'
+  const subhead = page?.heroSubhead ?? 'Interested in running as a Democrat in Allegheny County? We\'re here to help.'
+  const body = stripDuplicatedHeroBlocks(page?.body, headline, subhead)
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
-      <h1 className="font-display text-3xl font-bold text-[var(--color-blue)] mb-2">Run for Office</h1>
-      <p className="text-[var(--color-text-muted)] mb-8">
-        Interested in running as a Democrat in Allegheny County? We&apos;re here to help.
-      </p>
+      <PageHero
+        headline={headline}
+        subhead={subhead}
+        image={page?.heroImage}
+      />
 
-      {page?.body ? (
+      {body ? (
         <div className="prose-content mb-10">
-          <PortableText value={page.body as Parameters<typeof PortableText>[0]['value']} />
+          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} />
         </div>
       ) : (
         <div className="space-y-4 mb-10">

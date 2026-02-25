@@ -1,19 +1,35 @@
 import type { Metadata } from 'next'
-import { getSiteSettings } from '@/sanity/lib/queries'
+import { PortableText } from '@portabletext/react'
+import PageHero from '@/components/page-hero'
+import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
+import { getPageBySlug, getSiteSettings } from '@/sanity/lib/queries'
 import ContactForm from '@/components/contact-form'
 
 export const metadata: Metadata = { title: 'Contact' }
 export const revalidate = 86400
 
 export default async function ContactPage() {
-  const settings = await getSiteSettings()
+  const [settings, page] = await Promise.all([
+    getSiteSettings(),
+    getPageBySlug('contact'),
+  ])
+  const headline = page?.heroHeadline ?? page?.title ?? 'Contact Us'
+  const subhead = page?.heroImage
+    ? (page?.heroSubhead ?? 'Get in touch with the Allegheny County Democratic Committee.')
+    : undefined
+  const body = stripDuplicatedHeroBlocks(page?.body, headline, subhead)
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
-      <h1 className="font-display text-3xl font-bold text-[var(--color-blue)] mb-2">Contact Us</h1>
-      <p className="text-[var(--color-text-muted)] mb-8">Get in touch with the Allegheny County Democratic Committee.</p>
+    <div className="max-w-7xl mx-auto px-4 py-10">
+      <PageHero headline={headline} subhead={subhead} image={page?.heroImage} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+      {body && (
+        <div className="prose-content mb-8 max-w-3xl">
+          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} />
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl">
         {/* Contact Info */}
         <div>
           <h2 className="font-semibold text-[var(--color-blue)] mb-4">Office Information</h2>

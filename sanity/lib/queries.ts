@@ -41,7 +41,32 @@ export interface CommitteeMember extends SanityDocument {
   district?: string
   email?: string
   phone?: string
+  facebookUrl?: string
+  instagramUrl?: string
+  xUrl?: string
   photo?: SanityImage
+  isActive?: boolean
+  displayOrder?: number
+}
+
+export interface CommitteeDirectoryEntry extends SanityDocument {
+  committee: string
+  ward?: string
+  district?: string
+  firstName?: string
+  lastName?: string
+  committeeOffice?: string
+  isActive?: boolean
+  displayOrder?: number
+}
+
+export interface CommitteeContactEntry extends SanityDocument {
+  committee: string
+  chair?: string
+  websiteUrl?: string
+  facebookUrl?: string
+  instagramUrl?: string
+  otherUrl?: string
   isActive?: boolean
   displayOrder?: number
 }
@@ -69,6 +94,25 @@ export interface SiteSettings extends SanityDocument {
   googleCalendarEmbedUrl?: string
   googleAnalyticsId?: string
   facebookPixelId?: string
+}
+
+export interface PageDocument extends SanityDocument {
+  title: string
+  slug: { current: string }
+  heroHeadline?: string
+  heroSubhead?: string
+  heroImage?: SanityImage
+  body?: unknown[]
+}
+
+function dedupeMembersByName<T extends CommitteeMember>(members: T[]): T[] {
+  const seen = new Set<string>()
+  return members.filter((member) => {
+    const key = `${(member.district ?? '').trim().toLowerCase()}|${member.name.trim().toLowerCase()}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
 }
 
 // ─── Queries ─────────────────────────────────────────────────────────
@@ -113,9 +157,57 @@ export async function getNewsPost(slug: string): Promise<NewsPost | null> {
 }
 
 export async function getCommitteeMembers(): Promise<CommitteeMember[]> {
-  return client.fetch(
-    `*[_type == "committeeMember" && isActive != false] | order(district asc, displayOrder asc, name asc)`
+  const members = await client.fetch<CommitteeMember[]>(
+    `*[
+      _type == "committeeMember" &&
+      isActive != false &&
+      !(
+        defined(district) &&
+        lower(district) in ["elected-official", "elected officials", "who-we-are"]
+      )
+    ] | order(district asc, displayOrder asc, name asc)`
   )
+  return dedupeMembersByName(members)
+}
+
+export async function getCommitteeDirectoryEntries(): Promise<CommitteeDirectoryEntry[]> {
+  return client.fetch(
+    `*[
+      _type == "committeeDirectoryEntry" &&
+      isActive != false
+    ] | order(committee asc, ward asc, district asc, displayOrder asc, firstName asc, lastName asc)`
+  )
+}
+
+export async function getCommitteeContactEntries(): Promise<CommitteeContactEntry[]> {
+  return client.fetch(
+    `*[
+      _type == "committeeContactEntry" &&
+      isActive != false
+    ] | order(committee asc, displayOrder asc)`
+  )
+}
+
+export async function getElectedOfficials(): Promise<CommitteeMember[]> {
+  const members = await client.fetch<CommitteeMember[]>(
+    `*[
+      _type == "committeeMember" &&
+      defined(district) &&
+      lower(district) in ["elected-official", "elected officials"]
+    ] | order(_updatedAt desc, name asc)`
+  )
+  return dedupeMembersByName(members)
+}
+
+export async function getWhoWeAreMembers(): Promise<CommitteeMember[]> {
+  const members = await client.fetch<CommitteeMember[]>(
+    `*[
+      _type == "committeeMember" &&
+      isActive != false &&
+      (!defined(district) || district == "" || lower(district) == "who-we-are")
+    ] | order(displayOrder asc, name asc)`
+  )
+  return dedupeMembersByName(members)
 }
 
 export async function getExternalLinks(): Promise<ExternalLink[]> {
@@ -124,7 +216,15 @@ export async function getExternalLinks(): Promise<ExternalLink[]> {
   )
 }
 
-export async function getPageBySlug(slug: string) {
+export async function getAllEventsForCalendar(): Promise<Event[]> {
+  return client.fetch(
+    `*[_type == "event"] | order(date asc) {
+      _id, _type, title, slug, date, endDate, locationName, locationAddress, rsvpUrl, isFeatured
+    }`
+  )
+}
+
+export async function getPageBySlug(slug: string): Promise<PageDocument | null> {
   return client.fetch(
     `*[_type == "page" && slug.current == $slug][0]`,
     { slug }

@@ -13,10 +13,10 @@ export default function FacebookFeed({ pageUrl, width = 400, height = 500 }: Fac
   const src = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(pageUrl)}&tabs=timeline&width=${width}&height=${height}&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`
 
   return (
-    <div className="overflow-hidden rounded-lg shadow-sm bg-white" style={{ maxWidth: width }}>
+    <div className="overflow-hidden rounded-lg shadow-sm bg-white w-full" style={{ maxWidth: width }}>
       <iframe
         src={src}
-        width={width}
+        width="100%"
         height={height}
         style={{ border: 'none', overflow: 'hidden' }}
         scrolling="no"
