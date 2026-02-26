@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import type { NavItem } from '@/sanity/lib/queries'
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
@@ -48,9 +49,22 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
 
 export default function Nav({ navItems }: { navItems?: NavItem[] | null }) {
   const items = (navItems && navItems.length > 0) ? navItems : DEFAULT_NAV_ITEMS
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function isActive(href: string) {
+    if (href === '/') return pathname === '/'
+    if (href.startsWith('http')) return false
+    return pathname === href || pathname.startsWith(href + '/')
+  }
+
+  function isChildActive(href: string) {
+    if (!href || href.startsWith('http')) return false
+    const hrefPath = href.split('#')[0]
+    return pathname === hrefPath || pathname.startsWith(hrefPath + '/')
+  }
 
   function openDropdown(label: string) {
     if (closeTimer.current) clearTimeout(closeTimer.current)
@@ -81,7 +95,11 @@ export default function Nav({ navItems }: { navItems?: NavItem[] | null }) {
             >
               <Link
                 href={item.href}
-                className="px-3 py-2 rounded text-sm font-medium hover:bg-[var(--color-navy)]/10 transition-colors flex items-center gap-1"
+                className={
+                  isActive(item.href)
+                    ? "px-3 py-2 rounded text-sm font-semibold bg-[var(--color-navy)]/15 border-b-2 border-white/80 transition-colors flex items-center gap-1"
+                    : "px-3 py-2 rounded text-sm font-medium hover:bg-[var(--color-navy)]/10 transition-colors flex items-center gap-1"
+                }
               >
                 {item.label}
                 {item.children && <span className="text-xs opacity-60">▾</span>}
@@ -98,7 +116,11 @@ export default function Nav({ navItems }: { navItems?: NavItem[] | null }) {
                       href={child.href}
                       target={'external' in child && child.external ? '_blank' : undefined}
                       rel={'external' in child && child.external ? 'noopener noreferrer' : undefined}
-                      className="block px-4 py-2 text-sm hover:bg-[var(--color-blue-light)] hover:text-[var(--color-blue)] transition-colors"
+                      className={
+                        isChildActive(child.href)
+                          ? "block px-4 py-2 pl-3 text-sm font-semibold text-[var(--color-blue)] bg-[var(--color-blue-light)] border-l-2 border-[var(--color-blue)] transition-colors"
+                          : "block px-4 py-2 text-sm hover:bg-[var(--color-blue-light)] hover:text-[var(--color-blue)] transition-colors"
+                      }
                       onClick={() => setActiveDropdown(null)}
                     >
                       {child.label}
@@ -138,7 +160,11 @@ export default function Nav({ navItems }: { navItems?: NavItem[] | null }) {
             <div key={item.href}>
               <Link
                 href={item.href}
-                className="block py-2 text-sm font-medium border-b border-white/10 text-white"
+                className={
+                  isActive(item.href)
+                    ? "block py-2 pl-2 text-sm font-semibold border-b border-white/10 text-white border-l-2 border-l-white"
+                    : "block py-2 text-sm font-medium border-b border-white/10 text-white"
+                }
                 onClick={() => setOpen(false)}
               >
                 {item.label}
@@ -149,7 +175,11 @@ export default function Nav({ navItems }: { navItems?: NavItem[] | null }) {
                   href={child.href}
                   target={'external' in child && child.external ? '_blank' : undefined}
                   rel={'external' in child && child.external ? 'noopener noreferrer' : undefined}
-                  className="block py-1.5 pl-4 text-sm text-white/70 hover:text-white"
+                  className={
+                    isChildActive(child.href)
+                      ? "block py-1.5 pl-5 text-sm font-semibold text-white"
+                      : "block py-1.5 pl-4 text-sm text-white/70 hover:text-white"
+                  }
                   onClick={() => setOpen(false)}
                 >
                   {child.label}
