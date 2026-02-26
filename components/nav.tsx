@@ -2,14 +2,16 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useRef } from 'react'
+import type { NavItem } from '@/sanity/lib/queries'
 
-const NAV_ITEMS = [
+const DEFAULT_NAV_ITEMS: NavItem[] = [
   {
     label: 'About',
     href: '/about',
     children: [
       { label: 'Who We Are', href: '/about/who-we-are' },
       { label: 'Elected Officials', href: '/elected-officials' },
+      { label: 'Legislative Tracker', href: '/legislative-tracker' },
       { label: 'Democratic Organizations', href: '/links#party' },
     ],
   },
@@ -44,7 +46,8 @@ const NAV_ITEMS = [
   { label: 'Contact', href: '/contact' },
 ]
 
-export default function Nav() {
+export default function Nav({ navItems }: { navItems?: NavItem[] | null }) {
+  const items = (navItems && navItems.length > 0) ? navItems : DEFAULT_NAV_ITEMS
   const [open, setOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -69,7 +72,7 @@ export default function Nav() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-1">
-          {NAV_ITEMS.map((item) => (
+          {items.map((item) => (
             <div
               key={item.href}
               className="relative"
@@ -131,7 +134,7 @@ export default function Nav() {
       {/* Mobile menu */}
       {open && (
         <div className="md:hidden bg-[var(--color-navy)] border-t border-white/10 px-4 pb-4 text-white">
-          {NAV_ITEMS.map((item) => (
+          {items.map((item) => (
             <div key={item.href}>
               <Link
                 href={item.href}

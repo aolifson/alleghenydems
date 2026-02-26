@@ -7,22 +7,25 @@ export const pageType = defineType({
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
+      title: 'Page Title',
       type: 'string',
-      validation: (r) => r.required(),
+      description: 'The page title shown in the browser tab and used to generate the URL slug.',
+      validation: (r) => r.required().error('Page title is required.'),
     }),
     defineField({
       name: 'slug',
-      title: 'Slug',
+      title: 'Slug (URL)',
       type: 'slug',
       options: { source: 'title' },
-      validation: (r) => r.required(),
+      description: 'Auto-generated from the title. Click "Generate" then do not change after publishing — this becomes the page URL.',
+      readOnly: ({ document }) => !!(document?.slug as { current?: string } | undefined)?.current,
+      validation: (r) => r.required().error('Slug is required. Click Generate.'),
     }),
     defineField({
       name: 'heroHeadline',
       title: 'Hero Headline',
       type: 'string',
-      description: 'Large text shown on the page hero banner.',
+      description: 'Large text shown on the page banner at the top. Keep it short.',
     }),
     defineField({
       name: 'heroSubhead',
@@ -35,13 +38,14 @@ export const pageType = defineType({
       title: 'Hero Background Image',
       type: 'image',
       options: { hotspot: true },
+      description: 'Background image for the page banner. Use the focal-point handles to control cropping.',
       fields: [
-        defineField({ name: 'alt', title: 'Alt Text', type: 'string' }),
+        defineField({ name: 'alt', title: 'Alt Text', type: 'string', description: 'Describe the image for screen readers and SEO.' }),
       ],
     }),
     defineField({
       name: 'body',
-      title: 'Content',
+      title: 'Page Content',
       type: 'array',
       of: [
         { type: 'block' },
@@ -49,11 +53,12 @@ export const pageType = defineType({
           type: 'image',
           options: { hotspot: true },
           fields: [
-            defineField({ name: 'alt', title: 'Alt Text', type: 'string' }),
+            defineField({ name: 'alt', title: 'Alt Text', type: 'string', description: 'Describe the image for screen readers.' }),
             defineField({ name: 'caption', title: 'Caption', type: 'string' }),
           ],
         },
       ],
+      description: 'The main content of the page. Use headings, paragraphs, bullet points, and images.',
     }),
   ],
   preview: {

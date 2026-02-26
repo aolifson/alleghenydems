@@ -6,7 +6,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const settings = await getSiteSettings()
   return (
     <>
-      <Nav />
+      <Nav navItems={settings?.navigationItems} />
       <main className="flex-1">{children}</main>
       <Footer settings={settings} />
     </>

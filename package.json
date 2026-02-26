@@ -9,13 +9,16 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@behold/widget": "^0.5.121",
     "@portabletext/react": "^6.0.2",
     "@sanity/image-url": "^2.0.3",
     "@sanity/vision": "^5.12.0",
+    "@types/pdf-parse": "^1.1.5",
     "next": "16.1.6",
     "next-sanity": "^12.1.0",
     "papaparse": "^5.4.1",
+    "pdf-parse": "^2.4.5",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "resend": "^6.9.2",

@@ -1,6 +1,16 @@
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
+import {
+  CalendarIcon,
+  CogIcon,
+  DocumentIcon,
+  DocumentsIcon,
+  EnvelopeIcon,
+  LinkIcon,
+  MasterDetailIcon,
+  UsersIcon,
+} from '@sanity/icons'
 import { schemaTypes } from './sanity/schemaTypes'
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!
@@ -18,26 +28,67 @@ export default defineConfig({
     structureTool({
       structure: (S) =>
         S.list()
-          .title('Content')
+          .title('Allegheny Dems Content')
           .items([
-            // Singleton: Site Settings
+            // ── Site-wide settings (singleton) ──
             S.listItem()
               .title('Site Settings')
+              .icon(CogIcon)
               .id('siteSettings')
               .child(
                 S.document()
                   .schemaType('siteSettings')
                   .documentId('siteSettings')
+                  .title('Site Settings')
               ),
+
             S.divider(),
-            S.documentTypeListItem('event').title('Events'),
-            S.documentTypeListItem('news').title('News & Updates'),
+
+            // ── Main content ──
+            S.documentTypeListItem('event')
+              .title('Events')
+              .icon(CalendarIcon),
+
+            S.documentTypeListItem('news')
+              .title('News & Updates')
+              .icon(DocumentsIcon),
+
+            S.documentTypeListItem('voterGuide')
+              .title('Voter Guides')
+              .icon(MasterDetailIcon),
+
             S.divider(),
-            S.documentTypeListItem('committeeMember').title('Committee Members'),
-            S.documentTypeListItem('externalLink').title('External Links'),
+
+            // ── Committee & People ──
+            S.listItem()
+              .title('Committee & People')
+              .icon(UsersIcon)
+              .child(
+                S.list()
+                  .title('Committee & People')
+                  .items([
+                    S.documentTypeListItem('committeeMember').title('Committee Members').icon(UsersIcon),
+                    S.documentTypeListItem('committeeDirectoryEntry').title('Committee Directory').icon(DocumentsIcon),
+                    S.documentTypeListItem('committeeContactEntry').title('Committee Contacts').icon(EnvelopeIcon),
+                  ])
+              ),
+
             S.divider(),
-            S.documentTypeListItem('page').title('Pages'),
-            S.documentTypeListItem('voterGuide').title('Voter Guides'),
+
+            // ── Advanced / Developers ──
+            S.listItem()
+              .title('External Links')
+              .icon(LinkIcon)
+              .child(S.documentTypeList('externalLink').title('External Links')),
+
+            S.listItem()
+              .title('Pages (Advanced)')
+              .icon(DocumentIcon)
+              .child(
+                S.documentTypeList('page')
+                  .title('Pages')
+              ),
+
           ]),
     }),
     visionTool(),

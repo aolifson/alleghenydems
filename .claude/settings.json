@@ -4,7 +4,9 @@
       "Bash(ls -la /Users/alanolifson/programming/alleghenydems/app/\\\\\\(site\\\\\\)/)",
       "Bash(ls -la /Users/alanolifson/programming/alleghenydems/app/\\\\\\(site\\\\\\)/news/)",
       "Bash(npx tsc --noEmit)",
-      "Bash(node -e \"const m = require\\(''@sanity/image-url''\\); console.log\\(Object.keys\\(m\\)\\)\")"
+      "Bash(node -e \"const m = require\\(''@sanity/image-url''\\); console.log\\(Object.keys\\(m\\)\\)\")",
+      "Bash(node -e \"const icons = require\\(''/Users/alanolifson/programming/alleghenydems/node_modules/@sanity/icons''\\); console.log\\(Object.keys\\(icons\\).filter\\(k => k.endsWith\\(''Icon''\\)\\).sort\\(\\).join\\(''\\\\n''\\)\\)\")",
+      "Bash(node -e \"const icons = require\\(''/Users/alanolifson/programming/alleghenydems/node_modules/@sanity/icons''\\); console.log\\(Object.keys\\(icons\\).filter\\(k => k.endsWith\\(''Icon''\\)\\).filter\\(k => [''Cog'',''Gear'',''Settings'',''Config'',''Admin''].some\\(s => k.includes\\(s\\)\\)\\).join\\(''\\\\n''\\)\\)\")"
     ]
   }
 }

@@ -35,30 +35,38 @@ export const committeeDirectoryEntryType = defineType({
       name: 'committeeOffice',
       title: 'Committee Office',
       type: 'string',
+      description: 'e.g. Chair, Vice Chair, Committee Person',
     }),
     defineField({
       name: 'isActive',
       title: 'Active',
       type: 'boolean',
       initialValue: true,
+      description: 'Turn off to hide this entry without deleting it.',
     }),
     defineField({
       name: 'displayOrder',
       title: 'Display Order',
       type: 'number',
-      description: 'Used to preserve table row order from import.',
+      description: 'Controls the order within this committee/ward. Lower numbers appear first.',
     }),
     defineField({
       name: 'sourceTableId',
-      title: 'Source Table ID',
+      title: 'Source Table ID (System)',
       type: 'number',
+      description: 'Auto-assigned during import. Do not edit.',
       readOnly: true,
+      hidden: ({ currentUser }) =>
+        !currentUser?.roles?.some((r: { name: string }) => r.name === 'administrator'),
     }),
     defineField({
       name: 'sourceRowId',
-      title: 'Source Row ID',
+      title: 'Source Row ID (System)',
       type: 'number',
+      description: 'Auto-assigned during import. Do not edit.',
       readOnly: true,
+      hidden: ({ currentUser }) =>
+        !currentUser?.roles?.some((r: { name: string }) => r.name === 'administrator'),
     }),
   ],
   orderings: [

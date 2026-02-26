@@ -80,6 +80,20 @@ export interface ExternalLink extends SanityDocument {
   displayOrder?: number
 }
 
+export interface NavChild {
+  _key?: string
+  label: string
+  href: string
+  external?: boolean
+}
+
+export interface NavItem {
+  _key?: string
+  label: string
+  href: string
+  children?: NavChild[]
+}
+
 export interface SiteSettings extends SanityDocument {
   heroHeadline?: string
   heroSubtext?: string
@@ -94,6 +108,7 @@ export interface SiteSettings extends SanityDocument {
   googleCalendarEmbedUrl?: string
   googleAnalyticsId?: string
   facebookPixelId?: string
+  navigationItems?: NavItem[]
 }
 
 export interface PageDocument extends SanityDocument {
