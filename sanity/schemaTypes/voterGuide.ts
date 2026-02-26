@@ -138,6 +138,27 @@ export const voterGuideDistrictType = defineType({
       description: 'Optional geographic description of this district.',
     }),
     defineField({
+      name: 'searchTerms',
+      title: 'Search Terms',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'Optional aliases for district lookup, e.g. Mt Lebanon, Squirrel Hill, Monroeville.',
+    }),
+    defineField({
+      name: 'zipCodes',
+      title: 'ZIP Codes',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'Optional ZIP codes used for district lookup. Use 5-digit ZIPs only.',
+      validation: (rule) =>
+        rule.custom((value) => {
+          if (!value) return true
+          if (!Array.isArray(value)) return 'ZIP Codes must be a list.'
+          const invalid = value.find((zip) => !/^\d{5}$/.test(String(zip).trim()))
+          return invalid ? `Invalid ZIP code: ${invalid}` : true
+        }),
+    }),
+    defineField({
       name: 'candidates',
       title: 'Candidates',
       type: 'array',

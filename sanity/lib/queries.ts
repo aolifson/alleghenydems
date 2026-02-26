@@ -138,6 +138,8 @@ export interface VoterGuideDistrict {
   _key?: string
   districtLabel: string
   districtDescription?: string
+  searchTerms?: string[]
+  zipCodes?: string[]
   candidates: VoterGuideCandidate[]
   displayOrder?: number
 }

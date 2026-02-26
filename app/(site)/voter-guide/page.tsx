@@ -1,22 +1,14 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { PortableText } from '@portabletext/react'
-import SocialLinks from '@/components/social-links'
-import { urlFor } from '@/sanity/lib/image'
+import VoterGuideDistrictLookup from '@/components/voter-guide-district-lookup'
 import {
   getLatestVoterGuide,
   getVoterGuideBySlug,
-  type VoterGuideCandidate,
 } from '@/sanity/lib/queries'
 
 export const metadata: Metadata = { title: '2026 Voter Guide' }
 export const revalidate = 3600
-
-function candidateStatusLabel(status?: VoterGuideCandidate['ballotStatus']) {
-  if (status === 'alsoAppearing') return 'Also Appearing On Ballot'
-  if (status === 'appearing') return 'Appearing On Ballot'
-  return null
-}
 
 export default async function VoterGuidePage() {
   const guide = (await getVoterGuideBySlug('voter-guide-2026')) ?? (await getLatestVoterGuide())
@@ -68,118 +60,7 @@ export default async function VoterGuidePage() {
           </section>
         )}
 
-        {races.map((race) => (
-          <section key={race._key ?? race.officeTitle} className="bg-white rounded-lg overflow-hidden border border-white/40 shadow-sm">
-            <div className="bg-[var(--color-navy)] text-white px-6 py-4">
-              <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide">{race.officeTitle}</h2>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr]">
-              <aside className="bg-[var(--color-blue-light)] px-6 py-5 border-b lg:border-b-0 lg:border-r border-[var(--color-border)]">
-                {race.term && (
-                  <div className="mb-5">
-                    <p className="text-xs uppercase tracking-wide font-semibold text-[var(--color-text-muted)]">Term</p>
-                    <p className="font-semibold text-[var(--color-navy)]">{race.term}</p>
-                  </div>
-                )}
-                {race.annualSalary && (
-                  <div className="mb-5">
-                    <p className="text-xs uppercase tracking-wide font-semibold text-[var(--color-text-muted)]">Annual Salary</p>
-                    <p className="font-semibold text-[var(--color-navy)]">{race.annualSalary}</p>
-                  </div>
-                )}
-                {race.powersAndDuties && race.powersAndDuties.length > 0 && (
-                  <div>
-                    <p className="text-xs uppercase tracking-wide font-semibold text-[var(--color-text-muted)] mb-2">Powers & Duties</p>
-                    <ul className="space-y-1.5 text-sm text-[var(--color-text)]">
-                      {race.powersAndDuties.map((duty) => (
-                        <li key={duty} className="leading-relaxed">• {duty}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </aside>
-
-              <div className="px-6 py-6 space-y-6">
-                {[...(race.districts ?? [])]
-                  .sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
-                  .map((district) => (
-                    <article key={district._key ?? district.districtLabel} className="space-y-3">
-                      <h3 className="text-xl font-bold text-[var(--color-blue-mid)] uppercase tracking-wide">{district.districtLabel}</h3>
-                      {district.districtDescription && (
-                        <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">
-                          {district.districtDescription}
-                        </p>
-                      )}
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {[...(district.candidates ?? [])]
-                          .sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
-                          .map((candidate) => {
-                            const status = candidateStatusLabel(candidate.ballotStatus)
-                            return (
-                              <div key={candidate._key ?? candidate.name} className="rounded-lg border border-[var(--color-border)] p-4 bg-white">
-                                {candidate.endorsedByAcdc && (
-                                  <div className="mb-3 inline-flex items-center rounded-r-sm bg-[var(--color-navy)] text-white px-3 py-1 text-xs font-bold uppercase tracking-wide">
-                                    Endorsed by ACDC
-                                  </div>
-                                )}
-                                <div className="flex gap-3">
-                                  {candidate.photo ? (
-                                    <div className="relative h-20 w-20 shrink-0 rounded overflow-hidden border border-[var(--color-border)]">
-                                      <Image
-                                        src={urlFor(candidate.photo).width(160).height(160).url()}
-                                        alt={candidate.photo.alt ?? candidate.name}
-                                        fill
-                                        className="object-cover"
-                                      />
-                                    </div>
-                                  ) : (
-                                    <div className="h-20 w-20 shrink-0 rounded bg-[var(--color-blue-light)] border border-[var(--color-border)] flex items-center justify-center font-bold text-[var(--color-blue-mid)]">
-                                      {candidate.name.charAt(0)}
-                                    </div>
-                                  )}
-
-                                  <div className="min-w-0">
-                                    <h4 className="font-semibold text-[var(--color-navy)]">{candidate.name}</h4>
-                                    {candidate.campaignWebsite && (
-                                      <a
-                                        href={candidate.campaignWebsite}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-sm text-[var(--color-blue-mid)] hover:underline break-all"
-                                      >
-                                        {candidate.campaignWebsite.replace(/^https?:\/\//, '')}
-                                      </a>
-                                    )}
-                                    {status && (
-                                      <p className="mt-1 text-xs font-semibold text-[var(--color-red)] uppercase tracking-wide">{status}</p>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {candidate.description && (
-                                  <p className="mt-3 text-sm text-[var(--color-text)] leading-relaxed whitespace-pre-line">
-                                    {candidate.description}
-                                  </p>
-                                )}
-
-                                <SocialLinks
-                                  className="justify-start mt-3"
-                                  facebookUrl={candidate.facebookUrl}
-                                  instagramUrl={candidate.instagramUrl}
-                                  xUrl={candidate.xUrl}
-                                />
-                              </div>
-                            )
-                          })}
-                      </div>
-                    </article>
-                  ))}
-              </div>
-            </div>
-          </section>
-        ))}
+        <VoterGuideDistrictLookup races={races} />
       </div>
     </main>
   )
