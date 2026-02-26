@@ -445,6 +445,139 @@ const ACTIONS: ActionEntry[] = [
 ]
 
 /* ------------------------------------------------------------------ */
+/*  Hyperlocal borough-level data                                      */
+/* ------------------------------------------------------------------ */
+
+type LocalEntry = {
+  community: string
+  outcome: 'helped' | 'hurt' | 'ongoing'
+  party: 'D' | 'R' | 'both'
+  summary: string
+  detail: string
+  date: string
+  sourceLabel: string
+  sourceUrl: string
+}
+
+const LOCAL_ENTRIES: LocalEntry[] = [
+  // ---- DEMOCRATIC WINS / HELP ----
+  {
+    community: 'Wilkinsburg',
+    outcome: 'helped',
+    party: 'D',
+    summary: '$10M+ in state grants to replace lead water pipes — free to homeowners',
+    detail:
+      'The Wilkinsburg-Penn Joint Water Authority received two PENNVEST tranches under Gov. Shapiro: $6.8M grant + $3.1M loan (Oct 2024) for ~1,060 lead lines, and $3.9M grant + $6.1M loan (Jan 2025) for additional lines. Property owners had their privately-owned lead service lines replaced at no cost.',
+    date: '2024–2025',
+    sourceLabel: 'PA.gov — PENNVEST October 2024 Board Meeting',
+    sourceUrl: 'https://www.pa.gov/agencies/pennvest/pennvest-newsroom/-216-3-million-investment-in-water-infrastructure-projects-in-21/',
+  },
+  {
+    community: 'Highlands School District (Brackenridge, Tarentum, Harrison Township)',
+    outcome: 'helped',
+    party: 'D',
+    summary: '$740,000+ school funding increase under Shapiro adequacy formula',
+    detail:
+      'The Highlands School District received a $740,000+ increase in state funding for the 2024–25 school year, bringing total state aid to $19.2 million. Gov. Shapiro and Democratic legislators celebrated the increase as part of the new adequacy funding formula designed to correct decades of underfunding.',
+    date: '2024–2025',
+    sourceLabel: 'PA.gov — Gov. Shapiro Celebrates K-12 Funding at Highlands',
+    sourceUrl: 'https://www.pa.gov/governor/newsroom/2024-press-releases/gov-shapiro--leg--ed--students-celebrate-k-12-funding-highlands-',
+  },
+  {
+    community: 'All 130 Allegheny County Municipalities',
+    outcome: 'helped',
+    party: 'D',
+    summary: '$130M in American Rescue Plan funds distributed to every borough and township',
+    detail:
+      'The Biden administration\'s American Rescue Plan delivered $130 million to Allegheny County\'s 130 municipalities. For communities like Penn Hills, the allocation equaled 30% of their entire municipal budget. Most small boroughs used the funds for road repairs, community center upgrades, and emergency infrastructure.',
+    date: '2021–2024',
+    sourceLabel: 'Next Pittsburgh — How Allegheny County Municipalities Spent ARPA Money',
+    sourceUrl: 'https://nextpittsburgh.com/features/how-are-allegheny-county-municipalities-spending-american-rescue-plan-money/',
+  },
+  {
+    community: 'McKees Rocks area (West View Water Authority)',
+    outcome: 'helped',
+    party: 'D',
+    summary: '$8M federal grant to replace 750 lead pipes in underserved communities',
+    detail:
+      'The West View Water Authority, which serves McKees Rocks and surrounding communities, received $8 million through Biden\'s Bipartisan Infrastructure Law to replace 750 lead service lines in underserved Allegheny County neighborhoods.',
+    date: '2023–2025',
+    sourceLabel: 'US EPA — Biden Admin Announces $152M for PA Lead Pipe Replacement',
+    sourceUrl: 'https://www.epa.gov/newsreleases/biden-harris-administration-announces-over-152-million-pennsylvania-lead-pipe',
+  },
+  {
+    community: 'Braddock, North Braddock, East Pittsburgh',
+    outcome: 'helped',
+    party: 'D',
+    summary: '$6.1M class-action settlement for U.S. Steel air pollution affecting residents',
+    detail:
+      'A class-action settlement was approved in March 2025 against U.S. Steel\'s Edgar Thomson Plant, covering 3,700 households within one mile of the plant for "noxious odors and fugitive dust" from 2020 onward. The settlement includes $1.5M for residents and $4.6M in on-site environmental improvements — the result of Biden-era EPA enforcement.',
+    date: 'March 2025',
+    sourceLabel: 'Allegheny Front — U.S. Steel Agrees to $1.5M Settlement',
+    sourceUrl: 'https://www.alleghenyfront.org/us-steel-class-action-settlement-edgar-thomson-plant-braddock-air-pollution/',
+  },
+
+  // ---- REPUBLICAN ACTIONS THAT HURT ----
+  {
+    community: 'Braddock, Homestead, Swissvale, Wilmerding, Wilkinsburg',
+    outcome: 'hurt',
+    party: 'R',
+    summary: 'Trump EPA cancelled $930K green infrastructure grant days before work was set to begin',
+    detail:
+      'In March 2025, the Trump administration\'s EPA cancelled a $930,000 Allegheny County Health Department grant for 10 stormwater mitigation projects across Braddock, Homestead, Swissvale, Wilmerding, and others. Work was scheduled to begin days later. The EPA\'s termination letter stated it would not support programs linked to "environmental justice" or "DEI." Projects included rainwater capture systems and debris cleanups designed to reduce flooding in low-income communities.',
+    date: 'March 2025',
+    sourceLabel: 'PublicSource — Allegheny County Loses Millions in Green Infrastructure Grants',
+    sourceUrl: 'https://www.publicsource.org/allegheny-county-environmental-funding-cuts-epa-deregulation/',
+  },
+  {
+    community: 'All PA municipalities (incl. every Allegheny County borough)',
+    outcome: 'hurt',
+    party: 'R',
+    summary: 'Republican Congress eliminated all Community Project Funding for FY2025, wiping out vetted local infrastructure grants',
+    detail:
+      'A Republican-led Congress passed a short-term spending bill for FY2025 that eliminated all Community Project Funding — the mechanism used by reps like Chris Deluzio and Summer Lee to direct infrastructure dollars to specific local projects. Communities across Pennsylvania lost police equipment upgrades, flood control projects, and emergency communications improvements that had already been fully vetted and approved.',
+    date: '2025',
+    sourceLabel: 'WHYY — Pennsylvania Lost Millions in Federal Infrastructure Funding',
+    sourceUrl: 'https://whyy.org/articles/pennsylvania-budget-federal-infrastructure-funding/',
+  },
+
+  // ---- ONGOING CRISES ----
+  {
+    community: 'Stowe Township, McKees Rocks (Sto-Rox School District)',
+    outcome: 'ongoing',
+    party: 'both',
+    summary: 'School district in financial recovery — 92.7% of students economically disadvantaged, highest tax burden in county',
+    detail:
+      'The Sto-Rox School District has been in "moderate financial recovery" status since July 2021. Over 92.7% of its 1,190 students are economically disadvantaged — yet residents face the highest local tax effort index (1.58) in Allegheny County. The district\'s enrollment has fallen 20.1% over five years. Democrats secured $14.4M in federal ESSER funds and $12.6M in state empowerment grants, but these were one-time sources. The root cause — Pennsylvania\'s school funding formula — has been challenged in court and partially fixed by Democratic legislation, but full equity remains unachieved.',
+    date: '2021–present',
+    sourceLabel: 'PublicSource — The Sto-Rox School District\'s 5-Year Struggle to Survive',
+    sourceUrl: 'https://www.publicsource.org/sto-rox-school-district-began-5-year-struggle-to-survive/',
+  },
+  {
+    community: 'Etna',
+    outcome: 'ongoing',
+    party: 'both',
+    summary: 'Record flooding in April 2024 — Pine Creek reached 14 feet, dozens of homes and businesses damaged',
+    detail:
+      'On April 12, 2024, near-record rainfall caused Pine Creek to reach 14 feet in Etna, forcing evacuations of Sycamore, Cherry, and Railroad/Middle Streets. The National Weather Service called it a "one in 10 to 20 year event." Water backed into dozens of homes and businesses. The flooding highlights the urgent need for stormwater infrastructure investment — the same kind of green infrastructure that Trump\'s EPA cancelled in March 2025.',
+    date: 'April 2024',
+    sourceLabel: 'Pittsburgh Post-Gazette — Allegheny County Communities Hit Hard by Major Flooding',
+    sourceUrl: 'https://www.post-gazette.com/news/weather-news/2024/04/12/ohio-river-flooding-storms-cleanup-etna-millvale-oakdale/',
+  },
+  {
+    community: 'McKees Rocks',
+    outcome: 'ongoing',
+    party: 'both',
+    summary: 'Mazzaro Landfill Superfund Site — abandoned industrial waste site under active remediation',
+    detail:
+      'The Mazzaro Landfill, used from the 1940s through 1972 and containing unknown industrial waste and exposed drums, is an active EPA Superfund site in McKees Rocks. The PA DEP issued a remedial response notice in February 2021 with a public hearing in April 2021. Remediation is ongoing.',
+    date: '2021–present',
+    sourceLabel: 'US EPA Superfund Site Profile — Mazzaro Landfill',
+    sourceUrl: 'https://cumulis.epa.gov/supercpad/CurSites/csitinfo.cfm?id=0300457',
+  },
+]
+
+/* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -513,6 +646,18 @@ export default function LegislativeTrackerPage() {
           Blocked or Harmful ({blockedOrHarmful.length})
         </a>
         <a
+          href="#hyperlocal"
+          className="px-4 py-2 text-sm font-semibold rounded bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors"
+        >
+          Your Borough, Your Story ({LOCAL_ENTRIES.length})
+        </a>
+        <a
+          href="#fact-checks"
+          className="px-4 py-2 text-sm font-semibold rounded bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors"
+        >
+          Fact Checks
+        </a>
+        <a
           href="#find-your-district"
           className="px-4 py-2 text-sm font-semibold rounded bg-[var(--color-blue-light)] text-[var(--color-blue)] hover:opacity-80 transition-colors"
         >
@@ -562,6 +707,108 @@ export default function LegislativeTrackerPage() {
             </div>
           )
         })}
+      </section>
+
+      {/* =========== HYPERLOCAL =========== */}
+      <section id="hyperlocal" className="mb-16">
+        <h2 className="text-2xl font-display font-bold text-yellow-800 border-b-2 border-yellow-300 pb-2 mb-2">
+          Your Borough, Your Story
+        </h2>
+        <p className="text-sm text-[var(--color-text-muted)] mb-6">
+          How state and federal policy decisions have played out in specific Allegheny County communities — the things
+          that affect your street, your school, your water.
+        </p>
+        <div className="space-y-4">
+          {LOCAL_ENTRIES.map((entry, i) => (
+            <LocalCard key={i} entry={entry} />
+          ))}
+        </div>
+      </section>
+
+      {/* =========== FACT CHECKS =========== */}
+      <section id="fact-checks" className="mb-16">
+        <h2 className="text-2xl font-display font-bold text-purple-800 border-b-2 border-purple-300 pb-2 mb-6">
+          Fact Checks — Separating Truth from Political Spin
+        </h2>
+        <p className="text-sm text-[var(--color-text-muted)] mb-6">
+          Some stories circulating in our communities are accurate. Others are exaggerated, misattributed,
+          or simply false. Here we research the most-heard claims and tell you exactly what we found.
+        </p>
+
+        {/* BLAWNOX BOAT */}
+        <div className="border border-purple-200 rounded-lg overflow-hidden mb-6">
+          <div className="bg-purple-50 px-5 py-3 flex items-center gap-3">
+            <span className="text-lg font-bold text-purple-700">CLAIM</span>
+            <span className="text-sm text-purple-900 font-medium">
+              &ldquo;A boat broke loose, crashed in Blawnox, and federal aid to remove it was blocked because Pittsburgh is a sanctuary city.&rdquo;
+            </span>
+          </div>
+          <div className="px-5 py-4 bg-white">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="bg-orange-100 text-orange-800 border border-orange-300 text-xs font-bold px-3 py-1 rounded">
+                ⚠ UNVERIFIED / MISLEADING
+              </span>
+            </div>
+            <div className="space-y-3 text-sm text-[var(--color-text)]">
+              <p>
+                <strong>The boat:</strong> We found no news coverage of a boat breaking loose and crashing in Blawnox.
+                There are references to an abandoned boat in Blawnox that took months to remove, and other river
+                incidents in the area — but the specific &ldquo;broke loose and crashed&rdquo; incident cannot be verified
+                from any public record or news source.
+              </p>
+              <p>
+                <strong>The sanctuary city funding claim:</strong> This part is where the story breaks down factually.
+                In April–May 2025, the Trump administration did designate Pittsburgh and Allegheny County as
+                &ldquo;sanctuary jurisdictions&rdquo; and threatened to cut federal funding. However:
+              </p>
+              <ul className="list-disc pl-5 space-y-1 text-[var(--color-text)]">
+                <li>A federal judge blocked those funding cuts on <strong>April 24, 2025</strong>, ruling them unconstitutional.</li>
+                <li>By <strong>August 5, 2025</strong>, Pittsburgh and Allegheny County were quietly removed from the
+                sanctuary list entirely — without changing any local policies.</li>
+                <li>No federal aid was ever actually withheld from Allegheny County or any of its boroughs.</li>
+                <li>Blawnox is a <em>separate municipality</em> from Pittsburgh. Pittsburgh&rsquo;s sanctuary policies
+                have no legal mechanism to affect a different borough&rsquo;s federal funding eligibility.</li>
+              </ul>
+              <p>
+                <strong>Our assessment:</strong> The story appears to combine a real (but unverified) local incident
+                with the Trump administration&rsquo;s sanctuary city political campaign to create a causal story that
+                courts have ruled legally impossible. It&rsquo;s worth noting that the threat itself <em>was</em> real — and
+                it was Republicans who created that uncertainty, and the courts (not Republicans) who stopped it.
+              </p>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-3 text-xs">
+              <a
+                href="https://www.wesa.fm/politics-government/2025-08-22/sanctuary-city-pittsburgh-allegheny-federal"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--color-blue)] hover:underline"
+              >
+                Source: WESA — Pittsburgh, Allegheny County removed from DOJ sanctuary list ↗
+              </a>
+              <a
+                href="https://www.publicrightsproject.org/news-insights/press-releases/court-rules-trump-administration-cannot-withhold-or-freeze-federal-funding-to-cities-and-counties-it-labels-as-sanctuary-jurisdictions/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--color-blue)] hover:underline"
+              >
+                Source: Public Rights Project — Court Blocks Trump Funding Cuts ↗
+              </a>
+              <a
+                href="https://www.wpxi.com/news/local/trump-administration-names-pittsburgh-allegheny-county-sanctuary-jurisdictions/VHJKGD5HCBEOBLKTUQVWA54RXU/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--color-blue)] hover:underline"
+              >
+                Source: WPXI — Trump Names Pittsburgh/Allegheny Sanctuary Jurisdictions ↗
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-sm text-[var(--color-text-muted)] italic">
+          Have a claim you want us to fact-check?{' '}
+          <a href="/contact" className="text-[var(--color-blue)] underline hover:no-underline">Send it to us</a>.
+        </p>
       </section>
 
       {/* =========== FIND YOUR DISTRICT =========== */}
@@ -704,6 +951,38 @@ function ActionCard({ item }: { item: ActionEntry }) {
           {item.municipalities.join(' · ')}
         </p>
       </details>
+    </article>
+  )
+}
+
+function LocalCard({ entry }: { entry: LocalEntry }) {
+  const outcomeStyles = {
+    helped: { badge: 'bg-green-100 text-green-800 border-green-300', label: '✓ Helped community', bar: 'bg-green-500' },
+    hurt:   { badge: 'bg-red-100 text-red-800 border-red-300',   label: '✗ Hurt community',   bar: 'bg-red-500' },
+    ongoing:{ badge: 'bg-yellow-100 text-yellow-800 border-yellow-300', label: '⚠ Ongoing issue', bar: 'bg-yellow-400' },
+  }
+  const style = outcomeStyles[entry.outcome]
+
+  return (
+    <article className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow bg-white">
+      <div className={`h-1 ${style.bar}`} />
+      <div className="p-4">
+        <div className="flex flex-wrap items-center gap-2 mb-2">
+          <span className="font-bold text-sm text-[var(--color-blue)]">{entry.community}</span>
+          <span className={`text-xs font-semibold px-2 py-0.5 rounded border ${style.badge}`}>{style.label}</span>
+          <span className="text-xs text-[var(--color-text-muted)]">{entry.date}</span>
+        </div>
+        <p className="font-semibold text-sm text-[var(--color-text)] mb-2">{entry.summary}</p>
+        <p className="text-sm text-[var(--color-text)] mb-3">{entry.detail}</p>
+        <a
+          href={entry.sourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs font-medium text-[var(--color-blue)] hover:underline"
+        >
+          Source: {entry.sourceLabel} ↗
+        </a>
+      </div>
     </article>
   )
 }

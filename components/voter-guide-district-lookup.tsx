@@ -291,6 +291,12 @@ export default function VoterGuideDistrictLookup({ races }: Props) {
   const hasQuery = query.trim().length > 0
   const hasAnyDistrictMatch = matchResults.some((race) => race.matches.length > 0)
   const zipQuery = query.trim().match(/^\d{5}$/)?.[0]
+  const zipMatchSummary = useMemo(() => {
+    if (!zipQuery) return []
+    return matchResults.flatMap((result) =>
+      result.matches.map((match) => `${result.race.officeTitle}: ${match.district.districtLabel}`)
+    )
+  }, [matchResults, zipQuery])
 
   const racesToRender = useMemo(() => {
     if (!hasQuery) {
@@ -345,6 +351,11 @@ export default function VoterGuideDistrictLookup({ races }: Props) {
         {zipQuery && (
           <p className="mt-2 text-xs text-[var(--color-text-muted)]">
             ZIP results come from district ZIP mappings in Sanity. If a ZIP returns no district matches, add it under the district&apos;s `ZIP Codes` field.
+          </p>
+        )}
+        {zipQuery && hasAnyDistrictMatch && (
+          <p className="mt-2 text-xs text-[var(--color-text-muted)]">
+            ZIP {zipQuery} matched {zipMatchSummary.length} district race{zipMatchSummary.length === 1 ? '' : 's'}: {zipMatchSummary.join(' · ')}.
           </p>
         )}
 

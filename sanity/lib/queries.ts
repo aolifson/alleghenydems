@@ -293,14 +293,17 @@ export async function getPageBySlug(slug: string): Promise<PageDocument | null> 
 }
 
 export async function getVoterGuideBySlug(slug: string): Promise<VoterGuideDocument | null> {
-  return client.fetch(
+  return client.withConfig({ useCdn: false }).fetch(
     `*[_type == "voterGuide" && slug.current == $slug][0]`,
-    { slug }
+    { slug },
+    { cache: 'no-store' }
   )
 }
 
 export async function getLatestVoterGuide(): Promise<VoterGuideDocument | null> {
-  return client.fetch(
-    `*[_type == "voterGuide"] | order(cycleYear desc, _updatedAt desc)[0]`
+  return client.withConfig({ useCdn: false }).fetch(
+    `*[_type == "voterGuide"] | order(cycleYear desc, _updatedAt desc)[0]`,
+    {},
+    { cache: 'no-store' }
   )
 }
