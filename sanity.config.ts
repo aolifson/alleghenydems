@@ -57,6 +57,10 @@ export default defineConfig({
               .title('Voter Guides')
               .icon(MasterDetailIcon),
 
+            S.documentTypeListItem('legislativeTracker')
+              .title('Legislative Tracker')
+              .icon(DocumentsIcon),
+
             S.divider(),
 
             // ── Committee & People ──

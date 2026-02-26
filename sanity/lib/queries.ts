@@ -166,6 +166,68 @@ export interface VoterGuideDocument extends SanityDocument {
   sourcePdfTitle?: string
 }
 
+export interface LegislativeAction {
+  _key?: string
+  official: string
+  party: 'D' | 'R'
+  office: string
+  description: string
+  date: string
+  type: 'accomplishment' | 'blocked' | 'harmful'
+  category: string
+  sourceLabel: string
+  sourceUrl: string
+  municipalities?: string[]
+  displayOrder?: number
+}
+
+export interface LegislativeLocalEntry {
+  _key?: string
+  community: string
+  outcome: 'helped' | 'hurt' | 'ongoing'
+  party: 'D' | 'R' | 'both'
+  summary: string
+  detail: string
+  date: string
+  sourceLabel: string
+  sourceUrl: string
+  displayOrder?: number
+}
+
+export interface LegislativeExternalLink {
+  _key?: string
+  label: string
+  url: string
+  description?: string
+  displayOrder?: number
+}
+
+export interface LegislativeOfficialRow {
+  _key?: string
+  official: string
+  office: string
+  municipalities: string
+  displayOrder?: number
+}
+
+export interface LegislativeTrackerDocument extends SanityDocument {
+  title: string
+  slug: { current: string }
+  heroHeadline?: string
+  heroSubhead?: string
+  heroImage?: SanityImage
+  categories?: string[]
+  actions?: LegislativeAction[]
+  localEntries?: LegislativeLocalEntry[]
+  districtLookupIntro?: string
+  districtLookupLinks?: LegislativeExternalLink[]
+  officialTableIntro?: string
+  republicanOfficials?: LegislativeOfficialRow[]
+  aboutTitle?: string
+  aboutBody?: string
+  lastUpdatedNote?: string
+}
+
 function dedupeMembersByName<T extends CommitteeMember>(members: T[]): T[] {
   const seen = new Set<string>()
   return members.filter((member) => {
@@ -304,6 +366,14 @@ export async function getLatestVoterGuide(): Promise<VoterGuideDocument | null> 
   return client.withConfig({ useCdn: false }).fetch(
     `*[_type == "voterGuide"] | order(cycleYear desc, _updatedAt desc)[0]`,
     {},
+    { cache: 'no-store' }
+  )
+}
+
+export async function getLegislativeTrackerBySlug(slug: string): Promise<LegislativeTrackerDocument | null> {
+  return client.withConfig({ useCdn: false }).fetch(
+    `*[_type == "legislativeTracker" && slug.current == $slug][0]`,
+    { slug },
     { cache: 'no-store' }
   )
 }

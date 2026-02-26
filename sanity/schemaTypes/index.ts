@@ -12,6 +12,13 @@ import {
   voterGuideRaceType,
   voterGuideType,
 } from './voterGuide'
+import {
+  legislativeActionType,
+  legislativeExternalLinkType,
+  legislativeLocalEntryType,
+  legislativeOfficialRowType,
+  legislativeTrackerType,
+} from './legislativeTracker'
 
 export const schemaTypes = [
   siteSettingsType,
@@ -26,4 +33,9 @@ export const schemaTypes = [
   voterGuideDistrictType,
   voterGuideRaceType,
   voterGuideType,
+  legislativeActionType,
+  legislativeExternalLinkType,
+  legislativeLocalEntryType,
+  legislativeOfficialRowType,
+  legislativeTrackerType,
 ]

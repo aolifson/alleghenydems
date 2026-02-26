@@ -1,0 +1,774 @@
+{
+  "metadata": {
+    "backedUpAt": "2026-02-26T15:15:44.124273+00:00",
+    "projectId": "mfzgc4rr",
+    "dataset": "production",
+    "documentId": "legislative-tracker"
+  },
+  "document": {
+    "_createdAt": "2026-02-26T15:14:50Z",
+    "_id": "legislative-tracker",
+    "_rev": "Hf5D95qY1zDCVCTkGpfQzR",
+    "_type": "legislativeTracker",
+    "_updatedAt": "2026-02-26T15:14:50Z",
+    "aboutBody": "Every item on this page links to a public source \u2014 news articles, official press releases, legislative records, or nonpartisan reporting \u2014 so you can verify the facts yourself. We are committed to accuracy. If you believe anything here is incorrect or missing context, please contact us.",
+    "aboutTitle": "About this page",
+    "actions": [
+      {
+        "_key": "19f1cb825231",
+        "_type": "legislativeAction",
+        "category": "Infrastructure & Jobs",
+        "date": "2023\u20132024",
+        "description": "Secured over $800 million in federal dollars for Western PA, including $159 million for Pittsburgh regional transit, a $50 million HUD Choice Housing grant to revitalize Bedford Dwellings and the Hill District, $4.1 million for EV charging in Allegheny County, and $800,000 Reconnecting Communities grant for the Turtle Creek Valley.",
+        "displayOrder": 0,
+        "municipalities": [
+          "Pittsburgh (all wards)",
+          "Turtle Creek",
+          "Braddock",
+          "Homestead",
+          "McKeesport",
+          "Duquesne",
+          "Clairton",
+          "Monroeville",
+          "Plum",
+          "Munhall",
+          "West Mifflin",
+          "Whitehall",
+          "Bethel Park",
+          "Jefferson Hills",
+          "Pleasant Hills"
+        ],
+        "office": "U.S. House \u2014 District 12",
+        "official": "Rep. Summer Lee",
+        "party": "D",
+        "sourceLabel": "Summer Lee Fact Sheet \u2014 $800 M Delivered",
+        "sourceUrl": "https://summerlee.house.gov/newsroom/press-releases/fact-sheet-rep-summer-lee-announces-over-800-million-federal-dollars-delivered-to-western-pa",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "83158685f216",
+        "_type": "legislativeAction",
+        "category": "Infrastructure & Jobs",
+        "date": "2023",
+        "description": "Co-secured $142.34 million for Pittsburgh's Parkway East and MLK Jr. East Busway improvements, generating an estimated 2,500 jobs and $254.9 million in economic value.",
+        "displayOrder": 1,
+        "municipalities": [
+          "Pittsburgh (East End wards)",
+          "Monroeville",
+          "Wilkinsburg",
+          "Swissvale",
+          "Edgewood",
+          "Churchill",
+          "Forest Hills"
+        ],
+        "office": "U.S. House \u2014 District 12",
+        "official": "Rep. Summer Lee",
+        "party": "D",
+        "sourceLabel": "Casey, Fetterman, Lee, Deluzio \u2014 $142 M for Parkway East",
+        "sourceUrl": "https://www.casey.senate.gov/news/releases/casey-fetterman-lee-deluzio-secure-14234-million-for-pittsburghs-parkway-east",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "482165777fab",
+        "_type": "legislativeAction",
+        "category": "Workforce & Jobs",
+        "date": "2024",
+        "description": "Secured $450,000 in federal funding for the Trade Institute of Pittsburgh's new transitional jobs program (TIPX), providing paid masonry and carpentry training for workers re-entering the workforce.",
+        "displayOrder": 2,
+        "municipalities": [
+          "Pittsburgh (all wards)",
+          "Homestead",
+          "Braddock"
+        ],
+        "office": "U.S. House \u2014 District 12",
+        "official": "Rep. Summer Lee",
+        "party": "D",
+        "sourceLabel": "Summer Lee \u2014 Trade Institute Funding",
+        "sourceUrl": "https://summerlee.house.gov/newsroom/press-releases/rep-summer-lee-celebrates-450000-in-federal-funding-for-trade-institute-of-pittsburgh-s-new-transitional-jobs-program",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "6ec2d367d8df",
+        "_type": "legislativeAction",
+        "category": "Community Development",
+        "date": "2024",
+        "description": "Presented over $1 million in federal investment to combat blight and revitalize North Braddock.",
+        "displayOrder": 3,
+        "municipalities": [
+          "North Braddock",
+          "Braddock",
+          "East Pittsburgh",
+          "Rankin"
+        ],
+        "office": "U.S. House \u2014 District 12",
+        "official": "Rep. Summer Lee",
+        "party": "D",
+        "sourceLabel": "Summer Lee \u2014 North Braddock Investment",
+        "sourceUrl": "https://summerlee.house.gov/newsroom/press-releases/rep-summer-lee-presents-over-1-million-federal-investment-to-combat-blight-and-revitalize-north-braddock",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "bf995651aace",
+        "_type": "legislativeAction",
+        "category": "Children & Families",
+        "date": "2025",
+        "description": "Co-introduced the Child Care for Working Families Act with 83 House and 44 Senate co-sponsors to expand affordable child care nationwide.",
+        "displayOrder": 4,
+        "municipalities": [
+          "All Allegheny County municipalities (federal legislation)"
+        ],
+        "office": "U.S. House \u2014 District 12",
+        "official": "Rep. Summer Lee",
+        "party": "D",
+        "sourceLabel": "Summer Lee \u2014 Child Care for Working Families Act",
+        "sourceUrl": "https://summerlee.house.gov/newsroom/press-releases/rep-summer-lee-reintroduces-child-care-for-working-families-act-to-address-the-national-child-care-crisis",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "2999f9384f6d",
+        "_type": "legislativeAction",
+        "category": "Children & Families",
+        "date": "February 2026",
+        "description": "Introduced the Head Start for America's Children Act to expand Head Start to serve 11 million eligible young children and raise wages for Head Start educators.",
+        "displayOrder": 5,
+        "municipalities": [
+          "All Allegheny County municipalities (federal legislation)"
+        ],
+        "office": "U.S. House \u2014 District 12",
+        "official": "Rep. Summer Lee",
+        "party": "D",
+        "sourceLabel": "Summer Lee \u2014 Head Start Expansion Bill",
+        "sourceUrl": "https://summerlee.house.gov/newsroom/press-releases/rep-summer-lee-introduces-bill-to-expand-head-start-to-11-million-children",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "749900236cc2",
+        "_type": "legislativeAction",
+        "category": "Worker Safety",
+        "date": "2023\u20132024",
+        "description": "Lead House sponsor of the Railway Safety Act, establishing two-person crew requirements and stronger safety rules for hazmat trains. Successfully advocated for Dept. of Transportation rule making two-person crews permanent.",
+        "displayOrder": 6,
+        "municipalities": [
+          "Coraopolis",
+          "Moon",
+          "Sewickley",
+          "McKees Rocks",
+          "Carnegie",
+          "Aspinwall",
+          "Fox Chapel",
+          "Sharpsburg",
+          "Etna",
+          "Millvale",
+          "McCandless",
+          "Ross",
+          "Bellevue",
+          "Avalon",
+          "Ben Avon",
+          "Penn Hills",
+          "Wilkinsburg",
+          "Edgewood",
+          "Forest Hills"
+        ],
+        "office": "U.S. House \u2014 District 17",
+        "official": "Rep. Chris Deluzio",
+        "party": "D",
+        "sourceLabel": "Deluzio \u2014 Railway Safety Act",
+        "sourceUrl": "https://deluzio.house.gov/media/press-releases/deluzio-lalota-rulli-and-garamendi-introduce-bipartisan-railway-safety-bill",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "a0fd1818e94d",
+        "_type": "legislativeAction",
+        "category": "Infrastructure & Jobs",
+        "date": "2023",
+        "description": "Directed $480+ million in federal grants and contracts to western PA communities in 2023, including transportation, defense industry, and community development projects.",
+        "displayOrder": 7,
+        "municipalities": [
+          "Moon",
+          "Robinson",
+          "North Fayette",
+          "Findlay",
+          "McCandless",
+          "Pine",
+          "Marshall",
+          "Hampton",
+          "Shaler",
+          "Ross",
+          "Cheswick"
+        ],
+        "office": "U.S. House \u2014 District 17",
+        "official": "Rep. Chris Deluzio",
+        "party": "D",
+        "sourceLabel": "Deluzio \u2014 2023 Year in Review",
+        "sourceUrl": "https://deluzio.house.gov/media/press-releases/congressman-chris-deluzio-gets-stuff-done-western-pennsylvanians-2023",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "afdf8fc71623",
+        "_type": "legislativeAction",
+        "category": "Infrastructure & Jobs",
+        "date": "2026",
+        "description": "Secured $185+ million in federal funding in 2026 spending bills for western PA community projects \u2014 the most community project funding of any House Democrat.",
+        "displayOrder": 8,
+        "municipalities": [
+          "All District 17 municipalities in Allegheny County"
+        ],
+        "office": "U.S. House \u2014 District 17",
+        "official": "Rep. Chris Deluzio",
+        "party": "D",
+        "sourceLabel": "Deluzio \u2014 $185 M in 2026 Funding Bills",
+        "sourceUrl": "https://deluzio.house.gov/media/press-releases/congressman-deluzio-successfully-includes-185-million-western-pa-us-house-2026-funding-bills",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "793956050df9",
+        "_type": "legislativeAction",
+        "category": "Wages & Workers",
+        "date": "2023",
+        "description": "Original co-sponsor of the Raise the Wage Act to increase the federal minimum wage to $17/hour by 2028, benefiting an estimated 28 million workers.",
+        "displayOrder": 9,
+        "municipalities": [
+          "All Allegheny County municipalities (federal legislation)"
+        ],
+        "office": "U.S. Senate",
+        "official": "Sen. John Fetterman",
+        "party": "D",
+        "sourceLabel": "Congress.gov \u2014 Raise the Wage Act S.2488",
+        "sourceUrl": "https://www.congress.gov/bill/118th-congress/senate-bill/2488/text",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "cd58e0d53967",
+        "_type": "legislativeAction",
+        "category": "Healthcare & Safety Net",
+        "date": "2025",
+        "description": "Cast firm NO vote on the 2025 Budget Resolution, refusing to support bills that would strip Medicaid, Medicare, and SNAP benefits to fund tax cuts for billionaires.",
+        "displayOrder": 10,
+        "municipalities": [
+          "All Allegheny County municipalities (federal legislation)"
+        ],
+        "office": "U.S. Senate",
+        "official": "Sen. John Fetterman",
+        "party": "D",
+        "sourceLabel": "Fetterman \u2014 Rejects GOP Budget Slashing Medicaid/SNAP",
+        "sourceUrl": "https://www.fetterman.senate.gov/fetterman-rejects-gop-budget-slashing-medicaid-snap-for-billionaire-tax-breaks",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "70cf416b8697",
+        "_type": "legislativeAction",
+        "category": "Wages & Workers",
+        "date": "2024",
+        "description": "Urged the Labor Department to end subminimum wages ($1.50/hour) for workers with disabilities, calling the practice \"outrageous.\"",
+        "displayOrder": 11,
+        "municipalities": [
+          "All Allegheny County municipalities (federal legislation)"
+        ],
+        "office": "U.S. Senate",
+        "official": "Sen. John Fetterman",
+        "party": "D",
+        "sourceLabel": "FOX43 \u2014 Fetterman Urges End to Subminimum Wages",
+        "sourceUrl": "https://fox43.com/article/news/politics/national-politics/fetterman-senators-labor-department-end-subminimum-wages-disabled-workers/521-fcec9c30-535c-427e-b955-380f1f75a443",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "0a921bfef9a9",
+        "_type": "legislativeAction",
+        "category": "Taxes & Budget",
+        "date": "December 2025",
+        "description": "Passed a $1.2 billion county budget with zero property tax increase \u2014 unanimously approved by County Council \u2014 while preserving rental assistance, transit programs, and human services.",
+        "displayOrder": 12,
+        "municipalities": [
+          "All 130 Allegheny County municipalities"
+        ],
+        "office": "Allegheny County Executive",
+        "official": "County Exec. Sara Innamorato",
+        "party": "D",
+        "sourceLabel": "WESA \u2014 County Council Unanimously Backs 2026 Budget",
+        "sourceUrl": "https://www.wesa.fm/politics-government/2025-12-02/allegheny-county-council-unanimously-backs-innamorato-2026-budget-with-no-tax-increase",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "71ab932ac960",
+        "_type": "legislativeAction",
+        "category": "Transportation",
+        "date": "June 2024",
+        "description": "Launched AlleghenyGO, a permanent program offering 50% off transit fares for county residents receiving SNAP benefits \u2014 over 5,000 enrolled. Budget includes $1.5 million for the program.",
+        "displayOrder": 13,
+        "municipalities": [
+          "All 130 Allegheny County municipalities"
+        ],
+        "office": "Allegheny County Executive",
+        "official": "County Exec. Sara Innamorato",
+        "party": "D",
+        "sourceLabel": "WESA \u2014 AlleghenyGO Half-Fare Transit",
+        "sourceUrl": "https://www.wesa.fm/development-transportation/2024-05-21/low-income-allegheny-county-public-transit",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "8d92b2f981f5",
+        "_type": "legislativeAction",
+        "category": "Children & Families",
+        "date": "2024\u20132025",
+        "description": "Invested $500,000 in child care subsidies to clear the Child Care Matters waitlist, then boosted the Department of Children Initiatives budget by $2.5 million \u2014 a threefold increase in local tax dollars for child care.",
+        "displayOrder": 14,
+        "municipalities": [
+          "All 130 Allegheny County municipalities"
+        ],
+        "office": "Allegheny County Executive",
+        "official": "County Exec. Sara Innamorato",
+        "party": "D",
+        "sourceLabel": "WESA \u2014 Innamorato Child Care Subsidies",
+        "sourceUrl": "https://www.wesa.fm/politics-government/2024-01-10/innamorato-child-care-subsidies",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "76785f55f293",
+        "_type": "legislativeAction",
+        "category": "Healthcare & Safety Net",
+        "date": "2024",
+        "description": "Sponsored and passed Pharmacy Benefits Manager regulation (H.B. 1993), signed by Gov. Shapiro, protecting working families and seniors from inflated prescription drug costs.",
+        "displayOrder": 15,
+        "municipalities": [
+          "Brentwood",
+          "Mount Oliver",
+          "Pittsburgh (Beechview, Brookline, Carrick, South Side Slopes, Arlington)"
+        ],
+        "office": "PA House \u2014 District 36",
+        "official": "State Rep. Jessica Benham",
+        "party": "D",
+        "sourceLabel": "Benham for PA \u2014 PBM Legislation",
+        "sourceUrl": "https://www.benhamforpa.com/",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "1950a045897a",
+        "_type": "legislativeAction",
+        "category": "Children & Families",
+        "date": "2023",
+        "description": "Sponsored the Kinship Caregiver Tuition Waiver Bill, passed unanimously in the House, giving free college tuition to children raised by grandparents and other relatives.",
+        "displayOrder": 16,
+        "municipalities": [
+          "Brentwood",
+          "Mount Oliver",
+          "Pittsburgh (Beechview, Brookline, Carrick, South Side Slopes, Arlington)"
+        ],
+        "office": "PA House \u2014 District 36",
+        "official": "State Rep. Jessica Benham",
+        "party": "D",
+        "sourceLabel": "Ballotpedia \u2014 Jessica Benham",
+        "sourceUrl": "https://ballotpedia.org/Jessica_Benham",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "e4d57bf1f41f",
+        "_type": "legislativeAction",
+        "category": "Public Safety",
+        "date": "October 2024",
+        "description": "Filed discharge petitions to force Senate votes on House-passed gun safety bills: universal background checks (HB 714) and Emergency Risk Protection Orders (HB 1018) \u2014 both blocked by Republican committee chairs.",
+        "displayOrder": 17,
+        "municipalities": [
+          "Pittsburgh (Squirrel Hill, Shadyside, Oakland, Greenfield, Hazelwood, South Side)",
+          "Swissvale",
+          "Edgewood",
+          "Wilkinsburg",
+          "Penn Hills",
+          "Churchill",
+          "Forest Hills"
+        ],
+        "office": "PA Senate \u2014 District 43 (Senate Democratic Leader)",
+        "official": "State Sen. Jay Costa",
+        "party": "D",
+        "sourceLabel": "PA Senate Democrats \u2014 Costa Discharge Petitions",
+        "sourceUrl": "https://pasenate.com/democratic-leader-jay-costa-files-three-discharge-petitions-in-pa-senate-on-gun-safety-lgbtq-nondiscrimination-bills/",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "dd9669763fb3",
+        "_type": "legislativeAction",
+        "category": "Wages & Workers",
+        "date": "June 2023",
+        "description": "Passed House Bill 1500 to raise Pennsylvania's minimum wage from $7.25 to $15/hour by 2026, increase the tipped wage from $2.83/hour, and tie future raises to inflation. The bill passed the House in June 2023.",
+        "displayOrder": 18,
+        "municipalities": [
+          "All Allegheny County municipalities (state legislation)"
+        ],
+        "office": "PA House of Representatives",
+        "official": "PA House Democrats (incl. Kinkead, Venkat, Frankel, and others)",
+        "party": "D",
+        "sourceLabel": "PA Legislature \u2014 HB 1500",
+        "sourceUrl": "https://www.palegis.us/legislation/bills/2023/hb1500",
+        "type": "accomplishment"
+      },
+      {
+        "_key": "c5fb9abb9365",
+        "_type": "legislativeAction",
+        "category": "Wages & Workers",
+        "date": "2023\u2013present",
+        "description": "Refused to bring the House-passed $15/hour minimum wage bill (HB 1500) to a Senate floor vote. Pennsylvania's minimum wage has remained at $7.25/hour for 16+ years \u2014 one of only two states still at the federal minimum. Majority Leader Pittman called $15 a \"non-start.\"",
+        "displayOrder": 19,
+        "municipalities": [
+          "All Allegheny County municipalities \u2014 every worker earning minimum wage affected"
+        ],
+        "office": "PA State Senate",
+        "official": "PA Senate Republicans (led by Pres. Pro Temp. Kim Ward & Majority Leader Joe Pittman)",
+        "party": "R",
+        "sourceLabel": "Keystone Newsroom \u2014 Republicans Block Minimum Wage for 6 Months",
+        "sourceUrl": "https://keystonenewsroom.com/2023/12/26/pa-republicans-have-blocked-a-minimum-wage-increase-for-six-months/",
+        "type": "blocked"
+      },
+      {
+        "_key": "7551c1d2c4da",
+        "_type": "legislativeAction",
+        "category": "Public Safety",
+        "date": "2024\u2013present",
+        "description": "Blocked Senate hearings and votes on House-passed universal background check and red flag law bills, despite 95% of PA voters supporting background checks and 86% supporting red flag laws.",
+        "displayOrder": 20,
+        "municipalities": [
+          "All Allegheny County municipalities"
+        ],
+        "office": "PA State Senate",
+        "official": "PA Senate Republicans",
+        "party": "R",
+        "sourceLabel": "The Trace \u2014 PA Senate Gun Safety Inaction",
+        "sourceUrl": "https://www.thetrace.org/2024/10/pennsylvania-election-gun-laws-senate/",
+        "type": "blocked"
+      },
+      {
+        "_key": "19b250d00747",
+        "_type": "legislativeAction",
+        "category": "Healthcare & Safety Net",
+        "date": "2025",
+        "description": "Supported nearly $1 trillion in Medicaid cuts over 10 years through the \"One Big Beautiful Bill Act.\" An estimated 310,000 Pennsylvanians could lose coverage due to new 80-hour/month work requirements and more frequent eligibility checks.",
+        "displayOrder": 21,
+        "municipalities": [
+          "All Allegheny County municipalities \u2014 disproportionately affects McKeesport, Clairton, Duquesne, Braddock, McKees Rocks, Wilkinsburg"
+        ],
+        "office": "U.S. Congress",
+        "official": "Congressional Republicans (incl. Sen. Dave McCormick)",
+        "party": "R",
+        "sourceLabel": "PHLP \u2014 310,000 Pennsylvanians Could Lose Coverage",
+        "sourceUrl": "https://www.phlp.org/en/news/historic-medicaid-cuts-coming-to-pennsylvania-310-000-could-lose-coverage",
+        "type": "harmful"
+      },
+      {
+        "_key": "a2f53e9bbbe3",
+        "_type": "legislativeAction",
+        "category": "Children & Families",
+        "date": "March 2025",
+        "description": "All committee Republicans voted against the Family Care Act (HB 200), which would provide 12\u201320 weeks of paid leave for new parents, family caregivers, and violence victims. The bill advanced 14-12 on party lines.",
+        "displayOrder": 22,
+        "municipalities": [
+          "All Allegheny County municipalities (state legislation)"
+        ],
+        "office": "PA House of Representatives",
+        "official": "PA House Republicans on Labor & Industry Committee",
+        "party": "R",
+        "sourceLabel": "City & State PA \u2014 Paid Family Leave Vote",
+        "sourceUrl": "https://www.cityandstatepa.com/policy/2025/03/bipartisan-paid-family-leave-bill-advances-pennsylvania-house/403895/",
+        "type": "blocked"
+      },
+      {
+        "_key": "ef005f864eb4",
+        "_type": "legislativeAction",
+        "category": "Education",
+        "date": "2023\u20132025",
+        "description": "Pushed a $100 million school voucher program (\"PA Award for Student Success\") to divert public school funding to private schools. Gov. Shapiro vetoed the 2023 version; Senate Republicans revived it in 2024 and 2025.",
+        "displayOrder": 23,
+        "municipalities": [
+          "All Allegheny County school districts \u2014 especially impacts underfunded districts like McKeesport, Clairton, Duquesne, Wilkinsburg, Sto-Rox"
+        ],
+        "office": "PA State Senate",
+        "official": "PA Senate Republicans",
+        "party": "R",
+        "sourceLabel": "Chalkbeat \u2014 PA Voucher Debate",
+        "sourceUrl": "https://www.chalkbeat.org/philadelphia/2023/7/5/23785092/pennsylvania-philadelphia-school-shapiro-private-vouchers-low-achieving-funding-scholarships-budget/",
+        "type": "harmful"
+      },
+      {
+        "_key": "fb457a8b0d20",
+        "_type": "legislativeAction",
+        "category": "Taxes & Budget",
+        "date": "2022\u20132031 (phased)",
+        "description": "Enacted corporate net income tax cuts from 9.99% to a planned 4.99% by 2031, plus increased net operating loss deductions. This shifts the tax burden from corporations onto working and middle-class families.",
+        "displayOrder": 24,
+        "municipalities": [
+          "All Allegheny County municipalities \u2014 affects state revenue for schools, infrastructure, and services"
+        ],
+        "office": "PA State Legislature",
+        "official": "PA Legislature (Republican-led initiative)",
+        "party": "R",
+        "sourceLabel": "Tax Foundation \u2014 PA Corporate Tax Cut",
+        "sourceUrl": "https://taxfoundation.org/blog/pa-corporate-tax-cut/",
+        "type": "harmful"
+      },
+      {
+        "_key": "dc5029710650",
+        "_type": "legislativeAction",
+        "category": "Wages & Workers",
+        "date": "2023\u2013present",
+        "description": "As part of the Senate Republican majority, has not broken ranks to advance minimum wage increases, gun safety bills, or paid family leave legislation despite representing suburban communities where these poll favorably.",
+        "displayOrder": 25,
+        "municipalities": [
+          "Bethel Park",
+          "Upper St. Clair",
+          "South Park",
+          "Jefferson Hills",
+          "Pleasant Hills",
+          "Moon",
+          "Sewickley",
+          "Franklin Park",
+          "Marshall",
+          "North Fayette",
+          "South Fayette",
+          "Collier",
+          "Robinson"
+        ],
+        "office": "PA Senate \u2014 District 37",
+        "official": "Sen. Devlin Robinson",
+        "party": "R",
+        "sourceLabel": "Spotlight PA \u2014 PA Senate Minimum Wage Stalemate",
+        "sourceUrl": "https://spotlightpa.org/news/2023/06/pa-minimum-wage-raise-legislature/",
+        "type": "blocked"
+      }
+    ],
+    "categories": [
+      "Wages & Workers",
+      "Healthcare & Safety Net",
+      "Children & Families",
+      "Education",
+      "Infrastructure & Jobs",
+      "Workforce & Jobs",
+      "Community Development",
+      "Public Safety",
+      "Transportation",
+      "Taxes & Budget"
+    ],
+    "districtLookupIntro": "Not sure who represents you? Use these official tools to look up your state and county districts by address:",
+    "districtLookupLinks": [
+      {
+        "_key": "4c6ad7e7d1e2",
+        "_type": "legislativeExternalLink",
+        "description": "Enter your address to see your exact PA House, Senate, and Congressional districts.",
+        "displayOrder": 0,
+        "label": "PA Voter Services \u2014 Find Your District",
+        "url": "https://www.pavoterservices.pa.gov/pages/FindYourDistrict.aspx"
+      },
+      {
+        "_key": "ce14531a176d",
+        "_type": "legislativeExternalLink",
+        "description": "Full list of every state legislator representing Allegheny County.",
+        "displayOrder": 1,
+        "label": "PA Legislature \u2014 Allegheny County Legislators",
+        "url": "https://www.palegis.us/find-my-legislator/by-county?county=ALLEGHENY"
+      },
+      {
+        "_key": "39dc8dd2bfa4",
+        "_type": "legislativeExternalLink",
+        "description": "Map and listing of all 13 county council districts and their representatives.",
+        "displayOrder": 2,
+        "label": "Allegheny County Council Districts",
+        "url": "https://www.alleghenycounty.us/Government/Departments-and-Offices/County-Council/Council-Districts"
+      },
+      {
+        "_key": "4b609c2e1fdd",
+        "_type": "legislativeExternalLink",
+        "description": "Nonpartisan voter guides and district information for the greater Pittsburgh area.",
+        "displayOrder": 3,
+        "label": "League of Women Voters of Greater Pittsburgh",
+        "url": "https://lwvpgh.org"
+      }
+    ],
+    "heroHeadline": "Legislative Tracker",
+    "heroSubhead": "What Democrats delivered \u2014 and what Republicans blocked \u2014 for working families in Allegheny County. Every item links to its source so you can verify it yourself.",
+    "lastUpdatedNote": "Last updated: February 2026. Sources include official congressional and state legislative records, WESA, Spotlight PA, Keystone Newsroom, The Trace, Chalkbeat, City & State PA, and the PA Health Law Project.",
+    "localEntries": [
+      {
+        "_key": "adf332bc9b31",
+        "_type": "legislativeLocalEntry",
+        "community": "Wilkinsburg",
+        "date": "2024\u20132025",
+        "detail": "The Wilkinsburg-Penn Joint Water Authority received two PENNVEST tranches under Gov. Shapiro: $6.8M grant + $3.1M loan (Oct 2024) for ~1,060 lead lines, and $3.9M grant + $6.1M loan (Jan 2025) for additional lines. Property owners had their privately-owned lead service lines replaced at no cost.",
+        "displayOrder": 0,
+        "outcome": "helped",
+        "party": "D",
+        "sourceLabel": "PA.gov \u2014 PENNVEST October 2024 Board Meeting",
+        "sourceUrl": "https://www.pa.gov/agencies/pennvest/pennvest-newsroom/-216-3-million-investment-in-water-infrastructure-projects-in-21/",
+        "summary": "$10M+ in state grants to replace lead water pipes \u2014 free to homeowners"
+      },
+      {
+        "_key": "af0e62bcfd2a",
+        "_type": "legislativeLocalEntry",
+        "community": "Highlands School District (Brackenridge, Tarentum, Harrison Township)",
+        "date": "2024\u20132025",
+        "detail": "The Highlands School District received a $740,000+ increase in state funding for the 2024\u201325 school year, bringing total state aid to $19.2 million. Gov. Shapiro and Democratic legislators celebrated the increase as part of the new adequacy funding formula designed to correct decades of underfunding.",
+        "displayOrder": 1,
+        "outcome": "helped",
+        "party": "D",
+        "sourceLabel": "PA.gov \u2014 Gov. Shapiro Celebrates K-12 Funding at Highlands",
+        "sourceUrl": "https://www.pa.gov/governor/newsroom/2024-press-releases/gov-shapiro--leg--ed--students-celebrate-k-12-funding-highlands-",
+        "summary": "$740,000+ school funding increase under Shapiro adequacy formula"
+      },
+      {
+        "_key": "2395f0ee244d",
+        "_type": "legislativeLocalEntry",
+        "community": "All 130 Allegheny County Municipalities",
+        "date": "2021\u20132024",
+        "detail": "The Biden administration's American Rescue Plan delivered $130 million to Allegheny County's 130 municipalities. For communities like Penn Hills, the allocation equaled 30% of their entire municipal budget. Most small boroughs used the funds for road repairs, community center upgrades, and emergency infrastructure.",
+        "displayOrder": 2,
+        "outcome": "helped",
+        "party": "D",
+        "sourceLabel": "Next Pittsburgh \u2014 How Allegheny County Municipalities Spent ARPA Money",
+        "sourceUrl": "https://nextpittsburgh.com/features/how-are-allegheny-county-municipalities-spending-american-rescue-plan-money/",
+        "summary": "$130M in American Rescue Plan funds distributed to every borough and township"
+      },
+      {
+        "_key": "dbe17e154f39",
+        "_type": "legislativeLocalEntry",
+        "community": "McKees Rocks area (West View Water Authority)",
+        "date": "2023\u20132025",
+        "detail": "The West View Water Authority, which serves McKees Rocks and surrounding communities, received $8 million through Biden's Bipartisan Infrastructure Law to replace 750 lead service lines in underserved Allegheny County neighborhoods.",
+        "displayOrder": 3,
+        "outcome": "helped",
+        "party": "D",
+        "sourceLabel": "US EPA \u2014 Biden Admin Announces $152M for PA Lead Pipe Replacement",
+        "sourceUrl": "https://www.epa.gov/newsreleases/biden-harris-administration-announces-over-152-million-pennsylvania-lead-pipe",
+        "summary": "$8M federal grant to replace 750 lead pipes in underserved communities"
+      },
+      {
+        "_key": "34b597256a8a",
+        "_type": "legislativeLocalEntry",
+        "community": "Braddock, North Braddock, East Pittsburgh",
+        "date": "March 2025",
+        "detail": "A class-action settlement was approved in March 2025 against U.S. Steel's Edgar Thomson Plant, covering 3,700 households within one mile of the plant for \"noxious odors and fugitive dust\" from 2020 onward. The settlement includes $1.5M for residents and $4.6M in on-site environmental improvements \u2014 the result of Biden-era EPA enforcement.",
+        "displayOrder": 4,
+        "outcome": "helped",
+        "party": "D",
+        "sourceLabel": "Allegheny Front \u2014 U.S. Steel Agrees to $1.5M Settlement",
+        "sourceUrl": "https://www.alleghenyfront.org/us-steel-class-action-settlement-edgar-thomson-plant-braddock-air-pollution/",
+        "summary": "$6.1M class-action settlement for U.S. Steel air pollution affecting residents"
+      },
+      {
+        "_key": "63e28dd4d208",
+        "_type": "legislativeLocalEntry",
+        "community": "Braddock, Homestead, Swissvale, Wilmerding, Wilkinsburg",
+        "date": "March 2025",
+        "detail": "In March 2025, the Trump administration's EPA cancelled a $930,000 Allegheny County Health Department grant for 10 stormwater mitigation projects across Braddock, Homestead, Swissvale, Wilmerding, and others. Work was scheduled to begin days later. The EPA's termination letter stated it would not support programs linked to \"environmental justice\" or \"DEI.\" Projects included rainwater capture systems and debris cleanups designed to reduce flooding in low-income communities.",
+        "displayOrder": 5,
+        "outcome": "hurt",
+        "party": "R",
+        "sourceLabel": "PublicSource \u2014 Allegheny County Loses Millions in Green Infrastructure Grants",
+        "sourceUrl": "https://www.publicsource.org/allegheny-county-environmental-funding-cuts-epa-deregulation/",
+        "summary": "Trump EPA cancelled $930K green infrastructure grant days before work was set to begin"
+      },
+      {
+        "_key": "d3216f0ad924",
+        "_type": "legislativeLocalEntry",
+        "community": "All PA municipalities (incl. every Allegheny County borough)",
+        "date": "2025",
+        "detail": "A Republican-led Congress passed a short-term spending bill for FY2025 that eliminated all Community Project Funding \u2014 the mechanism used by reps like Chris Deluzio and Summer Lee to direct infrastructure dollars to specific local projects. Communities across Pennsylvania lost police equipment upgrades, flood control projects, and emergency communications improvements that had already been fully vetted and approved.",
+        "displayOrder": 6,
+        "outcome": "hurt",
+        "party": "R",
+        "sourceLabel": "WHYY \u2014 Pennsylvania Lost Millions in Federal Infrastructure Funding",
+        "sourceUrl": "https://whyy.org/articles/pennsylvania-budget-federal-infrastructure-funding/",
+        "summary": "Republican Congress eliminated all Community Project Funding for FY2025, wiping out vetted local infrastructure grants"
+      },
+      {
+        "_key": "4577986b9dc1",
+        "_type": "legislativeLocalEntry",
+        "community": "Stowe Township, McKees Rocks (Sto-Rox School District)",
+        "date": "2021\u2013present",
+        "detail": "The Sto-Rox School District has been in \"moderate financial recovery\" status since July 2021. Over 92.7% of its 1,190 students are economically disadvantaged \u2014 yet residents face the highest local tax effort index (1.58) in Allegheny County. The district's enrollment has fallen 20.1% over five years. Democrats secured $14.4M in federal ESSER funds and $12.6M in state empowerment grants, but these were one-time sources. The root cause \u2014 Pennsylvania's school funding formula \u2014 has been challenged in court and partially fixed by Democratic legislation, but full equity remains unachieved.",
+        "displayOrder": 7,
+        "outcome": "ongoing",
+        "party": "both",
+        "sourceLabel": "PublicSource \u2014 The Sto-Rox School District's 5-Year Struggle to Survive",
+        "sourceUrl": "https://www.publicsource.org/sto-rox-school-district-began-5-year-struggle-to-survive/",
+        "summary": "School district in financial recovery \u2014 92.7% of students economically disadvantaged, highest tax burden in county"
+      },
+      {
+        "_key": "f79e9974d48a",
+        "_type": "legislativeLocalEntry",
+        "community": "Etna",
+        "date": "April 2024",
+        "detail": "On April 12, 2024, near-record rainfall caused Pine Creek to reach 14 feet in Etna, forcing evacuations of Sycamore, Cherry, and Railroad/Middle Streets. The National Weather Service called it a \"one in 10 to 20 year event.\" Water backed into dozens of homes and businesses. The flooding highlights the urgent need for stormwater infrastructure investment \u2014 the same kind of green infrastructure that Trump's EPA cancelled in March 2025.",
+        "displayOrder": 8,
+        "outcome": "ongoing",
+        "party": "both",
+        "sourceLabel": "Pittsburgh Post-Gazette \u2014 Allegheny County Communities Hit Hard by Major Flooding",
+        "sourceUrl": "https://www.post-gazette.com/news/weather-news/2024/04/12/ohio-river-flooding-storms-cleanup-etna-millvale-oakdale/",
+        "summary": "Record flooding in April 2024 \u2014 Pine Creek reached 14 feet, dozens of homes and businesses damaged"
+      },
+      {
+        "_key": "b5f5d05729b6",
+        "_type": "legislativeLocalEntry",
+        "community": "McKees Rocks",
+        "date": "2021\u2013present",
+        "detail": "The Mazzaro Landfill, used from the 1940s through 1972 and containing unknown industrial waste and exposed drums, is an active EPA Superfund site in McKees Rocks. The PA DEP issued a remedial response notice in February 2021 with a public hearing in April 2021. Remediation is ongoing.",
+        "displayOrder": 9,
+        "outcome": "ongoing",
+        "party": "both",
+        "sourceLabel": "US EPA Superfund Site Profile \u2014 Mazzaro Landfill",
+        "sourceUrl": "https://cumulis.epa.gov/supercpad/CurSites/csitinfo.cfm?id=0300457",
+        "summary": "Mazzaro Landfill Superfund Site \u2014 abandoned industrial waste site under active remediation"
+      }
+    ],
+    "officialTableIntro": "Below is a quick reference for which Republican state legislators represent parts of Allegheny County.",
+    "republicanOfficials": [
+      {
+        "_key": "58501f41c5c8",
+        "_type": "legislativeOfficialRow",
+        "displayOrder": 0,
+        "municipalities": "Bethel Park, Upper St. Clair, Moon, Sewickley, Franklin Park, Marshall, South Fayette, North Fayette, Robinson, South Park, Jefferson Hills, Pleasant Hills, Bridgeville, Collier, Findlay, Crescent, Coraopolis, and more",
+        "office": "PA Senate \u2014 Dist. 37",
+        "official": "Sen. Devlin Robinson"
+      },
+      {
+        "_key": "d57a7d63daba",
+        "_type": "legislativeOfficialRow",
+        "displayOrder": 1,
+        "municipalities": "Pine, Marshall, Hampton, Bradford Woods, West Deer, Richland",
+        "office": "PA House \u2014 Dist. 28",
+        "official": "Rep. Jeremy Shaffer"
+      },
+      {
+        "_key": "ded40c707480",
+        "_type": "legislativeOfficialRow",
+        "displayOrder": 2,
+        "municipalities": "Bethel Park, part of Upper St. Clair",
+        "office": "PA House \u2014 Dist. 40",
+        "official": "Rep. Natalie Mihalek"
+      },
+      {
+        "_key": "259cc29c71db",
+        "_type": "legislativeOfficialRow",
+        "displayOrder": 3,
+        "municipalities": "Moon, Sewickley, North Fayette, Crescent, Findlay, and west hills communities",
+        "office": "PA House \u2014 Dist. 44",
+        "official": "Rep. Valerie Gaydos"
+      },
+      {
+        "_key": "29d754a01fc6",
+        "_type": "legislativeOfficialRow",
+        "displayOrder": 4,
+        "municipalities": "South Fayette, Oakdale, McDonald (Allegheny County portion)",
+        "office": "PA House \u2014 Dist. 46",
+        "official": "Rep. Jason Ortitay"
+      },
+      {
+        "_key": "253d28374f28",
+        "_type": "legislativeOfficialRow",
+        "displayOrder": 5,
+        "municipalities": "All of Pennsylvania (statewide)",
+        "office": "U.S. Senate",
+        "official": "Sen. Dave McCormick"
+      }
+    ],
+    "slug": {
+      "_type": "slug",
+      "current": "legislative-tracker"
+    },
+    "title": "Legislative Tracker"
+  }
+}
