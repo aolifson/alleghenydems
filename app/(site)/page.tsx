@@ -36,25 +36,25 @@ export default async function HomePage() {
             priority
           />
         )}
-        <div className="relative max-w-7xl mx-auto px-4 py-16 md:py-20 grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-10 items-center">
+        <div className="relative max-w-7xl mx-auto px-4 py-8 md:py-10 grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-6 md:gap-8 items-center">
           <div className="text-center lg:text-left">
-            <h1 className="font-display text-4xl md:text-6xl font-bold mb-4 leading-tight">
+            <h1 className="font-display text-3xl md:text-5xl font-bold mb-3 leading-tight">
               {settings?.heroHeadline ?? 'Allegheny County Democratic Committee'}
             </h1>
-            <p className="text-lg md:text-2xl text-white/80 mb-8 max-w-2xl mx-auto lg:mx-0">
+            <p className="text-base md:text-xl text-white/80 mb-6 max-w-2xl mx-auto lg:mx-0">
               {settings?.heroSubtext ?? 'Fighting for working families across Allegheny County. Join us.'}
             </p>
             <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
               <Link href="/get-involved"
-                className="px-6 py-3 bg-[var(--color-red)] hover:bg-[var(--color-red-dark)] text-white font-semibold rounded transition-colors">
+                className="px-5 py-2.5 bg-[var(--color-red)] hover:bg-[var(--color-red-dark)] text-white font-semibold rounded transition-colors">
                 Get Involved
               </Link>
               <Link href="https://secure.actblue.com" target="_blank" rel="noopener noreferrer"
-                className="px-6 py-3 border-2 border-white hover:bg-white hover:text-[var(--color-navy)] text-white font-semibold rounded transition-colors">
+                className="px-5 py-2.5 border-2 border-white hover:bg-white hover:text-[var(--color-navy)] text-white font-semibold rounded transition-colors">
                 Donate
               </Link>
               <Link href="/vote"
-                className="px-6 py-3 bg-[var(--color-gold)] hover:opacity-90 text-[var(--color-navy)] font-semibold rounded transition-colors">
+                className="px-5 py-2.5 bg-[var(--color-gold)] hover:opacity-90 text-[var(--color-navy)] font-semibold rounded transition-colors">
                 Voter Resources
               </Link>
             </div>

@@ -47,6 +47,25 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
   { label: 'Contact', href: '/contact' },
 ]
 
+const FACEBOOK_URL = 'https://www.facebook.com/AlleghenyDems'
+const INSTAGRAM_URL = 'https://www.instagram.com/allegheny.dems'
+
+function FacebookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="currentColor">
+      <path d="M13.5 8.5V6.8c0-.6.4-1 1-1H16V3h-2c-2.5 0-3.5 1.3-3.5 3.7v1.8H8V12h2.5v9h3V12H16l.5-3.5h-3Z" />
+    </svg>
+  )
+}
+
+function InstagramIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="currentColor">
+      <path d="M7.5 3h9A4.5 4.5 0 0 1 21 7.5v9a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5v-9A4.5 4.5 0 0 1 7.5 3Zm0 1.8A2.7 2.7 0 0 0 4.8 7.5v9a2.7 2.7 0 0 0 2.7 2.7h9a2.7 2.7 0 0 0 2.7-2.7v-9a2.7 2.7 0 0 0-2.7-2.7h-9Zm4.5 2.8A4.4 4.4 0 1 1 7.6 12 4.4 4.4 0 0 1 12 7.6Zm0 1.8a2.6 2.6 0 1 0 2.6 2.6A2.6 2.6 0 0 0 12 9.4Zm4.8-2.9a1.1 1.1 0 1 1-1.1 1.1 1.1 1.1 0 0 1 1.1-1.1Z" />
+    </svg>
+  )
+}
+
 export default function Nav({ navItems }: { navItems?: NavItem[] | null }) {
   const items = (navItems && navItems.length > 0) ? navItems : DEFAULT_NAV_ITEMS
   const pathname = usePathname()
@@ -77,15 +96,14 @@ export default function Nav({ navItems }: { navItems?: NavItem[] | null }) {
 
   return (
     <header className="bg-[var(--color-blue)] text-[var(--color-navy)] shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+      <div className="max-w-7xl mx-auto px-4 flex items-center h-16">
+        {/* Logo only */}
+        <Link href="/" className="shrink-0 hover:opacity-90 transition-opacity">
           <Image src="/acdc-seal.png" alt="Allegheny County Democratic Committee" width={40} height={40} className="rounded-full" />
-          <span className="font-display font-bold text-lg tracking-tight hidden sm:block">Allegheny Dems</span>
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-1 ml-5 flex-1">
           {items.map((item) => (
             <div
               key={item.href}
@@ -131,26 +149,76 @@ export default function Nav({ navItems }: { navItems?: NavItem[] | null }) {
               )}
             </div>
           ))}
+        </nav>
+
+        {/* Desktop right controls */}
+        <div className="hidden md:flex items-center gap-2 ml-4">
+          <Link
+            href={FACEBOOK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/35 text-white hover:bg-white/15 transition-colors"
+          >
+            <FacebookIcon />
+          </Link>
+          <Link
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/35 text-white hover:bg-white/15 transition-colors"
+          >
+            <InstagramIcon />
+          </Link>
+          <Link
+            href="https://store.alleghenydems.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-1 px-4 py-2 bg-white/15 hover:bg-white/25 text-white text-sm font-semibold rounded transition-colors"
+          >
+            Merch Store
+          </Link>
           <Link
             href="https://secure.actblue.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-2 px-4 py-2 bg-[var(--color-red)] hover:bg-[var(--color-red-dark)] text-white text-sm font-semibold rounded transition-colors"
+            className="px-4 py-2 bg-[var(--color-red)] hover:bg-[var(--color-red-dark)] text-white text-sm font-semibold rounded transition-colors"
           >
             Donate
           </Link>
-        </nav>
+        </div>
 
         {/* Mobile hamburger */}
-        <button
-          className="md:hidden p-2 rounded hover:bg-[var(--color-navy)]/10"
-          onClick={() => setOpen(!open)}
-          aria-label="Toggle menu"
-        >
-          <span className="block w-5 h-0.5 bg-[var(--color-navy)] mb-1" />
-          <span className="block w-5 h-0.5 bg-[var(--color-navy)] mb-1" />
-          <span className="block w-5 h-0.5 bg-[var(--color-navy)]" />
-        </button>
+        <div className="md:hidden ml-auto flex items-center gap-2">
+          <Link
+            href={FACEBOOK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/35 text-white hover:bg-white/15 transition-colors"
+          >
+            <FacebookIcon />
+          </Link>
+          <Link
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/35 text-white hover:bg-white/15 transition-colors"
+          >
+            <InstagramIcon />
+          </Link>
+          <button
+            className="p-2 rounded hover:bg-[var(--color-navy)]/10"
+            onClick={() => setOpen(!open)}
+            aria-label="Toggle menu"
+          >
+            <span className="block w-5 h-0.5 bg-[var(--color-navy)] mb-1" />
+            <span className="block w-5 h-0.5 bg-[var(--color-navy)] mb-1" />
+            <span className="block w-5 h-0.5 bg-[var(--color-navy)]" />
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -187,14 +255,24 @@ export default function Nav({ navItems }: { navItems?: NavItem[] | null }) {
               ))}
             </div>
           ))}
-          <Link
-            href="https://secure.actblue.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 block text-center px-4 py-2 bg-[var(--color-red)] text-white text-sm font-semibold rounded"
-          >
-            Donate
-          </Link>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <Link
+              href="https://store.alleghenydems.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-center px-4 py-2 bg-white/15 text-white text-sm font-semibold rounded"
+            >
+              Merch Store
+            </Link>
+            <Link
+              href="https://secure.actblue.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-center px-4 py-2 bg-[var(--color-red)] text-white text-sm font-semibold rounded"
+            >
+              Donate
+            </Link>
+          </div>
         </div>
       )}
     </header>

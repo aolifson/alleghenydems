@@ -2,6 +2,25 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { SiteSettings } from '@/sanity/lib/queries'
 
+const FACEBOOK_URL = 'https://www.facebook.com/AlleghenyDems'
+const INSTAGRAM_URL = 'https://www.instagram.com/allegheny.dems'
+
+function FacebookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="currentColor">
+      <path d="M13.5 8.5V6.8c0-.6.4-1 1-1H16V3h-2c-2.5 0-3.5 1.3-3.5 3.7v1.8H8V12h2.5v9h3V12H16l.5-3.5h-3Z" />
+    </svg>
+  )
+}
+
+function InstagramIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="currentColor">
+      <path d="M7.5 3h9A4.5 4.5 0 0 1 21 7.5v9a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5v-9A4.5 4.5 0 0 1 7.5 3Zm0 1.8A2.7 2.7 0 0 0 4.8 7.5v9a2.7 2.7 0 0 0 2.7 2.7h9a2.7 2.7 0 0 0 2.7-2.7v-9a2.7 2.7 0 0 0-2.7-2.7h-9Zm4.5 2.8A4.4 4.4 0 1 1 7.6 12 4.4 4.4 0 0 1 12 7.6Zm0 1.8a2.6 2.6 0 1 0 2.6 2.6A2.6 2.6 0 0 0 12 9.4Zm4.8-2.9a1.1 1.1 0 1 1-1.1 1.1 1.1 1.1 0 0 1 1.1-1.1Z" />
+    </svg>
+  )
+}
+
 export default function Footer({ settings }: { settings: SiteSettings | null }) {
   const year = new Date().getFullYear()
 
@@ -19,19 +38,25 @@ export default function Footer({ settings }: { settings: SiteSettings | null }) 
           <p className="text-sm text-white/70 leading-relaxed">
             {settings?.footerText ?? 'Fighting for working families in Allegheny County.'}
           </p>
-          <div className="flex gap-3 mt-4">
-            {settings?.facebookPageUrl && (
-              <a href={settings.facebookPageUrl} target="_blank" rel="noopener noreferrer"
-                className="text-white/70 hover:text-white text-sm">
-                Facebook
-              </a>
-            )}
-            {settings?.instagramHandle && (
-              <a href={`https://instagram.com/${settings.instagramHandle}`} target="_blank" rel="noopener noreferrer"
-                className="text-white/70 hover:text-white text-sm">
-                Instagram
-              </a>
-            )}
+          <div className="flex gap-2 mt-4">
+            <a
+              href={FACEBOOK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/35 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <FacebookIcon />
+            </a>
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/35 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <InstagramIcon />
+            </a>
           </div>
         </div>
 
