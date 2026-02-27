@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import Link from 'next/link'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import type { Event } from '@/sanity/lib/queries'
 
 type View = 'month' | 'list' | 'day'
@@ -18,6 +19,82 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', {
     weekday: 'short', month: 'short', day: 'numeric', timeZone: TZ,
   })
+}
+
+function fmtDateLong(iso: string) {
+  return new Date(iso).toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: TZ,
+  })
+}
+
+function portableTextToPlain(value: unknown): string {
+  if (!Array.isArray(value)) return ''
+  const blocks = value
+    .map((block) => {
+      if (!block || typeof block !== 'object') return ''
+      const children = (block as { children?: unknown[] }).children
+      if (!Array.isArray(children)) return ''
+      return children
+        .map((child) => {
+          if (!child || typeof child !== 'object') return ''
+          return (child as { text?: string }).text ?? ''
+        })
+        .join('')
+    })
+    .map((text) => text.trim())
+    .filter(Boolean)
+  return blocks.join('\n\n')
+}
+
+function truncateText(text: string, max = 220) {
+  if (text.length <= max) return text
+  return `${text.slice(0, max - 1).trimEnd()}…`
+}
+
+function splitTextWithUrls(text: string): Array<{ type: 'text' | 'link'; value: string; href?: string }> {
+  const parts: Array<{ type: 'text' | 'link'; value: string; href?: string }> = []
+  const regex = /(https?:\/\/[^\s<]+|www\.[^\s<]+)/gi
+  let lastIndex = 0
+  let match: RegExpExecArray | null = null
+
+  while ((match = regex.exec(text)) !== null) {
+    const url = match[0]
+    const start = match.index
+    if (start > lastIndex) {
+      parts.push({ type: 'text', value: text.slice(lastIndex, start) })
+    }
+    const href = url.startsWith('http') ? url : `https://${url}`
+    parts.push({ type: 'link', value: url, href })
+    lastIndex = start + url.length
+  }
+
+  if (lastIndex < text.length) {
+    parts.push({ type: 'text', value: text.slice(lastIndex) })
+  }
+  return parts
+}
+
+function LinkifiedText({ text, className }: { text: string; className?: string }) {
+  const segments = splitTextWithUrls(text)
+  return (
+    <p className={className}>
+      {segments.map((segment, index) =>
+        segment.type === 'link' ? (
+          <a
+            key={`${segment.value}-${index}`}
+            href={segment.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--color-blue-mid)] underline hover:no-underline break-words"
+          >
+            {segment.value}
+          </a>
+        ) : (
+          <span key={`${segment.value}-${index}`}>{segment.value}</span>
+        )
+      )}
+    </p>
+  )
 }
 
 function isoDate(iso: string) {
@@ -62,6 +139,39 @@ export default function EventsCalendar({ events }: { events: Event[] }) {
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [query, setQuery] = useState('')
+  const [expandedListItems, setExpandedListItems] = useState<Set<string>>(new Set())
+  const [canHover, setCanHover] = useState(true)
+  const [openPopoverEventId, setOpenPopoverEventId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const media = window.matchMedia('(hover: hover) and (pointer: fine)')
+    const apply = () => setCanHover(media.matches)
+    apply()
+    media.addEventListener('change', apply)
+    return () => media.removeEventListener('change', apply)
+  }, [])
+
+  useEffect(() => {
+    if (canHover || !openPopoverEventId) return
+
+    function onPointerDown(event: PointerEvent) {
+      const target = event.target as HTMLElement | null
+      if (!target) return
+      if (target.closest('[data-event-chip]') || target.closest('[data-event-popover]')) return
+      setOpenPopoverEventId(null)
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setOpenPopoverEventId(null)
+    }
+
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [canHover, openPopoverEventId])
 
   // Apply search filter
   const filtered = useMemo(() => {
@@ -104,6 +214,8 @@ export default function EventsCalendar({ events }: { events: Event[] }) {
   // Events in current month for list view
   const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`
   const monthEvents = filtered.filter(e => isoDate(e.date).startsWith(monthPrefix))
+  const monthCells = useMemo(() => buildCalendarGrid(year, month), [year, month])
+  const totalMonthRows = Math.max(1, Math.ceil(monthCells.length / 7))
 
   // Events for selected day (day view)
   const dayEvents = selectedDay ? (byDay[selectedDay] ?? []) : []
@@ -125,8 +237,17 @@ export default function EventsCalendar({ events }: { events: Event[] }) {
     }
   }
 
+  function toggleExpanded(id: string) {
+    setExpandedListItems((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
   return (
-    <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm overflow-hidden">
+    <div className="bg-white rounded-lg border border-[var(--color-border)] shadow-sm overflow-visible">
 
       {/* ── Toolbar ── */}
       <div className="flex flex-wrap gap-3 items-center px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-bg)]">
@@ -216,11 +337,15 @@ export default function EventsCalendar({ events }: { events: Event[] }) {
 
           {/* Calendar grid */}
           <div className="grid grid-cols-7 divide-x divide-y divide-[var(--color-border)]">
-            {buildCalendarGrid(year, month).map(({ date, isCurrentMonth }, i) => {
+            {monthCells.map(({ date, isCurrentMonth }, i) => {
               const key = calKey(date.getFullYear(), date.getMonth(), date.getDate())
               const dayEvs = byDay[key] ?? []
               const isToday = key === todayKey
               const isSelected = key === selectedDay
+              const column = i % 7
+              const row = Math.floor(i / 7)
+              const alignRight = column >= 5
+              const openUpward = row >= totalMonthRows - 2
 
               return (
                 <div
@@ -241,16 +366,90 @@ export default function EventsCalendar({ events }: { events: Event[] }) {
                   </span>
 
                   <div className="space-y-0.5">
-                    {dayEvs.slice(0, 3).map(ev => (
-                      <div
-                        key={ev._id}
-                        className="text-xs leading-tight px-1 py-0.5 rounded bg-[var(--color-blue-mid)]/10 text-[var(--color-blue)] truncate"
-                        title={ev.title}
-                      >
-                        <span className="text-[10px] text-[var(--color-text-muted)] mr-1">{fmtTime(ev.date)}</span>
-                        {ev.title}
-                      </div>
-                    ))}
+                    {dayEvs.slice(0, 3).map((ev) => {
+                      const details = portableTextToPlain(ev.description)
+                      const hasDetailPage = Boolean(ev.slug?.current)
+                      const isPopoverOpen = openPopoverEventId === ev._id
+                      return (
+                        <div key={ev._id} className="relative min-w-0 group/event">
+                          <Link
+                            href={hasDetailPage ? `/events/${ev.slug.current}` : '#'}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              if (!canHover) {
+                                event.preventDefault()
+                                setOpenPopoverEventId((prev) => (prev === ev._id ? null : ev._id))
+                                return
+                              }
+                              if (!hasDetailPage) event.preventDefault()
+                            }}
+                            data-event-chip
+                            className="flex w-full min-w-0 items-center gap-1 overflow-hidden whitespace-nowrap text-left text-xs leading-tight px-1 py-0.5 rounded bg-[var(--color-blue-mid)]/10 text-[var(--color-blue)] hover:bg-[var(--color-blue-mid)]/20"
+                          >
+                            <span className="shrink-0 text-[10px] text-[var(--color-text-muted)]">{fmtTime(ev.date)}</span>
+                            <span className="block min-w-0 truncate">{ev.title}</span>
+                          </Link>
+
+                          <div
+                            data-event-popover
+                            className={`absolute z-40 w-72 max-w-[calc(100vw-1rem)] sm:w-80 rounded border border-[var(--color-border)] bg-white shadow-lg ${alignRight ? 'right-0' : 'left-0'} ${openUpward ? 'bottom-full mb-1' : 'top-full mt-1'} ${canHover ? 'hidden group-hover/event:block group-focus-within/event:block' : isPopoverOpen ? 'block' : 'hidden'}`}
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            <div className="relative px-3 py-2 border-b border-[var(--color-border)] bg-[var(--color-bg)]">
+                              <p className="text-sm font-semibold text-[var(--color-text)] leading-snug">{ev.title}</p>
+                              <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                                {fmtDateLong(ev.date)} {fmtTime(ev.date)}
+                                {ev.endDate && ` – ${fmtTime(ev.endDate)}`}
+                              </p>
+                              {!canHover && (
+                                <button
+                                  type="button"
+                                  onClick={() => setOpenPopoverEventId(null)}
+                                  className="absolute right-2 top-2 rounded px-1.5 py-0.5 text-xs text-[var(--color-text-muted)] hover:bg-[var(--color-blue-light)]"
+                                  aria-label="Close details"
+                                >
+                                  Close
+                                </button>
+                              )}
+                            </div>
+                            <div className="px-3 py-2 space-y-2 max-h-52 overflow-y-auto">
+                              {ev.locationName && (
+                                <p className="text-xs text-[var(--color-text-muted)]">
+                                  📍 {ev.locationName}
+                                  {ev.locationAddress && `, ${ev.locationAddress}`}
+                                </p>
+                              )}
+                              {details && (
+                                <LinkifiedText
+                                  text={truncateText(details, 260)}
+                                  className="text-xs text-[var(--color-text)] whitespace-pre-line leading-relaxed"
+                                />
+                              )}
+                              {hasDetailPage && (
+                                <Link
+                                  href={`/events/${ev.slug.current}`}
+                                  onClick={(event) => event.stopPropagation()}
+                                  className="inline-block text-xs font-semibold text-[var(--color-blue-mid)] hover:underline"
+                                >
+                                  View full details →
+                                </Link>
+                              )}
+                              {ev.rsvpUrl && (
+                                <a
+                                  href={ev.rsvpUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(event) => event.stopPropagation()}
+                                  className="inline-block text-xs font-semibold text-[var(--color-blue-mid)] hover:underline"
+                                >
+                                  RSVP / Register ↗
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
                     {dayEvs.length > 3 && (
                       <div className="text-[10px] text-[var(--color-text-muted)] px-1">
                         +{dayEvs.length - 3} more
@@ -313,24 +512,50 @@ export default function EventsCalendar({ events }: { events: Event[] }) {
 
                   {/* Events column */}
                   <div className="flex-1 divide-y divide-[var(--color-border)]">
-                    {dayEvs.map(ev => (
-                      <div key={ev._id} className="px-4 py-3">
-                        <p className="text-xs text-[var(--color-text-muted)] mb-1">
-                          {fmtTime(ev.date)}
-                          {ev.endDate && ` – ${fmtTime(ev.endDate)}`}
-                        </p>
-                        <p className="font-semibold text-[var(--color-text)] text-sm leading-snug">{ev.title}</p>
-                        {ev.locationName && (
-                          <p className="text-xs text-[var(--color-text-muted)] mt-0.5">📍 {ev.locationName}</p>
-                        )}
-                        {ev.rsvpUrl && (
-                          <a href={ev.rsvpUrl} target="_blank" rel="noopener noreferrer"
-                            className="text-xs text-[var(--color-blue-mid)] hover:underline mt-1 inline-block">
-                            RSVP →
-                          </a>
-                        )}
-                      </div>
-                    ))}
+                    {dayEvs.map((ev) => {
+                      const details = portableTextToPlain(ev.description)
+                      return (
+                        <div key={ev._id} className="px-4 py-3">
+                          <p className="text-xs text-[var(--color-text-muted)] mb-1">
+                            {fmtTime(ev.date)}
+                            {ev.endDate && ` – ${fmtTime(ev.endDate)}`}
+                          </p>
+                          <p className="font-semibold text-[var(--color-text)] text-sm leading-snug">{ev.title}</p>
+                          {ev.locationName && (
+                            <p className="text-xs text-[var(--color-text-muted)] mt-0.5">📍 {ev.locationName}</p>
+                          )}
+                          {details && (
+                            <LinkifiedText
+                              text={expandedListItems.has(ev._id) ? details : truncateText(details, 220)}
+                              className="text-xs text-[var(--color-text-muted)] mt-1 leading-relaxed whitespace-pre-line"
+                            />
+                          )}
+                          {details && details.length > 220 && (
+                            <button
+                              type="button"
+                              onClick={() => toggleExpanded(ev._id)}
+                              className="text-xs text-[var(--color-blue-mid)] hover:underline mt-1"
+                            >
+                              {expandedListItems.has(ev._id) ? 'Less' : 'More'}
+                            </button>
+                          )}
+                          {ev.slug?.current && (
+                            <Link
+                              href={`/events/${ev.slug.current}`}
+                              className="text-xs text-[var(--color-blue-mid)] hover:underline mt-1 inline-block mr-3"
+                            >
+                              Details →
+                            </Link>
+                          )}
+                          {ev.rsvpUrl && (
+                            <a href={ev.rsvpUrl} target="_blank" rel="noopener noreferrer"
+                              className="text-xs text-[var(--color-blue-mid)] hover:underline mt-1 inline-block">
+                              RSVP →
+                            </a>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               ))}
@@ -353,27 +578,44 @@ export default function EventsCalendar({ events }: { events: Event[] }) {
             </p>
           ) : (
             <div className="divide-y divide-[var(--color-border)]">
-              {dayEvents.map(ev => (
-                <div key={ev._id} className="px-6 py-4">
-                  <p className="text-sm font-semibold text-[var(--color-blue-mid)] mb-1">
-                    {fmtTime(ev.date)}
-                    {ev.endDate && ` – ${fmtTime(ev.endDate)}`}
-                  </p>
-                  <p className="font-bold text-[var(--color-text)] mb-1">{ev.title}</p>
-                  {ev.locationName && (
-                    <p className="text-sm text-[var(--color-text-muted)]">
-                      📍 {ev.locationName}
-                      {ev.locationAddress && `, ${ev.locationAddress}`}
+              {dayEvents.map((ev) => {
+                const details = portableTextToPlain(ev.description)
+                return (
+                  <div key={ev._id} className="px-6 py-4">
+                    <p className="text-sm font-semibold text-[var(--color-blue-mid)] mb-1">
+                      {fmtTime(ev.date)}
+                      {ev.endDate && ` – ${fmtTime(ev.endDate)}`}
                     </p>
-                  )}
-                  {ev.rsvpUrl && (
-                    <a href={ev.rsvpUrl} target="_blank" rel="noopener noreferrer"
-                      className="mt-2 inline-block text-sm font-semibold text-white bg-[var(--color-blue-mid)] hover:opacity-90 px-3 py-1.5 rounded transition-opacity">
-                      RSVP / Register →
-                    </a>
-                  )}
-                </div>
-              ))}
+                    <p className="font-bold text-[var(--color-text)] mb-1">{ev.title}</p>
+                    {ev.locationName && (
+                      <p className="text-sm text-[var(--color-text-muted)]">
+                        📍 {ev.locationName}
+                        {ev.locationAddress && `, ${ev.locationAddress}`}
+                      </p>
+                    )}
+                    {details && (
+                      <LinkifiedText
+                        text={details}
+                        className="mt-2 text-sm text-[var(--color-text)] whitespace-pre-line leading-relaxed"
+                      />
+                    )}
+                    {ev.slug?.current && (
+                      <Link
+                        href={`/events/${ev.slug.current}`}
+                        className="mt-2 mr-3 inline-block text-sm font-semibold text-[var(--color-blue-mid)] hover:underline"
+                      >
+                        View full details →
+                      </Link>
+                    )}
+                    {ev.rsvpUrl && (
+                      <a href={ev.rsvpUrl} target="_blank" rel="noopener noreferrer"
+                        className="mt-2 inline-block text-sm font-semibold text-white bg-[var(--color-blue-mid)] hover:opacity-90 px-3 py-1.5 rounded transition-opacity">
+                        RSVP / Register →
+                      </a>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           )}
         </div>

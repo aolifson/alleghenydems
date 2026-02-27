@@ -265,6 +265,13 @@ export async function getPastEvents(limit = 10): Promise<Event[]> {
   )
 }
 
+export async function getEventBySlug(slug: string): Promise<Event | null> {
+  return client.fetch(
+    `*[_type == "event" && slug.current == $slug][0]`,
+    { slug }
+  )
+}
+
 export async function getLatestNews(limit = 6): Promise<NewsPost[]> {
   return client.fetch(
     `*[_type == "news"] | order(publishedAt desc) [0...$limit]`,
@@ -342,7 +349,7 @@ export async function getExternalLinks(): Promise<ExternalLink[]> {
 export async function getAllEventsForCalendar(): Promise<Event[]> {
   return client.fetch(
     `*[_type == "event"] | order(date asc) {
-      _id, _type, title, slug, date, endDate, locationName, locationAddress, rsvpUrl, isFeatured
+      _id, _type, title, slug, date, endDate, locationName, locationAddress, description, rsvpUrl, isFeatured
     }`
   )
 }
