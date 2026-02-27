@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import type { NavItem } from '@/sanity/lib/queries'
+import { useMunicipalityPrefix, prefixHref } from '@/lib/municipality-prefix-context'
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
   {
@@ -75,10 +76,23 @@ export default function Nav({
   logoUrl?: string | null
   municipalityName?: string | null
 }) {
-  const items = (navItems && navItems.length > 0) ? navItems : DEFAULT_NAV_ITEMS
+  const basePath = useMunicipalityPrefix()
   const resolvedLogoUrl = logoUrl ?? '/acdc-seal.png'
   const resolvedLogoAlt = municipalityName ?? 'Allegheny County Democratic Committee'
   const pathname = usePathname()
+
+  // Prefix all internal nav hrefs with the municipality basePath so navigation
+  // stays within the demo path (e.g. /municipalities/northside/events).
+  // When basePath is '' (county or subdomain), hrefs are returned unchanged.
+  const rawItems = (navItems && navItems.length > 0) ? navItems : DEFAULT_NAV_ITEMS
+  const items = rawItems.map((item) => ({
+    ...item,
+    href: prefixHref(item.href, basePath),
+    children: item.children?.map((child) => ({
+      ...child,
+      href: prefixHref(child.href, basePath),
+    })),
+  }))
   const [open, setOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -108,7 +122,7 @@ export default function Nav({
     <header className="bg-[var(--color-blue)] text-[var(--color-navy)] shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 flex items-center h-16">
         {/* Logo only */}
-        <Link href="/" className="shrink-0 hover:opacity-90 transition-opacity">
+        <Link href={prefixHref('/', basePath)} className="shrink-0 hover:opacity-90 transition-opacity">
           <Image src={resolvedLogoUrl} alt={resolvedLogoAlt} width={40} height={40} className="rounded-full" />
         </Link>
 

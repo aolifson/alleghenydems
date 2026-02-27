@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PortableText } from '@portabletext/react'
 import { getEventBySlug } from '@/sanity/lib/queries'
-import { getMunicipalitySlug } from '@/lib/tenant'
+import { getMunicipalitySlug, getMunicipalityPrefix } from '@/lib/tenant'
 
 const TZ = 'UTC'
 
@@ -42,6 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function EventDetailPage({ params }: PageProps) {
   const { slug } = await params
   const municipalitySlug = await getMunicipalitySlug()
+  const basePath = await getMunicipalityPrefix()
   const event = await getEventBySlug(slug, municipalitySlug)
   if (!event) notFound()
 
@@ -50,7 +51,7 @@ export default async function EventDetailPage({ params }: PageProps) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
-      <Link href="/events" className="inline-flex items-center text-sm text-[var(--color-blue-mid)] hover:underline mb-6">
+      <Link href={`${basePath}/events`} className="inline-flex items-center text-sm text-[var(--color-blue-mid)] hover:underline mb-6">
         ← Back to Events Calendar
       </Link>
 

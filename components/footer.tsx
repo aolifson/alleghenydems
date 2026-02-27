@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { SiteSettings, MunicipalitySettings } from '@/sanity/lib/queries'
+import { prefixHref } from '@/lib/municipality-prefix-context'
 
 const DEFAULT_FACEBOOK_URL = 'https://www.facebook.com/AlleghenyDems'
 const DEFAULT_INSTAGRAM_HANDLE = 'allegheny.dems'
@@ -21,7 +22,13 @@ function InstagramIcon() {
   )
 }
 
-export default function Footer({ settings }: { settings: SiteSettings | MunicipalitySettings | null }) {
+export default function Footer({
+  settings,
+  basePath = '',
+}: {
+  settings: SiteSettings | MunicipalitySettings | null
+  basePath?: string
+}) {
   const year = new Date().getFullYear()
   const facebookUrl = settings?.facebookPageUrl ?? DEFAULT_FACEBOOK_URL
   const instagramHandle = settings?.instagramHandle ?? DEFAULT_INSTAGRAM_HANDLE
@@ -77,7 +84,7 @@ export default function Footer({ settings }: { settings: SiteSettings | Municipa
               { label: 'Contact', href: '/contact' },
             ].map(({ label, href }) => (
               <li key={href}>
-                <Link href={href} className="hover:text-white transition-colors">{label}</Link>
+                <Link href={prefixHref(href, basePath)} className="hover:text-white transition-colors">{label}</Link>
               </li>
             ))}
           </ul>

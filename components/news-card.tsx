@@ -3,9 +3,9 @@ import Image from 'next/image'
 import type { NewsPost } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 
-export default function NewsCard({ post }: { post: NewsPost }) {
+export default function NewsCard({ post, basePath = '' }: { post: NewsPost; basePath?: string }) {
   const date = new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-  const href = post.isExternal ? post.externalUrl! : `/news/${post.slug.current}`
+  const href = post.isExternal ? post.externalUrl! : `${basePath}/news/${post.slug.current}`
   const isExternal = post.isExternal && post.externalUrl
 
   return (

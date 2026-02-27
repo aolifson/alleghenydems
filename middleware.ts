@@ -22,6 +22,23 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // ── Path-based demo routing ───────────────────────────────────────────────
+  // /municipalities/northside/events → served as /events with northside branding.
+  // No DNS or Vercel domain config needed — works immediately after creating
+  // a municipality document in Sanity.
+  const municipalitiesMatch = pathname.match(/^\/municipalities\/([^/]+)(\/.*)?$/)
+  if (municipalitiesMatch) {
+    const slug = municipalitiesMatch[1]
+    const rest = municipalitiesMatch[2] || '/'
+    const rewriteUrl = request.nextUrl.clone()
+    rewriteUrl.pathname = rest
+    const response = NextResponse.rewrite(rewriteUrl)
+    response.headers.set('x-municipality-slug', slug)
+    response.headers.set('x-municipality-prefix', `/municipalities/${slug}`)
+    return response
+  }
+
+  // ── Hostname-based production routing ────────────────────────────────────
   const hostname = request.headers.get('host') ?? ''
   const host = hostname.split(':')[0] // strip port for local dev
 

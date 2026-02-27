@@ -6,12 +6,14 @@ import { fetchFacebookPosts } from '@/lib/facebook'
 import FacebookLiveFeed from '@/components/facebook-live-feed'
 import EventCard from '@/components/event-card'
 import NewsCard from '@/components/news-card'
-import { getMunicipalitySlug } from '@/lib/tenant'
+import { getMunicipalitySlug, getMunicipalityPrefix } from '@/lib/tenant'
+import { prefixHref } from '@/lib/municipality-prefix-context'
 
 export const revalidate = 300 // ISR: refresh every 5 minutes (for action alerts)
 
 export default async function HomePage() {
   const municipalitySlug = await getMunicipalitySlug()
+  const basePath = await getMunicipalityPrefix()
   const isCounty = municipalitySlug === 'allegheny-county'
 
   const facebookPromise = isCounty
@@ -52,7 +54,7 @@ export default async function HomePage() {
               {settings?.heroSubtext ?? 'Fighting for working families across Allegheny County. Join us.'}
             </p>
             <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
-              <Link href="/get-involved"
+              <Link href={prefixHref('/get-involved', basePath)}
                 className="px-5 py-2.5 bg-[var(--color-red)] hover:bg-[var(--color-red-dark)] text-white font-semibold rounded transition-colors">
                 Get Involved
               </Link>
@@ -60,7 +62,7 @@ export default async function HomePage() {
                 className="px-5 py-2.5 border-2 border-white hover:bg-white hover:text-[var(--color-navy)] text-white font-semibold rounded transition-colors">
                 Donate
               </Link>
-              <Link href="/vote"
+              <Link href={prefixHref('/vote', basePath)}
                 className="px-5 py-2.5 bg-[var(--color-gold)] hover:opacity-90 text-[var(--color-navy)] font-semibold rounded transition-colors">
                 Voter Resources
               </Link>
@@ -100,8 +102,8 @@ export default async function HomePage() {
           {[
             { label: 'Register to Vote', href: 'https://www.pavoterservices.pa.gov/pages/VoterRegistrationApplication.aspx', icon: '🗳️', external: true },
             { label: 'Find Your Polling Place', href: 'https://www.pavoterservices.pa.gov/pages/pollingplaceinfo.aspx', icon: '📍', external: true },
-            { label: 'Upcoming Events', href: '/events', icon: '📅', external: false },
-            { label: 'Volunteer', href: '/get-involved#volunteer', icon: '🤝', external: false },
+            { label: 'Upcoming Events', href: prefixHref('/events', basePath), icon: '📅', external: false },
+            { label: 'Volunteer', href: prefixHref('/get-involved#volunteer', basePath), icon: '🤝', external: false },
           ].map(({ label, href, icon, external }) => (
             <a
               key={href}
@@ -175,7 +177,7 @@ export default async function HomePage() {
         <section className="max-w-7xl mx-auto px-4 py-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="font-display text-2xl font-bold text-[var(--color-blue)]">Upcoming Events</h2>
-            <Link href="/events" className="text-sm text-[var(--color-blue-mid)] hover:underline">View all →</Link>
+            <Link href={prefixHref('/events', basePath)} className="text-sm text-[var(--color-blue-mid)] hover:underline">View all →</Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {featuredEvents.map((event) => (
@@ -191,11 +193,11 @@ export default async function HomePage() {
           <div className="max-w-7xl mx-auto px-4 py-12">
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-display text-2xl font-bold text-[var(--color-blue)]">News & Updates</h2>
-              <Link href="/news" className="text-sm text-[var(--color-blue-mid)] hover:underline">View all →</Link>
+              <Link href={prefixHref('/news', basePath)} className="text-sm text-[var(--color-blue-mid)] hover:underline">View all →</Link>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {latestNews.map((post) => (
-                <NewsCard key={post._id} post={post} />
+                <NewsCard key={post._id} post={post} basePath={basePath} />
               ))}
             </div>
           </div>
