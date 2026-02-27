@@ -2,6 +2,7 @@ import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
 import {
+  BellIcon,
   CalendarIcon,
   CogIcon,
   DocumentIcon,
@@ -41,6 +42,13 @@ export default defineConfig({
                   .documentId('siteSettings')
                   .title('Site Settings')
               ),
+
+            S.divider(),
+
+            // ── Action Alerts ──
+            S.documentTypeListItem('actionAlert')
+              .title('Action Alerts')
+              .icon(BellIcon),
 
             S.divider(),
 

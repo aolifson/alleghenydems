@@ -1,13 +1,13 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { getFeaturedEvents, getLatestNews, getSiteSettings } from '@/sanity/lib/queries'
+import { getFeaturedEvents, getLatestNews, getSiteSettings, getActiveActionAlerts } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { fetchFacebookPosts } from '@/lib/facebook'
 import FacebookLiveFeed from '@/components/facebook-live-feed'
 import EventCard from '@/components/event-card'
 import NewsCard from '@/components/news-card'
 
-export const revalidate = 3600 // ISR: refresh every hour
+export const revalidate = 300 // ISR: refresh every 5 minutes (for action alerts)
 
 export default async function HomePage() {
   const facebookPromise = fetchFacebookPosts({ limit: 3 }).catch((error) => {
@@ -15,11 +15,12 @@ export default async function HomePage() {
     return null
   })
 
-  const [settings, featuredEvents, latestNews, facebook] = await Promise.all([
+  const [settings, featuredEvents, latestNews, facebook, activeAlerts] = await Promise.all([
     getSiteSettings(),
     getFeaturedEvents(3),
     getLatestNews(3),
     facebookPromise,
+    getActiveActionAlerts(),
   ])
   const facebookPageUrl = settings?.facebookPageUrl ?? 'https://www.facebook.com/AlleghenyDems/'
 
@@ -109,6 +110,59 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* ── Take Action ──────────────────────────────────────────── */}
+      {activeAlerts.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 py-12">
+          <h2 className="font-display text-2xl font-bold text-[var(--color-blue)] mb-6">Take Action</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activeAlerts.map((alert) => {
+              const borderColor =
+                alert.urgency === 'urgent'
+                  ? 'border-[var(--color-red)]'
+                  : alert.urgency === 'action'
+                  ? 'border-[var(--color-gold)]'
+                  : 'border-[var(--color-blue)]'
+              const badgeColor =
+                alert.urgency === 'urgent'
+                  ? 'bg-[var(--color-red)] text-white'
+                  : alert.urgency === 'action'
+                  ? 'bg-[var(--color-gold)] text-[var(--color-navy)]'
+                  : 'bg-[var(--color-blue)] text-white'
+              const badgeLabel =
+                alert.urgency === 'urgent' ? 'Urgent' : alert.urgency === 'action' ? 'Take Action' : 'Announcement'
+              const ctaColor =
+                alert.urgency === 'urgent'
+                  ? 'bg-[var(--color-red)] hover:bg-[var(--color-red-dark)] text-white'
+                  : alert.urgency === 'action'
+                  ? 'bg-[var(--color-gold)] hover:opacity-90 text-[var(--color-navy)]'
+                  : 'bg-[var(--color-blue)] hover:opacity-90 text-white'
+
+              return (
+                <div
+                  key={alert._id}
+                  className={`bg-white rounded-lg shadow-sm border-l-4 ${borderColor} p-5 flex flex-col gap-3`}
+                >
+                  <span className={`self-start text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded ${badgeColor}`}>
+                    {badgeLabel}
+                  </span>
+                  <p className="font-semibold text-[var(--color-blue)] leading-snug">{alert.headline}</p>
+                  {alert.ctaLabel && alert.ctaUrl && (
+                    <a
+                      href={alert.ctaUrl}
+                      target={alert.ctaUrl.startsWith('/') ? undefined : '_blank'}
+                      rel={alert.ctaUrl.startsWith('/') ? undefined : 'noopener noreferrer'}
+                      className={`mt-auto self-start px-4 py-2 text-sm font-semibold rounded transition-colors ${ctaColor}`}
+                    >
+                      {alert.ctaLabel}
+                    </a>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </section>
+      )}
 
       {/* ── Featured Events ──────────────────────────────────────── */}
       {featuredEvents.length > 0 && (

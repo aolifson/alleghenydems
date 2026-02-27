@@ -10,6 +10,19 @@ export interface SanityImage {
   caption?: string
 }
 
+export interface ActionAlert extends SanityDocument {
+  title: string
+  headline: string
+  body?: unknown[]
+  urgency: 'urgent' | 'action' | 'announcement'
+  ctaLabel?: string
+  ctaUrl?: string
+  startDate: string
+  endDate?: string
+  isActive: boolean
+  showInBanner: boolean
+}
+
 export interface Event extends SanityDocument {
   title: string
   slug: { current: string }
@@ -382,5 +395,21 @@ export async function getLegislativeTrackerBySlug(slug: string): Promise<Legisla
     `*[_type == "legislativeTracker" && slug.current == $slug][0]`,
     { slug },
     { cache: 'no-store' }
+  )
+}
+
+export async function getActiveActionAlerts(): Promise<ActionAlert[]> {
+  return client.withConfig({ useCdn: false }).fetch(
+    `*[_type == "actionAlert" && isActive == true && startDate <= $now && (endDate == null || endDate >= $now)] | order(startDate desc)`,
+    { now: new Date().toISOString() },
+    { next: { revalidate: 300 } }
+  )
+}
+
+export async function getBannerAlert(): Promise<ActionAlert | null> {
+  return client.withConfig({ useCdn: false }).fetch(
+    `*[_type == "actionAlert" && isActive == true && showInBanner == true && startDate <= $now && (endDate == null || endDate >= $now)] | order(startDate desc)[0]`,
+    { now: new Date().toISOString() },
+    { next: { revalidate: 300 } }
   )
 }

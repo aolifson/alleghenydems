@@ -1,3 +1,4 @@
+import { actionAlertType } from './actionAlert'
 import { eventType } from './event'
 import { newsType } from './news'
 import { committeeMemberType } from './committeeMember'
@@ -22,6 +23,7 @@ import {
 
 export const schemaTypes = [
   siteSettingsType,
+  actionAlertType,
   eventType,
   newsType,
   committeeMemberType,
