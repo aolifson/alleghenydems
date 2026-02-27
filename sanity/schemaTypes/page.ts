@@ -60,6 +60,14 @@ export const pageType = defineType({
       ],
       description: 'The main content of the page. Use headings, paragraphs, bullet points, and images.',
     }),
+    defineField({
+      name: 'municipality',
+      title: 'Municipality',
+      type: 'reference',
+      to: [{ type: 'municipality' }],
+      description: 'Which municipality this page belongs to. Leave blank for county-wide pages.',
+      options: { filter: 'isActive == true', disableNew: false },
+    }),
   ],
   preview: {
     select: { title: 'title', subtitle: 'slug.current' },

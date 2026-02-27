@@ -86,6 +86,14 @@ export const committeeMemberType = defineType({
       hidden: ({ currentUser }) =>
         !currentUser?.roles?.some((r: { name: string }) => r.name === 'administrator'),
     }),
+    defineField({
+      name: 'municipality',
+      title: 'Municipality',
+      type: 'reference',
+      to: [{ type: 'municipality' }],
+      description: 'Which municipality this member belongs to. Leave blank for county-level members.',
+      options: { filter: 'isActive == true', disableNew: false },
+    }),
   ],
   orderings: [
     { title: 'District, then Name', name: 'districtName', by: [{ field: 'district', direction: 'asc' }, { field: 'name', direction: 'asc' }] },

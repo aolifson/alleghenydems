@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PortableText } from '@portabletext/react'
 import { getEventBySlug } from '@/sanity/lib/queries'
+import { getMunicipalitySlug } from '@/lib/tenant'
 
 const TZ = 'UTC'
 
@@ -29,7 +30,8 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const event = await getEventBySlug(slug)
+  const municipalitySlug = await getMunicipalitySlug()
+  const event = await getEventBySlug(slug, municipalitySlug)
   if (!event) return { title: 'Event Not Found' }
   return {
     title: event.title,
@@ -39,7 +41,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function EventDetailPage({ params }: PageProps) {
   const { slug } = await params
-  const event = await getEventBySlug(slug)
+  const municipalitySlug = await getMunicipalitySlug()
+  const event = await getEventBySlug(slug, municipalitySlug)
   if (!event) notFound()
 
   const start = formatDateTime(event.date)

@@ -3,6 +3,7 @@ import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
 import {
   BellIcon,
+  HomeIcon,
   CalendarIcon,
   CogIcon,
   DocumentIcon,
@@ -42,6 +43,13 @@ export default defineConfig({
                   .documentId('siteSettings')
                   .title('Site Settings')
               ),
+
+            S.divider(),
+
+            // ── Municipalities ──
+            S.documentTypeListItem('municipality')
+              .title('Municipalities')
+              .icon(HomeIcon),
 
             S.divider(),
 

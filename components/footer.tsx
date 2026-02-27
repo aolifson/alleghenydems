@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import type { SiteSettings } from '@/sanity/lib/queries'
+import type { SiteSettings, MunicipalitySettings } from '@/sanity/lib/queries'
 
-const FACEBOOK_URL = 'https://www.facebook.com/AlleghenyDems'
-const INSTAGRAM_URL = 'https://www.instagram.com/allegheny.dems'
+const DEFAULT_FACEBOOK_URL = 'https://www.facebook.com/AlleghenyDems'
+const DEFAULT_INSTAGRAM_HANDLE = 'allegheny.dems'
 
 function FacebookIcon() {
   return (
@@ -21,8 +21,12 @@ function InstagramIcon() {
   )
 }
 
-export default function Footer({ settings }: { settings: SiteSettings | null }) {
+export default function Footer({ settings }: { settings: SiteSettings | MunicipalitySettings | null }) {
   const year = new Date().getFullYear()
+  const facebookUrl = settings?.facebookPageUrl ?? DEFAULT_FACEBOOK_URL
+  const instagramHandle = settings?.instagramHandle ?? DEFAULT_INSTAGRAM_HANDLE
+  const instagramUrl = `https://www.instagram.com/${instagramHandle}`
+  const orgName = ('name' in (settings ?? {})) ? (settings as MunicipalitySettings).name : 'Allegheny County Democratic Committee'
 
   return (
     <footer className="bg-[var(--color-navy)] text-white mt-auto">
@@ -30,9 +34,9 @@ export default function Footer({ settings }: { settings: SiteSettings | null }) 
         {/* Brand */}
         <div>
           <div className="flex items-center gap-3 mb-3">
-            <Image src="/acdc-seal.png" alt="ACDC Seal" width={48} height={48} className="rounded-full" />
+            <Image src="/acdc-seal.png" alt="Logo" width={48} height={48} className="rounded-full" />
             <p className="font-display font-bold text-lg text-[var(--color-gold)]">
-              Allegheny County Democratic Committee
+              {orgName}
             </p>
           </div>
           <p className="text-sm text-white/70 leading-relaxed">
@@ -40,7 +44,7 @@ export default function Footer({ settings }: { settings: SiteSettings | null }) 
           </p>
           <div className="flex gap-2 mt-4">
             <a
-              href={FACEBOOK_URL}
+              href={facebookUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
@@ -49,7 +53,7 @@ export default function Footer({ settings }: { settings: SiteSettings | null }) 
               <FacebookIcon />
             </a>
             <a
-              href={INSTAGRAM_URL}
+              href={instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
@@ -96,7 +100,7 @@ export default function Footer({ settings }: { settings: SiteSettings | null }) 
       </div>
 
       <div className="border-t border-white/10 py-4 text-center text-xs text-white/40">
-        © {year} Allegheny County Democratic Committee. Paid for by the Allegheny County Democratic Committee.
+        © {year} {orgName}. Paid for by {orgName}.
       </div>
     </footer>
   )

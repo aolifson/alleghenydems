@@ -82,6 +82,14 @@ export const actionAlertType = defineType({
       description: 'Display this alert as a banner across all pages. If multiple are enabled, the most recent shows.',
       initialValue: false,
     }),
+    defineField({
+      name: 'municipality',
+      title: 'Municipality',
+      type: 'reference',
+      to: [{ type: 'municipality' }],
+      description: 'Which municipality this alert belongs to. Leave blank for county-wide alerts.',
+      options: { filter: 'isActive == true', disableNew: false },
+    }),
   ],
   orderings: [
     {

@@ -73,6 +73,14 @@ export const eventType = defineType({
       initialValue: false,
       description: 'Turn on to show this event in the homepage featured events section.',
     }),
+    defineField({
+      name: 'municipality',
+      title: 'Municipality',
+      type: 'reference',
+      to: [{ type: 'municipality' }],
+      description: 'Which municipality this event belongs to. Leave blank for county-wide events.',
+      options: { filter: 'isActive == true', disableNew: false },
+    }),
   ],
   orderings: [
     { title: 'Date (Upcoming First)', name: 'dateAsc', by: [{ field: 'date', direction: 'asc' }] },

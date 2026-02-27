@@ -68,6 +68,14 @@ export const committeeDirectoryEntryType = defineType({
       hidden: ({ currentUser }) =>
         !currentUser?.roles?.some((r: { name: string }) => r.name === 'administrator'),
     }),
+    defineField({
+      name: 'municipality',
+      title: 'Municipality',
+      type: 'reference',
+      to: [{ type: 'municipality' }],
+      description: 'Which municipality this directory entry belongs to. Leave blank for county-wide.',
+      options: { filter: 'isActive == true', disableNew: false },
+    }),
   ],
   orderings: [
     {

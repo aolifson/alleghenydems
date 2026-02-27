@@ -1,26 +1,32 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { getFeaturedEvents, getLatestNews, getSiteSettings, getActiveActionAlerts } from '@/sanity/lib/queries'
+import { getFeaturedEvents, getLatestNews, getSiteSettings, getMunicipalitySettings, getActiveActionAlerts } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { fetchFacebookPosts } from '@/lib/facebook'
 import FacebookLiveFeed from '@/components/facebook-live-feed'
 import EventCard from '@/components/event-card'
 import NewsCard from '@/components/news-card'
+import { getMunicipalitySlug } from '@/lib/tenant'
 
 export const revalidate = 300 // ISR: refresh every 5 minutes (for action alerts)
 
 export default async function HomePage() {
-  const facebookPromise = fetchFacebookPosts({ limit: 3 }).catch((error) => {
-    console.error('Facebook feed fetch failed:', error)
-    return null
-  })
+  const municipalitySlug = await getMunicipalitySlug()
+  const isCounty = municipalitySlug === 'allegheny-county'
+
+  const facebookPromise = isCounty
+    ? fetchFacebookPosts({ limit: 3 }).catch((error) => {
+        console.error('Facebook feed fetch failed:', error)
+        return null
+      })
+    : Promise.resolve(null)
 
   const [settings, featuredEvents, latestNews, facebook, activeAlerts] = await Promise.all([
-    getSiteSettings(),
-    getFeaturedEvents(3),
-    getLatestNews(3),
+    isCounty ? getSiteSettings() : getMunicipalitySettings(municipalitySlug),
+    getFeaturedEvents(3, municipalitySlug),
+    getLatestNews(3, municipalitySlug),
     facebookPromise,
-    getActiveActionAlerts(),
+    getActiveActionAlerts(municipalitySlug),
   ])
   const facebookPageUrl = settings?.facebookPageUrl ?? 'https://www.facebook.com/AlleghenyDems/'
 

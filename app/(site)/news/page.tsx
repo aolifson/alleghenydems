@@ -1,12 +1,14 @@
 import type { Metadata } from 'next'
 import { getLatestNews } from '@/sanity/lib/queries'
 import NewsCard from '@/components/news-card'
+import { getMunicipalitySlug } from '@/lib/tenant'
 
 export const metadata: Metadata = { title: 'News & Updates' }
 export const revalidate = 3600
 
 export default async function NewsPage() {
-  const posts = await getLatestNews(50)
+  const municipalitySlug = await getMunicipalitySlug()
+  const posts = await getLatestNews(50, municipalitySlug)
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">

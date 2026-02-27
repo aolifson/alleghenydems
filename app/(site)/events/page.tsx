@@ -1,12 +1,14 @@
 import type { Metadata } from 'next'
 import { getAllEventsForCalendar } from '@/sanity/lib/queries'
 import EventsCalendar from '@/components/events-calendar'
+import { getMunicipalitySlug } from '@/lib/tenant'
 
 export const metadata: Metadata = { title: 'Events' }
 export const revalidate = 3600
 
 export default async function EventsPage() {
-  const events = await getAllEventsForCalendar()
+  const municipalitySlug = await getMunicipalitySlug()
+  const events = await getAllEventsForCalendar(municipalitySlug)
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">

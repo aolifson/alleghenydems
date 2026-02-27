@@ -81,6 +81,14 @@ export const newsType = defineType({
       description: 'The full article content. Use headings, bullet points, and images to organize.',
       hidden: ({ document }) => !!document?.isExternal,
     }),
+    defineField({
+      name: 'municipality',
+      title: 'Municipality',
+      type: 'reference',
+      to: [{ type: 'municipality' }],
+      description: 'Which municipality this post belongs to. Leave blank for county-wide news.',
+      options: { filter: 'isActive == true', disableNew: false },
+    }),
   ],
   orderings: [
     { title: 'Published (Newest First)', name: 'publishedDesc', by: [{ field: 'publishedAt', direction: 'desc' }] },

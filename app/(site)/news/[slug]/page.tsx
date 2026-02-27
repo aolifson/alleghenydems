@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { PortableText } from '@portabletext/react'
 import { getNewsPost } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
+import { getMunicipalitySlug } from '@/lib/tenant'
 
 export const revalidate = 3600
 
@@ -11,14 +12,16 @@ type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const post = await getNewsPost(slug)
+  const municipalitySlug = await getMunicipalitySlug()
+  const post = await getNewsPost(slug, municipalitySlug)
   if (!post) return {}
   return { title: post.title, description: post.excerpt }
 }
 
 export default async function NewsPostPage({ params }: Props) {
   const { slug } = await params
-  const post = await getNewsPost(slug)
+  const municipalitySlug = await getMunicipalitySlug()
+  const post = await getNewsPost(slug, municipalitySlug)
   if (!post) notFound()
 
   const date = new Date(post.publishedAt).toLocaleDateString('en-US', {

@@ -124,6 +124,27 @@ export interface SiteSettings extends SanityDocument {
   navigationItems?: NavItem[]
 }
 
+export interface MunicipalitySettings extends SanityDocument {
+  name: string
+  slug: { current: string }
+  customDomain?: string
+  subdomain?: string
+  logo?: SanityImage
+  accentColor?: string
+  heroHeadline?: string
+  heroSubtext?: string
+  heroImage?: SanityImage
+  contactEmail?: string
+  contactPhone?: string
+  address?: string
+  facebookPageUrl?: string
+  instagramHandle?: string
+  footerText?: string
+  navigationItems?: NavItem[]
+  googleAnalyticsId?: string
+  isActive?: boolean
+}
+
 export interface PageDocument extends SanityDocument {
   title: string
   slug: { current: string }
@@ -257,49 +278,67 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
   return client.fetch(`*[_type == "siteSettings"][0]`)
 }
 
-export async function getFeaturedEvents(limit = 3): Promise<Event[]> {
+export async function getMunicipalitySettings(municipalitySlug: string): Promise<MunicipalitySettings | null> {
   return client.fetch(
-    `*[_type == "event" && isFeatured == true && date >= $now] | order(date asc) [0...$limit]`,
-    { now: new Date().toISOString(), limit }
+    `*[_type == "municipality" && slug.current == $municipalitySlug && isActive == true][0]`,
+    { municipalitySlug }
   )
 }
 
-export async function getUpcomingEvents(limit = 20): Promise<Event[]> {
+// ─── Municipality filter helper ───────────────────────────────────────────────
+// County queries match documents with no municipality reference OR an explicit
+// allegheny-county reference. Municipality queries match by slug. This ensures
+// existing county content (municipality == null) continues to work without migration.
+function municipalityFilter(slug: string): string {
+  if (slug === 'allegheny-county') {
+    return `(!defined(municipality) || municipality->slug.current == "allegheny-county")`
+  }
+  return `municipality->slug.current == $municipalitySlug`
+}
+
+export async function getFeaturedEvents(limit = 3, municipalitySlug = 'allegheny-county'): Promise<Event[]> {
   return client.fetch(
-    `*[_type == "event" && date >= $now] | order(date asc) [0...$limit]`,
-    { now: new Date().toISOString(), limit }
+    `*[_type == "event" && isFeatured == true && date >= $now && ${municipalityFilter(municipalitySlug)}] | order(date asc) [0...$limit]`,
+    { now: new Date().toISOString(), limit, municipalitySlug }
   )
 }
 
-export async function getPastEvents(limit = 10): Promise<Event[]> {
+export async function getUpcomingEvents(limit = 20, municipalitySlug = 'allegheny-county'): Promise<Event[]> {
   return client.fetch(
-    `*[_type == "event" && date < $now] | order(date desc) [0...$limit]`,
-    { now: new Date().toISOString(), limit }
+    `*[_type == "event" && date >= $now && ${municipalityFilter(municipalitySlug)}] | order(date asc) [0...$limit]`,
+    { now: new Date().toISOString(), limit, municipalitySlug }
   )
 }
 
-export async function getEventBySlug(slug: string): Promise<Event | null> {
+export async function getPastEvents(limit = 10, municipalitySlug = 'allegheny-county'): Promise<Event[]> {
   return client.fetch(
-    `*[_type == "event" && slug.current == $slug][0]`,
-    { slug }
+    `*[_type == "event" && date < $now && ${municipalityFilter(municipalitySlug)}] | order(date desc) [0...$limit]`,
+    { now: new Date().toISOString(), limit, municipalitySlug }
   )
 }
 
-export async function getLatestNews(limit = 6): Promise<NewsPost[]> {
+export async function getEventBySlug(slug: string, municipalitySlug = 'allegheny-county'): Promise<Event | null> {
   return client.fetch(
-    `*[_type == "news"] | order(publishedAt desc) [0...$limit]`,
-    { limit }
+    `*[_type == "event" && slug.current == $slug && ${municipalityFilter(municipalitySlug)}][0]`,
+    { slug, municipalitySlug }
   )
 }
 
-export async function getNewsPost(slug: string): Promise<NewsPost | null> {
+export async function getLatestNews(limit = 6, municipalitySlug = 'allegheny-county'): Promise<NewsPost[]> {
   return client.fetch(
-    `*[_type == "news" && slug.current == $slug][0]`,
-    { slug }
+    `*[_type == "news" && ${municipalityFilter(municipalitySlug)}] | order(publishedAt desc) [0...$limit]`,
+    { limit, municipalitySlug }
   )
 }
 
-export async function getCommitteeMembers(): Promise<CommitteeMember[]> {
+export async function getNewsPost(slug: string, municipalitySlug = 'allegheny-county'): Promise<NewsPost | null> {
+  return client.fetch(
+    `*[_type == "news" && slug.current == $slug && ${municipalityFilter(municipalitySlug)}][0]`,
+    { slug, municipalitySlug }
+  )
+}
+
+export async function getCommitteeMembers(municipalitySlug = 'allegheny-county'): Promise<CommitteeMember[]> {
   const members = await client.fetch<CommitteeMember[]>(
     `*[
       _type == "committeeMember" &&
@@ -307,27 +346,33 @@ export async function getCommitteeMembers(): Promise<CommitteeMember[]> {
       !(
         defined(district) &&
         lower(district) in ["elected-official", "elected officials", "who-we-are"]
-      )
-    ] | order(district asc, displayOrder asc, name asc)`
+      ) &&
+      ${municipalityFilter(municipalitySlug)}
+    ] | order(district asc, displayOrder asc, name asc)`,
+    { municipalitySlug }
   )
   return dedupeMembersByName(members)
 }
 
-export async function getCommitteeDirectoryEntries(): Promise<CommitteeDirectoryEntry[]> {
+export async function getCommitteeDirectoryEntries(municipalitySlug = 'allegheny-county'): Promise<CommitteeDirectoryEntry[]> {
   return client.fetch(
     `*[
       _type == "committeeDirectoryEntry" &&
-      isActive != false
-    ] | order(committee asc, ward asc, district asc, displayOrder asc, firstName asc, lastName asc)`
+      isActive != false &&
+      ${municipalityFilter(municipalitySlug)}
+    ] | order(committee asc, ward asc, district asc, displayOrder asc, firstName asc, lastName asc)`,
+    { municipalitySlug }
   )
 }
 
-export async function getCommitteeContactEntries(): Promise<CommitteeContactEntry[]> {
+export async function getCommitteeContactEntries(municipalitySlug = 'allegheny-county'): Promise<CommitteeContactEntry[]> {
   return client.fetch(
     `*[
       _type == "committeeContactEntry" &&
-      isActive != false
-    ] | order(committee asc, displayOrder asc)`
+      isActive != false &&
+      ${municipalityFilter(municipalitySlug)}
+    ] | order(committee asc, displayOrder asc)`,
+    { municipalitySlug }
   )
 }
 
@@ -359,18 +404,19 @@ export async function getExternalLinks(): Promise<ExternalLink[]> {
   )
 }
 
-export async function getAllEventsForCalendar(): Promise<Event[]> {
+export async function getAllEventsForCalendar(municipalitySlug = 'allegheny-county'): Promise<Event[]> {
   return client.fetch(
-    `*[_type == "event"] | order(date asc) {
+    `*[_type == "event" && ${municipalityFilter(municipalitySlug)}] | order(date asc) {
       _id, _type, title, slug, date, endDate, locationName, locationAddress, description, rsvpUrl, isFeatured
-    }`
+    }`,
+    { municipalitySlug }
   )
 }
 
-export async function getPageBySlug(slug: string): Promise<PageDocument | null> {
+export async function getPageBySlug(slug: string, municipalitySlug = 'allegheny-county'): Promise<PageDocument | null> {
   return client.fetch(
-    `*[_type == "page" && slug.current == $slug][0]`,
-    { slug }
+    `*[_type == "page" && slug.current == $slug && ${municipalityFilter(municipalitySlug)}][0]`,
+    { slug, municipalitySlug }
   )
 }
 
@@ -398,18 +444,18 @@ export async function getLegislativeTrackerBySlug(slug: string): Promise<Legisla
   )
 }
 
-export async function getActiveActionAlerts(): Promise<ActionAlert[]> {
+export async function getActiveActionAlerts(municipalitySlug = 'allegheny-county'): Promise<ActionAlert[]> {
   return client.withConfig({ useCdn: false }).fetch(
-    `*[_type == "actionAlert" && isActive == true && startDate <= $now && (endDate == null || endDate >= $now)] | order(startDate desc)`,
-    { now: new Date().toISOString() },
+    `*[_type == "actionAlert" && isActive == true && startDate <= $now && (endDate == null || endDate >= $now) && ${municipalityFilter(municipalitySlug)}] | order(startDate desc)`,
+    { now: new Date().toISOString(), municipalitySlug },
     { next: { revalidate: 300 } }
   )
 }
 
-export async function getBannerAlert(): Promise<ActionAlert | null> {
+export async function getBannerAlert(municipalitySlug = 'allegheny-county'): Promise<ActionAlert | null> {
   return client.withConfig({ useCdn: false }).fetch(
-    `*[_type == "actionAlert" && isActive == true && showInBanner == true && startDate <= $now && (endDate == null || endDate >= $now)] | order(startDate desc)[0]`,
-    { now: new Date().toISOString() },
+    `*[_type == "actionAlert" && isActive == true && showInBanner == true && startDate <= $now && (endDate == null || endDate >= $now) && ${municipalityFilter(municipalitySlug)}] | order(startDate desc)[0]`,
+    { now: new Date().toISOString(), municipalitySlug },
     { next: { revalidate: 300 } }
   )
 }

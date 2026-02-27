@@ -66,8 +66,18 @@ function InstagramIcon() {
   )
 }
 
-export default function Nav({ navItems }: { navItems?: NavItem[] | null }) {
+export default function Nav({
+  navItems,
+  logoUrl,
+  municipalityName,
+}: {
+  navItems?: NavItem[] | null
+  logoUrl?: string | null
+  municipalityName?: string | null
+}) {
   const items = (navItems && navItems.length > 0) ? navItems : DEFAULT_NAV_ITEMS
+  const resolvedLogoUrl = logoUrl ?? '/acdc-seal.png'
+  const resolvedLogoAlt = municipalityName ?? 'Allegheny County Democratic Committee'
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
@@ -99,7 +109,7 @@ export default function Nav({ navItems }: { navItems?: NavItem[] | null }) {
       <div className="max-w-7xl mx-auto px-4 flex items-center h-16">
         {/* Logo only */}
         <Link href="/" className="shrink-0 hover:opacity-90 transition-opacity">
-          <Image src="/acdc-seal.png" alt="Allegheny County Democratic Committee" width={40} height={40} className="rounded-full" />
+          <Image src={resolvedLogoUrl} alt={resolvedLogoAlt} width={40} height={40} className="rounded-full" />
         </Link>
 
         {/* Desktop Nav */}
