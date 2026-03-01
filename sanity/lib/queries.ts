@@ -285,6 +285,23 @@ export async function getMunicipalitySettings(municipalitySlug: string): Promise
   )
 }
 
+export interface MunicipalityListItem {
+  _id: string
+  name: string
+  slug: { current: string }
+  logo?: SanityImage
+  customDomain?: string
+  subdomain?: string
+}
+
+export async function getActiveMunicipalities(): Promise<MunicipalityListItem[]> {
+  return client.fetch(
+    `*[_type == "municipality" && isActive == true] | order(name asc) {
+      _id, name, slug, logo, customDomain, subdomain
+    }`
+  )
+}
+
 // ─── Municipality filter helper ───────────────────────────────────────────────
 // County queries match documents with no municipality reference OR an explicit
 // allegheny-county reference. Municipality queries match by slug. This ensures

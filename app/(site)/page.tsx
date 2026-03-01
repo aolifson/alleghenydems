@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { getFeaturedEvents, getLatestNews, getSiteSettings, getMunicipalitySettings, getActiveActionAlerts } from '@/sanity/lib/queries'
+import type { MunicipalitySettings } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { fetchFacebookPosts } from '@/lib/facebook'
 import FacebookLiveFeed from '@/components/facebook-live-feed'
@@ -31,6 +32,9 @@ export default async function HomePage() {
     getActiveActionAlerts(municipalitySlug),
   ])
   const facebookPageUrl = settings?.facebookPageUrl ?? 'https://www.facebook.com/AlleghenyDems/'
+  const heroLogoUrl = !isCounty && (settings as MunicipalitySettings)?.logo
+    ? urlFor((settings as MunicipalitySettings).logo!).width(320).height(320).url()
+    : null
 
   return (
     <>
@@ -71,8 +75,8 @@ export default async function HomePage() {
 
           <div className="hidden lg:flex justify-end">
             <Image
-              src="/acdc-seal.png"
-              alt="Allegheny County Democratic Committee Seal"
+              src={heroLogoUrl ?? '/acdc-seal.png'}
+              alt={heroLogoUrl ? ((settings as MunicipalitySettings)?.name ?? 'Municipality Logo') : 'Allegheny County Democratic Committee Seal'}
               width={320}
               height={320}
               className="drop-shadow-2xl"

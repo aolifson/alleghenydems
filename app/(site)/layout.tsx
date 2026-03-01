@@ -1,7 +1,8 @@
 import Nav from '@/components/nav'
 import Footer from '@/components/footer'
 import ActionAlertBanner from '@/components/action-alert-banner'
-import { getSiteSettings, getMunicipalitySettings, getBannerAlert } from '@/sanity/lib/queries'
+import { getSiteSettings, getMunicipalitySettings, getBannerAlert, getActiveMunicipalities } from '@/sanity/lib/queries'
+import type { MunicipalityListItem } from '@/sanity/lib/queries'
 import { getMunicipalitySlug, getMunicipalityPrefix } from '@/lib/tenant'
 import { MunicipalityPrefixProvider } from '@/lib/municipality-prefix-context'
 import { urlFor } from '@/sanity/lib/image'
@@ -13,10 +14,11 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const basePath = await getMunicipalityPrefix()
   const isCounty = municipalitySlug === 'allegheny-county'
 
-  const [settings, municipalitySettings, bannerAlert] = await Promise.all([
+  const [settings, municipalitySettings, bannerAlert, municipalities] = await Promise.all([
     isCounty ? getSiteSettings() : null,
     isCounty ? null : getMunicipalitySettings(municipalitySlug),
     getBannerAlert(municipalitySlug),
+    isCounty ? getActiveMunicipalities() : Promise.resolve([] as MunicipalityListItem[]),
   ])
 
   const effectiveSettings = isCounty ? settings : municipalitySettings
@@ -30,7 +32,20 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       {accentColor && (
         <style>{`:root { --color-blue: ${accentColor}; --color-blue-mid: ${accentColor}; }`}</style>
       )}
-      <Nav navItems={effectiveSettings?.navigationItems} logoUrl={logoUrl} municipalityName={municipalityName} />
+      {/* Parent org breadcrumb — only visible on municipality sites */}
+      {!isCounty && (
+        <div className="bg-[var(--color-navy)] border-b border-white/10">
+          <div className="max-w-7xl mx-auto px-4 py-1.5">
+            <a
+              href={basePath ? '/' : 'https://alleghenydems.com'}
+              className="text-xs text-white/60 hover:text-white/90 transition-colors"
+            >
+              ← Allegheny County Democratic Committee
+            </a>
+          </div>
+        </div>
+      )}
+      <Nav navItems={effectiveSettings?.navigationItems} logoUrl={logoUrl} municipalityName={municipalityName} municipalities={municipalities} />
       {bannerAlert && <ActionAlertBanner alert={bannerAlert} />}
       <main className="flex-1">{children}</main>
       <Footer settings={effectiveSettings} basePath={basePath} />

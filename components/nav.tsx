@@ -3,8 +3,14 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import type { NavItem } from '@/sanity/lib/queries'
+import type { NavItem, MunicipalityListItem } from '@/sanity/lib/queries'
 import { useMunicipalityPrefix, prefixHref } from '@/lib/municipality-prefix-context'
+
+function getMunicipalityUrl(m: MunicipalityListItem): string {
+  if (m.customDomain) return `https://${m.customDomain}`
+  if (m.subdomain) return `https://${m.subdomain}.alleghenydems.com`
+  return `/municipalities/${m.slug.current}`
+}
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
   {
@@ -71,10 +77,12 @@ export default function Nav({
   navItems,
   logoUrl,
   municipalityName,
+  municipalities = [],
 }: {
   navItems?: NavItem[] | null
   logoUrl?: string | null
   municipalityName?: string | null
+  municipalities?: MunicipalityListItem[]
 }) {
   const basePath = useMunicipalityPrefix()
   const resolvedLogoUrl = logoUrl ?? '/acdc-seal.png'
@@ -173,6 +181,39 @@ export default function Nav({
               )}
             </div>
           ))}
+
+          {/* Local Committees dropdown — county site only, hidden when empty */}
+          {municipalities.length > 0 && (
+            <div
+              className="relative"
+              onMouseEnter={() => openDropdown('__local_committees__')}
+              onMouseLeave={scheduleClose}
+            >
+              <button
+                className="px-3 py-2 rounded text-sm font-medium hover:bg-[var(--color-navy)]/10 transition-colors flex items-center gap-1"
+              >
+                Local Committees <span className="text-xs opacity-60">▾</span>
+              </button>
+              {activeDropdown === '__local_committees__' && (
+                <div
+                  className="absolute top-full right-0 mt-1 bg-white text-[var(--color-text)] shadow-lg rounded-md py-1 min-w-[220px]"
+                  onMouseEnter={() => { if (closeTimer.current) clearTimeout(closeTimer.current) }}
+                  onMouseLeave={scheduleClose}
+                >
+                  {municipalities.map((m) => (
+                    <a
+                      key={m._id}
+                      href={getMunicipalityUrl(m)}
+                      className="block px-4 py-2 text-sm hover:bg-[var(--color-blue-light)] hover:text-[var(--color-blue)] transition-colors"
+                      onClick={() => setActiveDropdown(null)}
+                    >
+                      {m.name}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </nav>
 
         {/* Desktop right controls */}
@@ -279,6 +320,21 @@ export default function Nav({
               ))}
             </div>
           ))}
+          {municipalities.length > 0 && (
+            <div className="border-b border-white/10 pb-2 mb-2">
+              <p className="py-2 text-xs font-semibold text-white/50 uppercase tracking-wide">Local Committees</p>
+              {municipalities.map((m) => (
+                <a
+                  key={m._id}
+                  href={getMunicipalityUrl(m)}
+                  className="block py-1.5 pl-4 text-sm text-white/70 hover:text-white"
+                  onClick={() => setOpen(false)}
+                >
+                  {m.name}
+                </a>
+              ))}
+            </div>
+          )}
           <div className="mt-3 grid grid-cols-2 gap-2">
             <Link
               href="https://store.alleghenydems.com/"
