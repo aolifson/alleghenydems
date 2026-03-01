@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { SiteSettings, MunicipalitySettings } from '@/sanity/lib/queries'
-import { prefixHref } from '@/lib/municipality-prefix-context'
+import { prefixHref } from '@/lib/prefix-href'
 
 const DEFAULT_FACEBOOK_URL = 'https://www.facebook.com/AlleghenyDems'
 const DEFAULT_INSTAGRAM_HANDLE = 'allegheny.dems'

@@ -7,7 +7,7 @@ import FacebookLiveFeed from '@/components/facebook-live-feed'
 import EventCard from '@/components/event-card'
 import NewsCard from '@/components/news-card'
 import { getMunicipalitySlug, getMunicipalityPrefix } from '@/lib/tenant'
-import { prefixHref } from '@/lib/municipality-prefix-context'
+import { prefixHref } from '@/lib/prefix-href'
 
 export const revalidate = 300 // ISR: refresh every 5 minutes (for action alerts)
 
