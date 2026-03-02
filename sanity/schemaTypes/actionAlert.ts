@@ -90,6 +90,22 @@ export const actionAlertType = defineType({
       description: 'Which municipality this alert belongs to. Leave blank for county-wide alerts.',
       options: { filter: 'isActive == true', disableNew: false },
     }),
+    defineField({
+      name: 'shareWithAll',
+      title: 'Share with all municipality sites',
+      type: 'boolean',
+      description: 'Show this county alert on every active municipality site.',
+      initialValue: false,
+      hidden: ({ document }) => !!document?.municipality,
+    }),
+    defineField({
+      name: 'sharedWith',
+      title: 'Or share with specific municipalities',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'municipality' }], options: { filter: 'isActive == true' } }],
+      description: 'Leave blank if using "Share with all" above.',
+      hidden: ({ document }) => !!document?.municipality || !!(document?.shareWithAll),
+    }),
   ],
   orderings: [
     {

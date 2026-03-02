@@ -89,6 +89,22 @@ export const newsType = defineType({
       description: 'Which municipality this post belongs to. Leave blank for county-wide news.',
       options: { filter: 'isActive == true', disableNew: false },
     }),
+    defineField({
+      name: 'shareWithAll',
+      title: 'Share with all municipality sites',
+      type: 'boolean',
+      description: 'Show this county post on every active municipality site.',
+      initialValue: false,
+      hidden: ({ document }) => !!document?.municipality,
+    }),
+    defineField({
+      name: 'sharedWith',
+      title: 'Or share with specific municipalities',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'municipality' }], options: { filter: 'isActive == true' } }],
+      description: 'Leave blank if using "Share with all" above.',
+      hidden: ({ document }) => !!document?.municipality || !!(document?.shareWithAll),
+    }),
   ],
   orderings: [
     { title: 'Published (Newest First)', name: 'publishedDesc', by: [{ field: 'publishedAt', direction: 'desc' }] },

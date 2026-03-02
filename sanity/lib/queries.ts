@@ -21,6 +21,8 @@ export interface ActionAlert extends SanityDocument {
   endDate?: string
   isActive: boolean
   showInBanner: boolean
+  shareWithAll?: boolean
+  sharedWith?: Array<{ _key: string; _ref: string }>
 }
 
 export interface Event extends SanityDocument {
@@ -34,6 +36,8 @@ export interface Event extends SanityDocument {
   image?: SanityImage
   rsvpUrl?: string
   isFeatured?: boolean
+  shareWithAll?: boolean
+  sharedWith?: Array<{ _key: string; _ref: string }>
 }
 
 export interface NewsPost extends SanityDocument {
@@ -46,6 +50,8 @@ export interface NewsPost extends SanityDocument {
   externalUrl?: string
   externalPublication?: string
   body?: unknown[]
+  shareWithAll?: boolean
+  sharedWith?: Array<{ _key: string; _ref: string }>
 }
 
 export interface CommitteeMember extends SanityDocument {
@@ -304,13 +310,12 @@ export async function getActiveMunicipalities(): Promise<MunicipalityListItem[]>
 
 // ─── Municipality filter helper ───────────────────────────────────────────────
 // County queries match documents with no municipality reference OR an explicit
-// allegheny-county reference. Municipality queries match by slug. This ensures
-// existing county content (municipality == null) continues to work without migration.
+// allegheny-county reference. Municipality queries match by slug, shareWithAll, or sharedWith array.
 function municipalityFilter(slug: string): string {
   if (slug === 'allegheny-county') {
     return `(!defined(municipality) || municipality->slug.current == "allegheny-county")`
   }
-  return `municipality->slug.current == $municipalitySlug`
+  return `(municipality->slug.current == $municipalitySlug || shareWithAll == true || $municipalitySlug in sharedWith[]->slug.current)`
 }
 
 export async function getFeaturedEvents(limit = 3, municipalitySlug = 'allegheny-county'): Promise<Event[]> {

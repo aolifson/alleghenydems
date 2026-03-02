@@ -28,8 +28,82 @@ export default defineConfig({
 
   plugins: [
     structureTool({
-      structure: (S) =>
-        S.list()
+      structure: (S, { currentUser }) => {
+        const roles = currentUser?.roles?.map((r) => r.name) ?? []
+        const isSuperAdmin = roles.includes('administrator')
+        const municipalityRole = roles.find((r) => r.startsWith('municipality-'))
+        const municipalitySlug = municipalityRole?.replace('municipality-', '') ?? null
+
+        // ── Scoped view: municipality editor ───────────────────────────
+        if (municipalitySlug && !isSuperAdmin) {
+          return S.list()
+            .title('My Committee')
+            .items([
+              S.listItem()
+                .title('Municipality Settings')
+                .icon(HomeIcon)
+                .child(
+                  S.documentTypeList('municipality')
+                    .title('Municipality Settings')
+                    .filter(`slug.current == "${municipalitySlug}"`)
+                ),
+              S.divider(),
+              S.listItem()
+                .title('Action Alerts')
+                .icon(BellIcon)
+                .child(
+                  S.documentTypeList('actionAlert')
+                    .title('Action Alerts')
+                    .filter(`municipality->slug.current == "${municipalitySlug}"`)
+                ),
+              S.listItem()
+                .title('Events')
+                .icon(CalendarIcon)
+                .child(
+                  S.documentTypeList('event')
+                    .title('Events')
+                    .filter(`municipality->slug.current == "${municipalitySlug}"`)
+                ),
+              S.listItem()
+                .title('News & Updates')
+                .icon(DocumentsIcon)
+                .child(
+                  S.documentTypeList('news')
+                    .title('News & Updates')
+                    .filter(`municipality->slug.current == "${municipalitySlug}"`)
+                ),
+              S.divider(),
+              // Read-only view of county content shared with this municipality
+              S.listItem()
+                .title('Shared from County (read-only)')
+                .icon(DocumentsIcon)
+                .child(
+                  S.list()
+                    .title('Shared from County')
+                    .items([
+                      S.listItem()
+                        .title('Shared Events')
+                        .icon(CalendarIcon)
+                        .child(
+                          S.documentTypeList('event')
+                            .title('Shared Events')
+                            .filter(`!defined(municipality) && (shareWithAll == true || "${municipalitySlug}" in sharedWith[]->slug.current)`)
+                        ),
+                      S.listItem()
+                        .title('Shared News')
+                        .icon(DocumentsIcon)
+                        .child(
+                          S.documentTypeList('news')
+                            .title('Shared News')
+                            .filter(`!defined(municipality) && (shareWithAll == true || "${municipalitySlug}" in sharedWith[]->slug.current)`)
+                        ),
+                    ])
+                ),
+            ])
+        }
+
+        // ── Full view: county editor or super-admin ─────────────────────
+        return S.list()
           .title('Allegheny Dems Content')
           .items([
             // ── Site-wide settings (singleton) ──
@@ -109,7 +183,8 @@ export default defineConfig({
                   .title('Pages')
               ),
 
-          ]),
+          ])
+      },
     }),
     visionTool(),
   ],
