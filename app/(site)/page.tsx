@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { getFeaturedEvents, getLatestNews, getSiteSettings, getMunicipalitySettings, getActiveActionAlerts } from '@/sanity/lib/queries'
+import { getFeaturedEvents, getLatestNews, getFeaturedNews, getSiteSettings, getMunicipalitySettings, getActiveActionAlerts } from '@/sanity/lib/queries'
 import type { MunicipalitySettings } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { fetchFacebookPosts } from '@/lib/facebook'
@@ -24,13 +24,15 @@ export default async function HomePage() {
       })
     : Promise.resolve(null)
 
-  const [settings, featuredEvents, latestNews, facebook, activeAlerts] = await Promise.all([
+  const [settings, featuredEvents, featuredNews, latestNews, facebook, activeAlerts] = await Promise.all([
     isCounty ? getSiteSettings() : getMunicipalitySettings(municipalitySlug),
     getFeaturedEvents(3, municipalitySlug),
+    getFeaturedNews(3, municipalitySlug),
     getLatestNews(3, municipalitySlug),
     facebookPromise,
     getActiveActionAlerts(municipalitySlug),
   ])
+  const displayNews = featuredNews.length > 0 ? featuredNews : latestNews
   const facebookPageUrl = settings?.facebookPageUrl ?? 'https://www.facebook.com/AlleghenyDems/'
   const heroLogoUrl = !isCounty && (settings as MunicipalitySettings)?.logo
     ? urlFor((settings as MunicipalitySettings).logo!).width(320).height(320).url()
@@ -192,7 +194,7 @@ export default async function HomePage() {
       )}
 
       {/* ── Latest News ──────────────────────────────────────────── */}
-      {latestNews.length > 0 && (
+      {displayNews.length > 0 && (
         <section className="bg-[var(--color-surface)] border-y border-[var(--color-border)]">
           <div className="max-w-7xl mx-auto px-4 py-12">
             <div className="flex items-center justify-between mb-6">
@@ -200,7 +202,7 @@ export default async function HomePage() {
               <Link href={prefixHref('/news', basePath)} className="text-sm text-[var(--color-blue-mid)] hover:underline">View all →</Link>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {latestNews.map((post) => (
+              {displayNews.map((post) => (
                 <NewsCard key={post._id} post={post} basePath={basePath} />
               ))}
             </div>

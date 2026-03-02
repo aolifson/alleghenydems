@@ -29,6 +29,13 @@ export const newsType = defineType({
       validation: (r) => r.required().error('Published date is required.'),
     }),
     defineField({
+      name: 'isFeatured',
+      title: 'Feature on Homepage',
+      type: 'boolean',
+      description: 'Pin this article to the homepage news section. Only affects the site(s) this article appears on.',
+      initialValue: false,
+    }),
+    defineField({
       name: 'excerpt',
       title: 'Excerpt',
       type: 'text',

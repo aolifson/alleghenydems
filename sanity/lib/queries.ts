@@ -50,6 +50,7 @@ export interface NewsPost extends SanityDocument {
   externalUrl?: string
   externalPublication?: string
   body?: unknown[]
+  isFeatured?: boolean
   shareWithAll?: boolean
   sharedWith?: Array<{ _key: string; _ref: string }>
 }
@@ -349,6 +350,13 @@ export async function getEventBySlug(slug: string, municipalitySlug = 'allegheny
 export async function getLatestNews(limit = 6, municipalitySlug = 'allegheny-county'): Promise<NewsPost[]> {
   return client.fetch(
     `*[_type == "news" && ${municipalityFilter(municipalitySlug)}] | order(publishedAt desc) [0...$limit]`,
+    { limit, municipalitySlug }
+  )
+}
+
+export async function getFeaturedNews(limit = 3, municipalitySlug = 'allegheny-county'): Promise<NewsPost[]> {
+  return client.fetch(
+    `*[_type == "news" && isFeatured == true && ${municipalityFilter(municipalitySlug)}] | order(publishedAt desc) [0...$limit]`,
     { limit, municipalitySlug }
   )
 }
