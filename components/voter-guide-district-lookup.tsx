@@ -13,6 +13,7 @@ interface LookupResult {
 
 interface Props {
   races: VoterGuideRace[]
+  initialQuery?: string
 }
 
 const TARGET_RACE_TITLES = [
@@ -257,8 +258,8 @@ function RaceSection({ race, districts }: { race: VoterGuideRace; districts: Vot
   )
 }
 
-export default function VoterGuideDistrictLookup({ races }: Props) {
-  const [query, setQuery] = useState('')
+export default function VoterGuideDistrictLookup({ races, initialQuery = '' }: Props) {
+  const [query, setQuery] = useState(initialQuery)
 
   const orderedRaces = useMemo(
     () => [...races].sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999)),

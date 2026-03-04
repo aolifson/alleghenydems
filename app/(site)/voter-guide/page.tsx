@@ -5,13 +5,21 @@ import VoterGuideDistrictLookup from '@/components/voter-guide-district-lookup'
 import {
   getLatestVoterGuide,
   getVoterGuideBySlug,
+  getMunicipalitySettings,
 } from '@/sanity/lib/queries'
+import { getMunicipalitySlug } from '@/lib/tenant'
 
 export const metadata: Metadata = { title: '2026 Voter Guide' }
 export const revalidate = 3600
 
 export default async function VoterGuidePage() {
-  const guide = (await getVoterGuideBySlug('voter-guide-2026')) ?? (await getLatestVoterGuide())
+  const municipalitySlug = await getMunicipalitySlug()
+  const isCounty = municipalitySlug === 'allegheny-county'
+  const [guide, municipalitySettings] = await Promise.all([
+    (getVoterGuideBySlug('voter-guide-2026')).then(g => g ?? getLatestVoterGuide()),
+    isCounty ? Promise.resolve(null) : getMunicipalitySettings(municipalitySlug),
+  ])
+  const initialQuery = municipalitySettings?.voterGuideSearchTerms?.[0] ?? ''
 
   if (!guide) {
     return (
@@ -60,7 +68,7 @@ export default async function VoterGuidePage() {
           </section>
         )}
 
-        <VoterGuideDistrictLookup races={races} />
+        <VoterGuideDistrictLookup races={races} initialQuery={initialQuery} />
       </div>
     </main>
   )

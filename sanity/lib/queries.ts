@@ -150,6 +150,7 @@ export interface MunicipalitySettings extends SanityDocument {
   navigationItems?: NavItem[]
   googleAnalyticsId?: string
   isActive?: boolean
+  voterGuideSearchTerms?: string[]
 }
 
 export interface PageDocument extends SanityDocument {

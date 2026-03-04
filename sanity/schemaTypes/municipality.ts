@@ -205,6 +205,14 @@ export const municipalityType = defineType({
       group: 'technical',
       description: 'Format: G-XXXXXXXXXX. Leave blank to use the county analytics ID.',
     }),
+    defineField({
+      name: 'voterGuideSearchTerms',
+      title: 'Voter Guide Search Terms',
+      type: 'array',
+      of: [{ type: 'string' }],
+      group: 'technical',
+      description: 'Terms to auto-filter the county voter guide for residents of this municipality (e.g. "NORTHSIDE", "15212"). The first term is used as the default. Must match the district labels or searchTerms in the voter guide.',
+    }),
   ],
   preview: {
     select: { title: 'name', subtitle: 'slug.current', isActive: 'isActive' },
