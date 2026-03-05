@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Allegheny County Dems — What's New & How to Manage It</title>
+<style>
+  :root {
+    --navy: #1a2744;
+    --blue: #2563eb;
+    --blue-mid: #1d4ed8;
+    --blue-light: #dbeafe;
+    --red: #dc2626;
+    --gold: #d97706;
+    --green: #16a34a;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --surface: #f8fafc;
+    --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; color: var(--text); background: var(--white); line-height: 1.6; }
+
+  /* ── Sticky top nav ── */
+  .top-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--navy); color: white;
+    padding: 0 1.5rem;
+    display: flex; align-items: center; gap: 1.5rem;
+    font-size: 0.8rem; height: 44px; overflow-x: auto;
+  }
+  .top-nav a { color: rgba(255,255,255,0.75); text-decoration: none; white-space: nowrap; }
+  .top-nav a:hover { color: white; }
+  .top-nav .brand { font-weight: 700; color: white; margin-right: 0.5rem; }
+
+  /* ── Cover ── */
+  .cover {
+    background: var(--navy); color: white;
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+  }
+  .cover h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.5rem; }
+  .cover .sub { font-size: 1.1rem; color: rgba(255,255,255,0.75); margin-bottom: 2rem; max-width: 640px; margin-left: auto; margin-right: auto; }
+  .cover .badge { display: inline-block; background: var(--blue); color: white; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 9999px; margin: 0.25rem; }
+  .cover .badge.new { background: var(--green); }
+
+  /* ── Sections ── */
+  .section { padding: 3rem 2rem; max-width: 960px; margin: 0 auto; }
+  .section-band { background: var(--surface); }
+  h2 { font-size: 1.75rem; font-weight: 800; color: var(--navy); margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 3px solid var(--blue); display: inline-block; }
+  h3 { font-size: 1.2rem; font-weight: 700; color: var(--navy); margin: 2rem 0 0.75rem; }
+  h4 { font-size: 1rem; font-weight: 600; color: var(--blue-mid); margin: 1.5rem 0 0.5rem; }
+  p { margin-bottom: 0.875rem; color: var(--text); }
+  .lead { font-size: 1.05rem; color: var(--muted); margin-bottom: 1.5rem; }
+  ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+  li { margin-bottom: 0.375rem; }
+  code { background: #f1f5f9; border: 1px solid var(--border); border-radius: 4px; padding: 0.125rem 0.375rem; font-size: 0.85em; font-family: 'Menlo', 'Consolas', monospace; color: var(--navy); }
+
+  /* ── Callout boxes ── */
+  .callout { border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; display: flex; gap: 0.75rem; align-items: flex-start; }
+  .callout-tip { background: #f0fdf4; border-left: 4px solid #16a34a; }
+  .callout-info { background: var(--blue-light); border-left: 4px solid var(--blue); }
+  .callout-warn { background: #fffbeb; border-left: 4px solid var(--gold); }
+  .callout-icon { font-size: 1.1rem; margin-top: 0.05rem; }
+  .callout p { margin: 0; font-size: 0.9rem; }
+
+  /* ── Steps ── */
+  .steps { counter-reset: step; list-style: none; padding: 0; }
+  .steps li { counter-increment: step; display: flex; gap: 1rem; margin-bottom: 1rem; align-items: flex-start; }
+  .steps li::before {
+    content: counter(step);
+    background: var(--blue); color: white;
+    font-weight: 700; font-size: 0.85rem;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 0.1rem;
+  }
+
+  /* ── Two-col layout ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* ── Feature comparison table ── */
+  .compare-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  .compare-table th { background: var(--navy); color: white; padding: 0.625rem 1rem; text-align: left; font-size: 0.8rem; }
+  .compare-table td { padding: 0.625rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table .check { color: var(--green); font-weight: 700; }
+  .compare-table .new-badge { display: inline-block; background: #dcfce7; color: #166534; font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 3px; margin-left: 0.4rem; vertical-align: middle; }
+  .compare-table .improved-badge { display: inline-block; background: #dbeafe; color: #1e40af; font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 3px; margin-left: 0.4rem; vertical-align: middle; }
+
+  /* ── Concept table ── */
+  .concept-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  .concept-table th { background: var(--navy); color: white; padding: 0.625rem 1rem; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  .concept-table td { padding: 0.625rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .concept-table tr:last-child td { border-bottom: none; }
+
+  /* ── Feature card grid ── */
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .feature-card { border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; background: white; }
+  .feature-card.new-feature { border-color: var(--green); border-width: 2px; }
+  .feature-card.improved { border-color: var(--blue); border-width: 2px; }
+  .feature-card .fc-icon { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  .feature-card h4 { margin: 0 0 0.375rem; color: var(--navy); font-size: 0.95rem; }
+  .feature-card p { font-size: 0.82rem; color: var(--muted); margin: 0; }
+  .feature-card .fc-tag { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 3px; margin-bottom: 0.375rem; }
+  .fc-tag.new { background: #dcfce7; color: #166534; }
+  .fc-tag.improved { background: #dbeafe; color: #1e40af; }
+  .fc-tag.existing { background: #f1f5f9; color: #475569; }
+
+  /* ── Browser chrome wrapper ── */
+  .browser {
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    margin: 1.25rem 0;
+    font-size: 0.85rem;
+  }
+  .browser-bar {
+    background: #f1f5f9; padding: 0.5rem 0.75rem;
+    display: flex; align-items: center; gap: 0.5rem;
+    border-bottom: 1px solid #cbd5e1;
+  }
+  .browser-dots { display: flex; gap: 5px; }
+  .browser-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .browser-dot.r { background: #ef4444; }
+  .browser-dot.y { background: #f59e0b; }
+  .browser-dot.g { background: #22c55e; }
+  .browser-url {
+    flex: 1; background: white; border: 1px solid #cbd5e1;
+    border-radius: 6px; padding: 0.2rem 0.5rem;
+    font-size: 0.78rem; color: var(--muted); margin-left: 0.25rem;
+  }
+
+  /* ── Site nav mockup ── */
+  .mock-nav {
+    background: var(--blue); color: white;
+    padding: 0 1rem;
+    display: flex; align-items: center; height: 52px; gap: 0.25rem;
+  }
+  .mock-nav .logo-area { display: flex; align-items: center; gap: 0.5rem; margin-right: 0.75rem; }
+  .mock-nav .logo-circle { width: 32px; height: 32px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; color: var(--navy); flex-shrink: 0; }
+  .mock-nav .logo-name { font-size: 0.78rem; font-weight: 600; }
+  .mock-nav a { color: rgba(255,255,255,0.85); font-size: 0.78rem; padding: 0.35rem 0.5rem; border-radius: 4px; text-decoration: none; white-space: nowrap; }
+  .mock-nav a:hover, .mock-nav a.active { background: rgba(255,255,255,0.15); color: white; }
+  .mock-nav .spacer { flex: 1; }
+  .mock-nav .donate-btn { background: var(--red); color: white !important; font-size: 0.75rem !important; font-weight: 700; padding: 0.3rem 0.75rem !important; border-radius: 4px; }
+  .mock-nav .dropdown-wrap { position: relative; }
+  .mock-nav .dropdown-menu {
+    position: absolute; top: 100%; left: 0; background: white; color: var(--text);
+    border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    min-width: 180px; padding: 0.375rem 0; z-index: 10; margin-top: 4px;
+  }
+  .mock-nav .dropdown-menu a { color: var(--text); display: block; padding: 0.4rem 1rem; font-size: 0.78rem; }
+
+  /* ── Municipality breadcrumb ── */
+  .mock-breadcrumb {
+    background: var(--navy); color: rgba(255,255,255,0.6);
+    font-size: 0.72rem; padding: 0.3rem 1rem;
+  }
+
+  /* ── Site hero mockup ── */
+  .mock-hero {
+    background: var(--navy); color: white;
+    padding: 1.5rem;
+    display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center;
+  }
+  .mock-hero h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.35rem; border: none; display: block; padding: 0; color: white; }
+  .mock-hero p { font-size: 0.78rem; color: rgba(255,255,255,0.75); margin-bottom: 0.75rem; }
+  .mock-hero .btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .mock-hero .btn { font-size: 0.72rem; font-weight: 700; padding: 0.35rem 0.75rem; border-radius: 4px; }
+  .mock-hero .btn-red { background: var(--red); color: white; }
+  .mock-hero .btn-gold { background: var(--gold); color: var(--navy); }
+  .mock-hero .btn-outline { border: 1.5px solid white; color: white; background: transparent; }
+
+  /* ── Content section mockup ── */
+  .mock-content { padding: 1rem; background: var(--surface); }
+  .mock-section-title { font-size: 0.72rem; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+  .mock-card-row { display: flex; gap: 0.5rem; }
+  .mock-card { background: white; border: 1px solid var(--border); border-radius: 6px; padding: 0.625rem; flex: 1; }
+  .mock-card .mc-label { font-size: 0.65rem; font-weight: 700; color: var(--blue); margin-bottom: 0.25rem; }
+  .mock-card .mc-title { font-size: 0.75rem; font-weight: 600; color: var(--navy); }
+  .mock-card .mc-meta { font-size: 0.65rem; color: var(--muted); margin-top: 0.2rem; }
+
+  /* ── Voter guide / search mockup ── */
+  .mock-search-bar { background: white; border: 2px solid var(--blue); border-radius: 8px; padding: 0.5rem 0.75rem; display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0; }
+  .mock-search-bar input-mock { flex: 1; font-size: 0.8rem; color: var(--muted); }
+  .mock-search-btn { background: var(--blue); color: white; font-size: 0.72rem; font-weight: 700; padding: 0.3rem 0.75rem; border-radius: 4px; }
+  .mock-result { border: 1px solid var(--border); border-radius: 6px; padding: 0.625rem 0.875rem; margin-bottom: 0.375rem; background: white; }
+  .mock-result .mr-race { font-size: 0.72rem; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.3px; }
+  .mock-result .mr-name { font-size: 0.85rem; font-weight: 600; color: var(--navy); }
+  .mock-result .mr-detail { font-size: 0.7rem; color: var(--muted); margin-top: 0.1rem; }
+
+  /* ── Legislative tracker mockup ── */
+  .mock-bill { border: 1px solid var(--border); border-radius: 6px; padding: 0.625rem 0.875rem; margin-bottom: 0.375rem; background: white; display: flex; gap: 0.75rem; align-items: flex-start; }
+  .mock-bill .bill-status { font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 3px; white-space: nowrap; flex-shrink: 0; margin-top: 0.15rem; }
+  .bill-status.passed { background: #dcfce7; color: #166534; }
+  .bill-status.pending { background: #fef3c7; color: #92400e; }
+  .bill-status.failed { background: #fee2e2; color: #991b1b; }
+  .mock-bill .bill-title { font-size: 0.82rem; font-weight: 600; color: var(--navy); }
+  .mock-bill .bill-detail { font-size: 0.7rem; color: var(--muted); margin-top: 0.1rem; }
+
+  /* ── Alert banner mockup ── */
+  .mock-alert { padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; }
+  .mock-alert.urgent { background: var(--red); color: white; }
+  .mock-alert.action { background: var(--blue); color: white; }
+  .mock-alert.announce { background: var(--gold); color: var(--navy); }
+
+  /* ── Editor / form mockup ── */
+  .studio-layout { display: flex; height: 340px; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; font-size: 0.8rem; }
+  .studio-sidebar { width: 200px; background: #111827; color: #d1d5db; flex-shrink: 0; display: flex; flex-direction: column; }
+  .studio-sidebar .studio-header { background: #1f2937; padding: 0.625rem 0.875rem; font-weight: 700; color: white; font-size: 0.78rem; border-bottom: 1px solid #374151; }
+  .studio-sidebar .studio-item { padding: 0.45rem 0.875rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #9ca3af; font-size: 0.78rem; }
+  .studio-sidebar .studio-item.active { background: #1d4ed8; color: white; border-right: 3px solid #60a5fa; }
+  .studio-sidebar .studio-item .icon { font-size: 0.9rem; }
+  .studio-sidebar hr { border: none; border-top: 1px solid #374151; margin: 0.25rem 0; }
+  .studio-main { flex: 1; background: #f9fafb; overflow-y: auto; }
+  .studio-toolbar { background: white; border-bottom: 1px solid #e5e7eb; padding: 0.625rem 1rem; font-size: 0.75rem; color: #6b7280; display: flex; justify-content: space-between; align-items: center; }
+  .studio-doc-list { padding: 0.5rem; }
+  .studio-doc-item { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.625rem 0.875rem; margin-bottom: 0.375rem; }
+  .studio-doc-item .doc-title { font-weight: 600; font-size: 0.82rem; color: var(--navy); }
+  .studio-doc-item .doc-meta { font-size: 0.72rem; color: #6b7280; margin-top: 0.125rem; }
+
+  /* ── Form field mockup ── */
+  .mock-form { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem 1.25rem; }
+  .form-field { margin-bottom: 0.875rem; }
+  .form-label { font-size: 0.75rem; font-weight: 600; color: #374151; display: block; margin-bottom: 0.25rem; }
+  .form-desc { font-size: 0.7rem; color: #6b7280; margin-bottom: 0.25rem; }
+  .form-input { width: 100%; border: 1px solid #d1d5db; border-radius: 5px; padding: 0.4rem 0.625rem; font-size: 0.82rem; color: var(--text); background: #f9fafb; }
+  .form-input.placeholder { color: #9ca3af; }
+  .form-toggle { display: flex; align-items: center; gap: 0.75rem; }
+  .toggle-pill { width: 42px; height: 22px; background: #d1d5db; border-radius: 11px; position: relative; cursor: pointer; }
+  .toggle-pill.on { background: var(--blue); }
+  .toggle-pill::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: white; border-radius: 50%; transition: left 0.15s; }
+  .toggle-pill.on::after { left: 23px; }
+  .toggle-label { font-size: 0.82rem; color: var(--text); font-weight: 500; }
+  .form-ref-input { width: 100%; border: 1px solid #d1d5db; border-radius: 5px; padding: 0.4rem 0.625rem; font-size: 0.82rem; background: #f9fafb; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .ref-tag { background: var(--blue-light); color: var(--blue-mid); font-size: 0.72rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 3px; }
+  .form-section-label { font-size: 0.7rem; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.5px; padding: 0.375rem 0; border-top: 1px solid #e5e7eb; margin-top: 0.5rem; }
+  .form-publish-bar { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 0.625rem 0.875rem; display: flex; align-items: center; justify-content: space-between; margin-top: 0.75rem; }
+  .publish-btn { background: var(--green); color: white; font-size: 0.8rem; font-weight: 700; padding: 0.35rem 1rem; border-radius: 4px; }
+
+  /* ── Municipality demo ── */
+  .muni-demo { border-radius: 10px; overflow: hidden; border: 1px solid #cbd5e1; box-shadow: 0 4px 16px rgba(0,0,0,0.1); margin: 1.25rem 0; }
+  .muni-hero-fc {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    color: white; padding: 1.25rem 1.5rem;
+    display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center;
+  }
+  .muni-hero-fc h2 { font-size: 0.9rem; font-weight: 800; color: white; margin-bottom: 0.25rem; border: none; display: block; padding: 0; }
+  .muni-hero-fc p { font-size: 0.72rem; color: rgba(255,255,255,0.8); margin: 0; }
+  .muni-nav-fc { background: #1e40af; }
+  .muni-hero-purple { background: #4c1d95; color: white; padding: 1.25rem 1.5rem; }
+  .muni-hero-purple h2 { font-size: 0.9rem; font-weight: 800; color: white; margin-bottom: 0.25rem; border: none; display: block; padding: 0; }
+  .muni-hero-purple p { font-size: 0.72rem; color: rgba(255,255,255,0.8); margin: 0; }
+  .muni-nav-purple { background: #7c3aed; }
+  .logo-seal { width: 45px; height: 45px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 700; color: rgba(255,255,255,0.8); text-align: center; line-height: 1.3; flex-shrink: 0; }
+
+  /* ── Scoping diagram ── */
+  .scope-diagram { display: flex; gap: 1rem; align-items: flex-start; margin: 1.5rem 0; flex-wrap: wrap; }
+  .scope-box { border-radius: 8px; padding: 0.875rem 1rem; flex: 1; min-width: 160px; }
+  .scope-box.county { background: var(--navy); color: white; }
+  .scope-box.committee { background: #1e40af; color: white; }
+  .scope-box h4 { color: white; font-size: 0.8rem; margin: 0 0 0.5rem; }
+  .scope-box ul { padding-left: 1rem; margin: 0; }
+  .scope-box li { font-size: 0.72rem; color: rgba(255,255,255,0.85); margin-bottom: 0.2rem; }
+  .scope-arrow { font-size: 1.5rem; color: var(--blue); display: flex; align-items: center; padding-top: 0.5rem; }
+
+  /* ── Print ── */
+  @media print {
+    .top-nav { display: none; }
+    .section { padding: 1.5rem 1rem; }
+    h2 { break-before: page; }
+    h2:first-child { break-before: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Sticky Nav ── -->
+<nav class="top-nav">
+  <span class="brand">ACDC Site Overview</span>
+  <a href="#whats-new">1. What's New</a>
+  <a href="#new-features">2. New Features</a>
+  <a href="#county-admin">3. Managing Content</a>
+  <a href="#municipalities">4. Local Committee Sites</a>
+</nav>
+
+<!-- ── Cover ── -->
+<div class="cover">
+  <p style="font-size:0.8rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.75rem;">Allegheny County Democratic Committee</p>
+  <h1>Your New Website</h1>
+  <p class="sub">Everything on the current site — plus powerful new tools for voters and organizers — all managed from one simple dashboard.</p>
+  <div>
+    <span class="badge existing">Events &amp; News</span>
+    <span class="badge existing">Voter Resources</span>
+    <span class="badge new">✦ Voter Guide</span>
+    <span class="badge new">✦ Legislative Tracker</span>
+    <span class="badge new">✦ Local Committee Sites</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION 1 — WHAT'S NEW
+══════════════════════════════════════════════════════════════ -->
+<div id="whats-new">
+<div class="section">
+  <h2>1 · What's New</h2>
+  <p class="lead">The new site carries over everything from the current alleghenydems.com, then adds major new features that weren't possible before.</p>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>Current Site</th>
+        <th>New Site</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Events calendar</strong></td>
+        <td><span class="check">✓</span> Yes</td>
+        <td><span class="check">✓</span> Yes <span class="improved-badge">Improved</span></td>
+      </tr>
+      <tr>
+        <td><strong>News &amp; updates</strong></td>
+        <td><span class="check">✓</span> Yes</td>
+        <td><span class="check">✓</span> Yes <span class="improved-badge">Improved</span></td>
+      </tr>
+      <tr>
+        <td><strong>Get involved / volunteer</strong></td>
+        <td><span class="check">✓</span> Yes</td>
+        <td><span class="check">✓</span> Yes</td>
+      </tr>
+      <tr>
+        <td><strong>Committee info &amp; contacts</strong></td>
+        <td><span class="check">✓</span> Yes</td>
+        <td><span class="check">✓</span> Yes</td>
+      </tr>
+      <tr>
+        <td><strong>Voter resources</strong></td>
+        <td><span class="check">✓</span> Basic</td>
+        <td><span class="check">✓</span> Yes <span class="improved-badge">Improved</span></td>
+      </tr>
+      <tr>
+        <td><strong>Action alerts &amp; banners</strong></td>
+        <td>—</td>
+        <td><span class="check">✓</span> <strong>New</strong> <span class="new-badge">NEW</span></td>
+      </tr>
+      <tr>
+        <td><strong>Searchable voter guide</strong></td>
+        <td>—</td>
+        <td><span class="check">✓</span> <strong>New</strong> <span class="new-badge">NEW</span></td>
+      </tr>
+      <tr>
+        <td><strong>Legislative tracker</strong></td>
+        <td>—</td>
+        <td><span class="check">✓</span> <strong>New</strong> <span class="new-badge">NEW</span></td>
+      </tr>
+      <tr>
+        <td><strong>Local committee sites</strong></td>
+        <td>—</td>
+        <td><span class="check">✓</span> <strong>New</strong> <span class="new-badge">NEW</span></td>
+      </tr>
+      <tr>
+        <td><strong>Mobile-friendly design</strong></td>
+        <td>Partial</td>
+        <td><span class="check">✓</span> Fully responsive <span class="improved-badge">Improved</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <p>The new site is managed from a single, easy-to-use dashboard — no WordPress logins, no plugins to update, no broken page builders. One place for everything.</p>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION 2 — NEW FEATURES IN DETAIL
+══════════════════════════════════════════════════════════════ -->
+<div class="section-band" id="new-features">
+<div class="section">
+  <h2>2 · The New Features</h2>
+  <p class="lead">Three major additions that give voters and organizers tools they can't find anywhere else on the county site.</p>
+
+  <h3>2a · Searchable Voter Guide</h3>
+  <p>Residents can look up every race on their ballot — from President down to local judge and school board — with candidate information, party, and endorsements all in one place. They type their neighborhood or district and instantly see only the races relevant to them.</p>
+
+  <div class="browser" style="max-width:600px;">
+    <div class="browser-bar">
+      <div class="browser-dots"><div class="browser-dot r"></div><div class="browser-dot y"></div><div class="browser-dot g"></div></div>
+      <div class="browser-url">alleghenydems.com/voter-guide</div>
+    </div>
+    <div style="padding:0.875rem;background:var(--surface);">
+      <div style="font-size:0.72rem;font-weight:700;color:var(--navy);margin-bottom:0.5rem;">2026 VOTER GUIDE — Search your district or neighborhood</div>
+      <div class="mock-search-bar">
+        <input-mock style="font-size:0.8rem;color:var(--muted);">Fox Chapel…</input-mock>
+        <div class="mock-search-btn">Search</div>
+      </div>
+      <div style="font-size:0.7rem;color:var(--muted);margin:0.375rem 0 0.75rem;">Showing 6 races for Fox Chapel area</div>
+      <div class="mock-result">
+        <div class="mr-race">U.S. Senate — Pennsylvania</div>
+        <div class="mr-name">Bob Casey Jr. <span style="font-size:0.7rem;background:#dbeafe;color:#1e40af;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700;">ACDC Endorsed</span></div>
+        <div class="mr-detail">Democrat · Incumbent · acdc.com/casey</div>
+      </div>
+      <div class="mock-result">
+        <div class="mr-race">PA House — District 33</div>
+        <div class="mr-name">Sara Innamorato</div>
+        <div class="mr-detail">Democrat · Progressive caucus member</div>
+      </div>
+      <div class="mock-result" style="color:var(--muted);font-size:0.78rem;text-align:center;border-style:dashed;">+ 4 more races in your area…</div>
+    </div>
+  </div>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">💡</span>
+    <p>When residents visit the voter guide through a local committee's site (e.g. Fox Chapel), it automatically pre-filters to their district — they see their races immediately without having to search.</p>
+  </div>
+
+  <h3>2b · Legislative Tracker</h3>
+  <p>Visitors can follow legislation that matters to Allegheny County residents — bills in Harrisburg and Washington, how our representatives voted, and what the committee's position is. This turns the site into a year-round civic resource, not just an election-season tool.</p>
+
+  <div class="browser" style="max-width:600px;">
+    <div class="browser-bar">
+      <div class="browser-dots"><div class="browser-dot r"></div><div class="browser-dot y"></div><div class="browser-dot g"></div></div>
+      <div class="browser-url">alleghenydems.com/legislation</div>
+    </div>
+    <div style="padding:0.875rem;background:var(--surface);">
+      <div style="font-size:0.72rem;font-weight:700;color:var(--navy);margin-bottom:0.5rem;">LEGISLATIVE TRACKER — 2025–26 Session</div>
+      <div class="mock-bill">
+        <div class="bill-status passed">Passed</div>
+        <div>
+          <div class="bill-title">PA HB 1 — Clean Water Protection Act</div>
+          <div class="bill-detail">Passed House 110–93 · Pending Senate · ACDC supports</div>
+        </div>
+      </div>
+      <div class="mock-bill">
+        <div class="bill-status pending">In Committee</div>
+        <div>
+          <div class="bill-title">PA SB 42 — Voting Rights Expansion</div>
+          <div class="bill-detail">Senate State Gov't Committee · ACDC supports</div>
+        </div>
+      </div>
+      <div class="mock-bill">
+        <div class="bill-status failed">Failed</div>
+        <div>
+          <div class="bill-title">PA HB 77 — School Voucher Expansion</div>
+          <div class="bill-detail">Failed House 97–106 · ACDC opposed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>2c · Local Committees in the Navigation</h3>
+  <p>The county site's navigation now includes a <strong>Local Committees</strong> dropdown that lists every active municipal committee. Visitors can jump directly to any committee's site — with their own branding, events, and content — from the county homepage.</p>
+
+  <div class="browser" style="max-width:520px;">
+    <div class="browser-bar">
+      <div class="browser-dots"><div class="browser-dot r"></div><div class="browser-dot y"></div><div class="browser-dot g"></div></div>
+      <div class="browser-url">alleghenydems.com</div>
+    </div>
+    <div class="mock-nav">
+      <div class="logo-area">
+        <div class="mock-nav logo-circle">A</div>
+      </div>
+      <a href="#">About ▾</a>
+      <a href="#">Events</a>
+      <a href="#">Vote ▾</a>
+      <div class="dropdown-wrap">
+        <a href="#" style="background:rgba(255,255,255,0.2);color:white;">Local Committees ▾</a>
+        <div class="dropdown-menu" style="display:block;position:static;margin-top:4px;box-shadow:none;border:1px solid #e2e8f0;">
+          <a href="#" style="font-weight:600;color:var(--blue);">Fox Chapel Democratic Committee →</a>
+          <a href="#">Mt. Lebanon Democrats →</a>
+          <a href="#">South Hills Democrats →</a>
+          <a href="#" style="color:var(--muted);font-style:italic;font-size:0.75rem;">+ more committees…</a>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <a href="#" class="donate-btn">Donate</a>
+    </div>
+  </div>
+
+  <h3>2d · Action Alerts</h3>
+  <p>A banner that appears across the top of any page — county-wide or committee-specific — for time-sensitive calls to action. Use it for election-day reminders, last-minute volunteer needs, or major announcements. Three urgency levels control the color.</p>
+
+  <div style="max-width:560px;border-radius:8px;overflow:hidden;border:1px solid var(--border);margin:1rem 0;">
+    <div class="mock-alert urgent">🚨 &nbsp;Election Day — Polls close at 8 PM. Find your polling place →</div>
+    <div class="mock-alert action" style="margin-top:2px;">📣 &nbsp;Phone bank tonight — 6 PM at Fox Chapel Borough Building. Sign up →</div>
+    <div class="mock-alert announce" style="margin-top:2px;">📢 &nbsp;ACDC endorses Jane Smith for PA House District 33 →</div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION 3 — MANAGING COUNTY CONTENT
+══════════════════════════════════════════════════════════════ -->
+<div id="county-admin">
+<div class="section">
+  <h2>3 · Managing Your Content</h2>
+  <p class="lead">Everything is managed from one simple dashboard at <strong>alleghenydems.com/studio</strong>. Log in and you'll see the full menu of content types on the left.</p>
+
+  <div class="studio-layout" style="height:300px;">
+    <div class="studio-sidebar">
+      <div class="studio-header">Allegheny Dems</div>
+      <div class="studio-item active"><span class="icon">⚙️</span> Site Settings</div>
+      <hr>
+      <div class="studio-item"><span class="icon">🏠</span> Municipalities</div>
+      <hr>
+      <div class="studio-item"><span class="icon">🔔</span> Action Alerts</div>
+      <hr>
+      <div class="studio-item"><span class="icon">📅</span> Events</div>
+      <div class="studio-item"><span class="icon">📰</span> News &amp; Updates</div>
+      <div class="studio-item"><span class="icon">🗳️</span> Voter Guides</div>
+      <div class="studio-item"><span class="icon">📋</span> Legislative Tracker</div>
+      <hr>
+      <div class="studio-item"><span class="icon">👥</span> Committee &amp; People</div>
+    </div>
+    <div class="studio-main">
+      <div class="studio-toolbar">
+        <span>Events — All</span>
+        <span style="color:var(--green);font-weight:600;">✓ Saved</span>
+      </div>
+      <div class="studio-doc-list">
+        <div class="studio-doc-item">
+          <div class="doc-title">Spring Volunteer Kickoff</div>
+          <div class="doc-meta">April 12, 2026 · 6:00 PM · County-wide</div>
+        </div>
+        <div class="studio-doc-item">
+          <div class="doc-title">Fox Chapel Monthly Meeting</div>
+          <div class="doc-meta">March 20, 2026 · Fox Chapel Borough Building</div>
+        </div>
+        <div class="studio-doc-item">
+          <div class="doc-title">Canvassing Training</div>
+          <div class="doc-meta">April 5, 2026 · County-wide · Shared with all committees</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <p>There's no publishing queue, no approval workflow, and no technical steps. Fill in the form, click <strong>Publish</strong>, and the change appears on the site within a few minutes.</p>
+  </div>
+
+  <h3>3a · Events</h3>
+  <p>Creating an event takes about two minutes. Fill in the title, date, location, and a short description. The two key options at the bottom control where the event appears:</p>
+
+  <div class="two-col">
+    <div>
+      <div class="mock-form">
+        <div class="form-section-label">Event Details</div>
+        <div class="form-field">
+          <label class="form-label">Event Title *</label>
+          <div class="form-input">Spring Volunteer Kickoff</div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Date &amp; Time *</label>
+          <div class="form-input">April 12, 2026 · 6:00 PM</div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Location</label>
+          <div class="form-input">Fox Chapel Borough Building</div>
+        </div>
+        <div class="form-section-label">Where does this appear?</div>
+        <div class="form-field">
+          <label class="form-label">Committee</label>
+          <div class="form-desc">Leave blank for county-wide. Or pick a committee to show it only on their site.</div>
+          <div class="form-input placeholder">— County-wide (no committee) —</div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Share with all committee sites</label>
+          <div class="form-toggle">
+            <div class="toggle-pill on"></div>
+            <span class="toggle-label">Yes — show on every committee site</span>
+          </div>
+        </div>
+        <div class="form-publish-bar">
+          <span style="font-size:0.78rem;color:var(--green);font-weight:600;">Ready to publish</span>
+          <div class="publish-btn">Publish</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h4>Where Will It Appear?</h4>
+      <table class="concept-table" style="font-size:0.82rem;">
+        <thead><tr><th>Committee set?</th><th>Share with all?</th><th>Shows up on…</th></tr></thead>
+        <tbody>
+          <tr><td>❌ Not set</td><td>❌ Off</td><td>County site only</td></tr>
+          <tr style="background:#f0fdf4;"><td>❌ Not set</td><td>✅ On</td><td><strong>County + every committee site</strong></td></tr>
+          <tr><td>✅ Fox Chapel</td><td>—</td><td>Fox Chapel site only</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-tip" style="margin-top:1rem;">
+        <span class="callout-icon">💡</span>
+        <p><strong>Election Day reminders, volunteer drives, major announcements</strong> — turn on "Share with all" and every active committee site shows it automatically. One post, everywhere.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>3b · News &amp; Updates</h3>
+  <p>Works exactly like events. Write the article, optionally attach a photo, and choose where it appears. One extra option: <strong>Feature on Homepage</strong> pins it to the top of the homepage news section.</p>
+
+  <div class="mock-form" style="max-width:480px;">
+    <div class="form-section-label">Article</div>
+    <div class="form-field">
+      <label class="form-label">Headline *</label>
+      <div class="form-input">ACDC Endorses Jane Smith for PA House District 33</div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Feature on Homepage</label>
+      <div class="form-desc">Pins this article to the top of the homepage news section.</div>
+      <div class="form-toggle">
+        <div class="toggle-pill on"></div>
+        <span class="toggle-label">Yes — feature on homepage</span>
+      </div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Committee</label>
+      <div class="form-input placeholder">— County-wide —</div>
+    </div>
+    <div class="form-publish-bar">
+      <span style="font-size:0.78rem;color:var(--green);font-weight:600;">Ready to publish</span>
+      <div class="publish-btn">Publish</div>
+    </div>
+  </div>
+
+  <h3>3c · Action Alerts</h3>
+  <p>Alerts appear as a prominent banner at the top of the site. They use the same sharing controls as events — county-wide or targeted to a specific committee. Pick an urgency level to set the color. Remove the alert when it's no longer needed by simply unpublishing it.</p>
+
+  <div class="mock-form" style="max-width:480px;">
+    <div class="form-section-label">Alert</div>
+    <div class="form-field">
+      <label class="form-label">Message *</label>
+      <div class="form-input">Polls close at 8 PM — find your polling place at vote.pa.gov</div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Urgency</label>
+      <div class="form-ref-input">
+        <span class="ref-tag" style="background:#fee2e2;color:#991b1b;">🚨 Urgent — Red</span>
+      </div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Share with all committee sites</label>
+      <div class="form-toggle">
+        <div class="toggle-pill on"></div>
+        <span class="toggle-label">Yes — show everywhere</span>
+      </div>
+    </div>
+    <div class="form-publish-bar">
+      <span style="font-size:0.78rem;color:var(--green);font-weight:600;">Ready to publish</span>
+      <div class="publish-btn">Publish</div>
+    </div>
+  </div>
+
+  <h3>3d · Voter Guide</h3>
+  <p>The voter guide is managed race by race. For each race, add the candidates, their party, endorsement status, and any notes. The search and filtering on the public side are automatic — residents just type and the right races appear.</p>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">💡</span>
+    <p>The voter guide is most valuable when updated before each election cycle. Add candidates as soon as primaries are decided. Residents will return to the site specifically to look up their ballot before Election Day.</p>
+  </div>
+
+  <h3>3e · Legislative Tracker</h3>
+  <p>Add and update legislative actions — bills, votes, or policy decisions — by filling in plain-English fields: a title, a type (Delivered / Blocked by GOP / Harmful), a category (like Education or Healthcare), a one-sentence description, and a link to your source.</p>
+  <p style="margin-top:0.75rem">To make entries searchable by community, fill in the <strong>Communities affected</strong> field with the names of boroughs or neighborhoods that are directly impacted — for example <em>Fox Chapel</em>, <em>Mt. Lebanon</em>, or <em>Squirrel Hill</em>. Use the same spelling your committee uses in its search settings.</p>
+  <p style="margin-top:0.75rem">When a resident visits the tracker on a local committee site — say, the Fox Chapel Democrats site — they'll automatically see only the entries tagged for Fox Chapel. They can clear the filter at any time to browse everything. No technical knowledge needed.</p>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SECTION 4 — LOCAL COMMITTEE SITES
+══════════════════════════════════════════════════════════════ -->
+<div class="section-band" id="municipalities">
+<div class="section">
+  <h2>4 · Local Committee Sites</h2>
+  <p class="lead">Every local committee can have their own fully branded website — with their logo, colors, events, news, and voter guide — all connected to the county site and managed from the same dashboard.</p>
+
+  <h3>What a Committee Site Looks Like</h3>
+  <p>A committee site is a complete website under the committee's own branding. It shows a breadcrumb linking back to the county site, the committee's logo and colors in the navigation, and content scoped to that committee (plus any county content shared with them).</p>
+
+  <div class="two-col">
+    <div>
+      <p style="font-size:0.8rem;font-weight:600;color:var(--muted);margin-bottom:0.5rem;">Fox Chapel Democratic Committee</p>
+      <div class="muni-demo">
+        <div class="browser-bar">
+          <div class="browser-dots"><div class="browser-dot r"></div><div class="browser-dot y"></div><div class="browser-dot g"></div></div>
+          <div class="browser-url">foxchapel.alleghenydems.com</div>
+        </div>
+        <div class="mock-breadcrumb">← Allegheny County Democratic Committee</div>
+        <div class="mock-nav muni-nav-fc">
+          <div class="logo-area">
+            <div class="mock-nav logo-circle" style="color:#1e40af;font-size:0.62rem;letter-spacing:-1px;font-weight:900;">FC</div>
+            <span class="logo-name">FC Dems</span>
+          </div>
+          <a href="#">Events</a>
+          <a href="#">News</a>
+          <a href="#">Get Involved</a>
+          <div class="spacer"></div>
+          <a href="#" class="donate-btn">Donate</a>
+        </div>
+        <div class="muni-hero-fc">
+          <div>
+            <h2>Democrats Building a Better Fox Chapel</h2>
+            <p>Organizing for our community since 1992.</p>
+          </div>
+          <div class="logo-seal">FC<br>Logo</div>
+        </div>
+        <div class="mock-content">
+          <div class="mock-section-title">Upcoming Events</div>
+          <div class="mock-card-row">
+            <div class="mock-card">
+              <div class="mc-label">FC DEMS EVENT</div>
+              <div class="mc-title">Monthly Meeting</div>
+              <div class="mc-meta">Mar 20 · Borough Building</div>
+            </div>
+            <div class="mock-card">
+              <div class="mc-label">COUNTY EVENT</div>
+              <div class="mc-title">Canvassing Training</div>
+              <div class="mc-meta">Apr 5 · Shared</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p style="font-size:0.8rem;font-weight:600;color:var(--muted);margin-bottom:0.5rem;">Mt. Lebanon Democrats</p>
+      <div class="muni-demo">
+        <div class="browser-bar">
+          <div class="browser-dots"><div class="browser-dot r"></div><div class="browser-dot y"></div><div class="browser-dot g"></div></div>
+          <div class="browser-url">mtlebanon.alleghenydems.com</div>
+        </div>
+        <div class="mock-breadcrumb">← Allegheny County Democratic Committee</div>
+        <div class="mock-nav muni-nav-purple">
+          <div class="logo-area">
+            <div class="mock-nav logo-circle" style="color:#7c3aed;">M</div>
+            <span class="logo-name">Mt. Leb Dems</span>
+          </div>
+          <a href="#">Events</a>
+          <a href="#">News</a>
+          <a href="#">Get Involved</a>
+          <div class="spacer"></div>
+          <a href="#" class="donate-btn">Donate</a>
+        </div>
+        <div class="muni-hero-purple">
+          <h2>Mt. Lebanon Democrats — Stronger Together</h2>
+          <p>Serving Mt. Lebanon and surrounding neighborhoods.</p>
+        </div>
+        <div class="mock-content">
+          <div class="mock-section-title">Upcoming Events</div>
+          <div class="mock-card-row">
+            <div class="mock-card">
+              <div class="mc-label">MTL DEMS EVENT</div>
+              <div class="mc-title">Endorsement Meeting</div>
+              <div class="mc-meta">Mar 28 · Library</div>
+            </div>
+            <div class="mock-card">
+              <div class="mc-label">COUNTY EVENT</div>
+              <div class="mc-title">Canvassing Training</div>
+              <div class="mc-meta">Apr 5 · Shared</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>How Content Flows Between Sites</h3>
+  <p>The county and committee sites are connected. County content can be shared down to committee sites. Committee content stays on their site. Nothing leaks where it shouldn't.</p>
+
+  <div class="scope-diagram">
+    <div class="scope-box county">
+      <h4>🏛 County Site</h4>
+      <ul>
+        <li>Election Day alert → <em>all sites</em></li>
+        <li>Endorsement news → <em>all sites</em></li>
+        <li>Canvassing training → <em>all sites</em></li>
+        <li>County-only event → <em>county only</em></li>
+      </ul>
+    </div>
+    <div class="scope-arrow">→</div>
+    <div class="scope-box committee">
+      <h4>🏘 Fox Chapel Site</h4>
+      <ul>
+        <li>FC monthly meeting</li>
+        <li>FC news &amp; updates</li>
+        <li>FC voter guide (pre-filtered)</li>
+        <li>+ Shared county content</li>
+      </ul>
+    </div>
+    <div class="scope-arrow">→</div>
+    <div class="scope-box committee" style="background:#6d28d9;">
+      <h4>🏘 Mt. Lebanon Site</h4>
+      <ul>
+        <li>MTL monthly meeting</li>
+        <li>MTL news &amp; updates</li>
+        <li>MTL voter guide (pre-filtered)</li>
+        <li>+ Shared county content</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">💡</span>
+    <p>A county admin creates one canvassing training event, flips "Share with all committees" on, and it instantly appears on every active committee site. Committee volunteers don't need to do anything.</p>
+  </div>
+
+  <h3>What Each Committee Gets</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="fc-icon">🎨</div>
+      <span class="fc-tag existing">Included</span>
+      <h4>Their own branding</h4>
+      <p>Logo, accent color, and committee name. Their site looks like theirs — not a copy of the county site.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon">📅</div>
+      <span class="fc-tag existing">Included</span>
+      <h4>Events calendar</h4>
+      <p>Committee events plus any county events shared with them. One unified calendar for their members.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon">📰</div>
+      <span class="fc-tag existing">Included</span>
+      <h4>News &amp; updates</h4>
+      <p>Their own news feed. County-wide announcements can be shared in automatically.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon">🗳️</div>
+      <span class="fc-tag new">New</span>
+      <h4>Pre-filtered voter guide</h4>
+      <p>The voter guide automatically shows races relevant to that committee's district when visitors arrive from their site.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon">🔔</div>
+      <span class="fc-tag existing">Included</span>
+      <h4>Action alerts</h4>
+      <p>Committee-specific banners, plus any county-wide alerts automatically appear at the top of their site.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon">🔗</div>
+      <span class="fc-tag existing">Included</span>
+      <h4>Listed on county site</h4>
+      <p>Automatically added to the "Local Committees" dropdown on the county navigation.</p>
+    </div>
+  </div>
+
+  <h3>Adding a New Committee — About 10 Minutes</h3>
+  <p>Setting up a new committee site requires no technical help. A county admin fills out a form in the dashboard and clicks Publish. The site is live immediately.</p>
+
+  <div class="two-col">
+    <div>
+      <ol class="steps">
+        <li>In the dashboard, go to <strong>Municipalities → New Municipality</strong></li>
+        <li>Enter the <strong>committee name</strong> and a short <strong>web ID</strong> (used in the URL — e.g. <code>foxchapel</code>)</li>
+        <li>Toggle <strong>Is Active</strong> on</li>
+        <li>Upload their <strong>logo</strong> and set their <strong>accent color</strong></li>
+        <li>Write a short <strong>hero headline</strong> for their homepage</li>
+        <li>Enter their <strong>district or zip codes</strong> so the voter guide pre-filters for their residents</li>
+        <li>Click <strong>Publish</strong> — the site is live instantly</li>
+      </ol>
+      <div class="callout callout-tip" style="margin-top:1rem;">
+        <span class="callout-icon">🚀</span>
+        <p>You can demo the site to a committee <em>before</em> they've committed to anything — create it, publish it, share the link. No domain setup, no IT required.</p>
+      </div>
+    </div>
+
+    <div>
+      <h4>New Committee Form</h4>
+      <div class="mock-form">
+        <div class="form-section-label">Identity</div>
+        <div class="form-field">
+          <label class="form-label">Committee Name *</label>
+          <div class="form-input">Fox Chapel Democratic Committee</div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Web ID *</label>
+          <div class="form-desc">Short code used in the URL — lowercase, no spaces.</div>
+          <div class="form-input">foxchapel</div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Is Active</label>
+          <div class="form-toggle">
+            <div class="toggle-pill on"></div>
+            <span class="toggle-label">Yes — site is live</span>
+          </div>
+        </div>
+        <div class="form-section-label">Branding</div>
+        <div class="form-field">
+          <label class="form-label">Logo</label>
+          <div class="form-input placeholder">Upload image…</div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Accent Color</label>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <div style="width:26px;height:26px;border-radius:4px;background:#1e40af;flex-shrink:0;border:1px solid #e2e8f0;"></div>
+            <div class="form-input" style="flex:1;">#1e40af</div>
+          </div>
+        </div>
+        <div class="form-section-label">Voter Guide</div>
+        <div class="form-field">
+          <label class="form-label">District / Search Terms</label>
+          <div class="form-desc">Auto-filters the voter guide for this committee's residents.</div>
+          <div class="form-ref-input">
+            <span class="ref-tag">FOX CHAPEL</span>
+            <span class="ref-tag">15238</span>
+            <span style="color:#9ca3af;font-size:0.75rem;">+ Add…</span>
+          </div>
+        </div>
+        <div class="form-publish-bar">
+          <span style="font-size:0.78rem;color:var(--green);font-weight:600;">Ready to publish</span>
+          <div class="publish-btn">Publish</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-info" style="margin-top:2rem;">
+    <span class="callout-icon">🔗</span>
+    <p>After publishing, the committee's site is immediately available at <code>alleghenydems.com/municipalities/foxchapel</code> and can be promoted to <code>foxchapel.alleghenydems.com</code> or their own domain (e.g. <code>fcdems.com</code>) when they're ready.</p>
+  </div>
+</div>
+</div>
+
+<!-- Footer -->
+<div style="background:var(--navy);color:rgba(255,255,255,0.5);text-align:center;padding:1.5rem;font-size:0.78rem;">
+  Allegheny County Democratic Committee — Committee Site Overview · March 2026
+</div>
+
+</body>
+</html>

@@ -1,12 +1,14 @@
 import type { Metadata } from 'next'
 import PageHero from '@/components/page-hero'
+import LegislativeTrackerFilter from '@/components/legislative-tracker-filter'
 import {
   getLegislativeTrackerBySlug,
+  getMunicipalitySettings,
   type LegislativeAction,
   type LegislativeExternalLink,
-  type LegislativeLocalEntry,
   type LegislativeOfficialRow,
 } from '@/sanity/lib/queries'
+import { getMunicipalitySlug } from '@/lib/tenant'
 
 export const metadata: Metadata = {
   title: 'Legislative Tracker — What They Did & What They Blocked',
@@ -39,30 +41,14 @@ function uniqueCategories(actions: LegislativeAction[], configured: string[] | u
   return [...configured, ...extras]
 }
 
-function badgeColor(type: LegislativeAction['type']) {
-  switch (type) {
-    case 'accomplishment':
-      return 'bg-green-100 text-green-800 border-green-300'
-    case 'blocked':
-      return 'bg-red-100 text-red-800 border-red-300'
-    case 'harmful':
-      return 'bg-red-200 text-red-900 border-red-400'
-  }
-}
-
-function badgeLabel(type: LegislativeAction['type']) {
-  switch (type) {
-    case 'accomplishment':
-      return 'Delivered'
-    case 'blocked':
-      return 'Blocked by GOP'
-    case 'harmful':
-      return 'Harmful'
-  }
-}
-
 export default async function LegislativeTrackerPage() {
-  const tracker = await getLegislativeTrackerBySlug('legislative-tracker')
+  const municipalitySlug = await getMunicipalitySlug()
+  const isCounty = municipalitySlug === 'allegheny-county'
+  const [tracker, municipalitySettings] = await Promise.all([
+    getLegislativeTrackerBySlug('legislative-tracker'),
+    isCounty ? Promise.resolve(null) : getMunicipalitySettings(municipalitySlug),
+  ])
+  const initialQuery = municipalitySettings?.voterGuideSearchTerms?.[0] ?? ''
 
   if (!tracker) {
     return (
@@ -92,89 +78,13 @@ export default async function LegislativeTrackerPage() {
         image={tracker.heroImage}
       />
 
-      <nav className="flex flex-wrap gap-2 mb-10">
-        <a
-          href="#accomplishments"
-          className="px-4 py-2 text-sm font-semibold rounded bg-green-100 text-green-800 hover:bg-green-200 transition-colors"
-        >
-          Democratic Accomplishments ({accomplishments.length})
-        </a>
-        <a
-          href="#blocked"
-          className="px-4 py-2 text-sm font-semibold rounded bg-red-100 text-red-800 hover:bg-red-200 transition-colors"
-        >
-          Blocked or Harmful ({blockedOrHarmful.length})
-        </a>
-        <a
-          href="#hyperlocal"
-          className="px-4 py-2 text-sm font-semibold rounded bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors"
-        >
-          Your Borough, Your Story ({localEntries.length})
-        </a>
-        <a
-          href="#find-your-district"
-          className="px-4 py-2 text-sm font-semibold rounded bg-[var(--color-blue-light)] text-[var(--color-blue)] hover:opacity-80 transition-colors"
-        >
-          Find Your District
-        </a>
-      </nav>
-
-      <section id="accomplishments" className="mb-16">
-        <h2 className="text-2xl font-display font-bold text-green-800 border-b-2 border-green-300 pb-2 mb-6">
-          What Democrats Delivered
-        </h2>
-
-        {categories.map((category) => {
-          const items = accomplishments.filter((action) => action.category === category)
-          if (!items.length) return null
-          return (
-            <div key={category} className="mb-8">
-              <h3 className="text-lg font-bold text-[var(--color-blue)] mb-3">{category}</h3>
-              <div className="space-y-4">
-                {items.map((item) => (
-                  <ActionCard key={item._key ?? `${item.official}-${item.sourceUrl}`} item={item} />
-                ))}
-              </div>
-            </div>
-          )
-        })}
-      </section>
-
-      <section id="blocked" className="mb-16">
-        <h2 className="text-2xl font-display font-bold text-red-800 border-b-2 border-red-300 pb-2 mb-6">
-          What Republicans Blocked or Pushed Through Against Working Families
-        </h2>
-
-        {categories.map((category) => {
-          const items = blockedOrHarmful.filter((action) => action.category === category)
-          if (!items.length) return null
-          return (
-            <div key={category} className="mb-8">
-              <h3 className="text-lg font-bold text-red-700 mb-3">{category}</h3>
-              <div className="space-y-4">
-                {items.map((item) => (
-                  <ActionCard key={item._key ?? `${item.official}-${item.sourceUrl}`} item={item} />
-                ))}
-              </div>
-            </div>
-          )
-        })}
-      </section>
-
-      <section id="hyperlocal" className="mb-16">
-        <h2 className="text-2xl font-display font-bold text-yellow-800 border-b-2 border-yellow-300 pb-2 mb-2">
-          Your Borough, Your Story
-        </h2>
-        <p className="text-sm text-[var(--color-text-muted)] mb-6">
-          How state and federal policy decisions have played out in specific Allegheny County communities — the things
-          that affect your street, your school, your water.
-        </p>
-        <div className="space-y-4">
-          {localEntries.map((entry) => (
-            <LocalCard key={entry._key ?? `${entry.community}-${entry.sourceUrl}`} entry={entry} />
-          ))}
-        </div>
-      </section>
+      <LegislativeTrackerFilter
+        accomplishments={accomplishments}
+        blockedOrHarmful={blockedOrHarmful}
+        localEntries={localEntries}
+        categories={categories}
+        initialQuery={initialQuery}
+      />
 
       <section id="find-your-district" className="mb-16">
         <h2 className="text-2xl font-display font-bold text-[var(--color-blue)] border-b-2 border-[var(--color-blue-light)] pb-2 mb-6">
@@ -232,78 +142,6 @@ export default async function LegislativeTrackerPage() {
         </p>
       </section>
     </div>
-  )
-}
-
-function ActionCard({ item }: { item: LegislativeAction }) {
-  return (
-    <article className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
-      <div className="flex flex-wrap items-center gap-2 mb-2">
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded border ${badgeColor(item.type)}`}>
-          {badgeLabel(item.type)}
-        </span>
-        <span className="text-xs text-[var(--color-text-muted)]">{item.date}</span>
-        <span className="text-xs font-medium text-[var(--color-blue)]">{item.category}</span>
-      </div>
-
-      <p className="font-semibold text-[var(--color-text)] mb-1">{item.official}</p>
-      <p className="text-xs text-[var(--color-text-muted)] mb-2">{item.office}</p>
-      <p className="text-sm text-[var(--color-text)] mb-3">{item.description}</p>
-
-      <div className="flex flex-wrap items-center gap-3">
-        <a
-          href={item.sourceUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs font-medium text-[var(--color-blue)] hover:underline"
-        >
-          Source: {item.sourceLabel} ↗
-        </a>
-      </div>
-
-      {item.municipalities && item.municipalities.length > 0 && (
-        <details className="mt-2">
-          <summary className="text-xs text-[var(--color-text-muted)] cursor-pointer hover:text-[var(--color-blue)]">
-            Municipalities affected
-          </summary>
-          <p className="text-xs text-[var(--color-text-muted)] mt-1 pl-2 border-l-2 border-gray-200">
-            {item.municipalities.join(' · ')}
-          </p>
-        </details>
-      )}
-    </article>
-  )
-}
-
-function LocalCard({ entry }: { entry: LegislativeLocalEntry }) {
-  const outcomeStyles = {
-    helped: { badge: 'bg-green-100 text-green-800 border-green-300', label: 'Helped community', bar: 'bg-green-500' },
-    hurt: { badge: 'bg-red-100 text-red-800 border-red-300', label: 'Hurt community', bar: 'bg-red-500' },
-    ongoing: { badge: 'bg-yellow-100 text-yellow-800 border-yellow-300', label: 'Ongoing issue', bar: 'bg-yellow-400' },
-  }
-  const style = outcomeStyles[entry.outcome]
-
-  return (
-    <article className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow bg-white">
-      <div className={`h-1 ${style.bar}`} />
-      <div className="p-4">
-        <div className="flex flex-wrap items-center gap-2 mb-2">
-          <span className="font-bold text-sm text-[var(--color-blue)]">{entry.community}</span>
-          <span className={`text-xs font-semibold px-2 py-0.5 rounded border ${style.badge}`}>{style.label}</span>
-          <span className="text-xs text-[var(--color-text-muted)]">{entry.date}</span>
-        </div>
-        <p className="font-semibold text-sm text-[var(--color-text)] mb-2">{entry.summary}</p>
-        <p className="text-sm text-[var(--color-text)] mb-3">{entry.detail}</p>
-        <a
-          href={entry.sourceUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs font-medium text-[var(--color-blue)] hover:underline"
-        >
-          Source: {entry.sourceLabel} ↗
-        </a>
-      </div>
-    </article>
   )
 }
 
