@@ -934,39 +934,36 @@
 <div class="section-band" id="costs">
 <div class="section">
   <h2>5 · What It Costs</h2>
-  <p class="lead">Based on your current traffic (~2,100 views/week), the two services that power the site — Vercel (hosting) and Sanity (content editor) — run about <strong>$20–35/month</strong> under normal conditions. Even during election-season spikes, you're unlikely to exceed the plans below.</p>
+  <p class="lead">Based on your current traffic (~2,100 views/week), both services that power the site fit comfortably within their free tiers — even during election-season spikes. The one nuance is Vercel's terms of service.</p>
 
   <table class="compare-table" style="margin-top:1.5rem">
     <thead>
       <tr>
         <th>Service</th>
         <th>What it does</th>
-        <th>Normal traffic</th>
-        <th>Election spike (5×)</th>
-        <th>Estimated cost</th>
+        <th>Free tier verdict</th>
+        <th>Paid option</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><strong>Vercel</strong><br><span style="font-size:0.8rem;color:var(--muted)">Hosts the website</span></td>
-        <td>Serves every page load to visitors</td>
-        <td>~9K views/mo<br>~4–5 GB bandwidth</td>
-        <td>~45K views/mo<br>~22 GB bandwidth</td>
-        <td><strong>$20/mo</strong> (Pro plan)<br><span style="font-size:0.8rem;color:var(--muted)">Includes 100 GB bandwidth — plenty of headroom</span></td>
-      </tr>
-      <tr>
         <td><strong>Sanity</strong><br><span style="font-size:0.8rem;color:var(--muted)">Content editor &amp; database</span></td>
         <td>Stores and delivers all content (events, news, voter guide, etc.)</td>
-        <td>Well within free tier</td>
-        <td>Still within free tier (pages are cached, not fetched live)</td>
-        <td><strong>Free</strong> (up to 2 editor accounts)<br><strong>$15/mo</strong> Growth plan if you need more editors or higher limits</td>
+        <td><span class="check">✓</span> <strong>Free tier works.</strong> Pages are cached, so Sanity only gets called when content changes — not on every visitor request. Current traffic fits easily.</td>
+        <td><strong>$15/mo</strong> Growth plan if you need more than 2 editor accounts or hit storage limits</td>
+      </tr>
+      <tr>
+        <td><strong>Vercel</strong><br><span style="font-size:0.8rem;color:var(--muted)">Hosts the website</span></td>
+        <td>Serves every page load to visitors</td>
+        <td><span style="color:var(--gold)">⚠</span> <strong>Technically fits, but ToS applies.</strong> Traffic (~9K views/mo, ~5 GB bandwidth) is well within the free Hobby plan's limits. However, Vercel's terms restrict Hobby to <em>personal</em> use — an organization should be on Pro.</td>
+        <td><strong>$20/mo</strong> Pro plan — appropriate for a committee/org, includes 100 GB bandwidth</td>
       </tr>
     </tbody>
   </table>
 
   <div style="background:var(--blue-light);border-radius:8px;padding:1.25rem 1.5rem;margin-top:1.5rem;font-size:0.9rem;">
-    <p style="font-weight:600;margin-bottom:0.5rem;">Why election spikes don't spike costs</p>
-    <p>The site generates static pages in advance and caches them globally — so a surge in visitors hits a CDN, not a live server. 45,000 monthly views still uses well under Vercel Pro's 100 GB bandwidth cap. You'd need roughly 10× your current traffic sustained over a full month before facing overage charges.</p>
+    <p style="font-weight:600;margin-bottom:0.5rem;">Bottom line</p>
+    <p>Sanity is genuinely free at your scale. Vercel could run free technically, but the correct plan for an organization is Pro at $20/mo. Even a 5× election-season spike (~45K views/mo) stays well under Pro's limits — no overage charges expected.</p>
   </div>
 
   <div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1.25rem 1.5rem;margin-top:1rem;font-size:0.9rem;">
