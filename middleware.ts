@@ -12,11 +12,82 @@ const HOSTNAME_TO_SLUG: Record<string, string> = {
 
 const COUNTY_SLUG = 'allegheny-county'
 
+const STUDIO_PREFIX = '/studio'
+
 // Routes that must never be tenant-scoped
-const BYPASS_PREFIXES = ['/studio', '/api', '/_next', '/favicon.ico']
+const BYPASS_PREFIXES = ['/api', '/_next', '/favicon.ico']
+
+function unauthorizedStudioResponse() {
+  return new NextResponse('Studio authentication required.', {
+    status: 401,
+    headers: {
+      'WWW-Authenticate': 'Basic realm="Allegheny Dems Studio"',
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'no-store',
+    },
+  })
+}
+
+function studioAuthMisconfiguredResponse() {
+  return new NextResponse('Studio auth is not configured. Set STUDIO_USERNAME and STUDIO_PASSWORD.', {
+    status: 503,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'no-store',
+    },
+  })
+}
+
+function isAuthorizedStudioRequest(request: NextRequest) {
+  const studioUsername = process.env.STUDIO_USERNAME
+  const studioPassword = process.env.STUDIO_PASSWORD
+
+  if (!studioUsername || !studioPassword) {
+    return { ok: false as const, misconfigured: true as const }
+  }
+
+  const authorization = request.headers.get('authorization')
+  if (!authorization?.startsWith('Basic ')) {
+    return { ok: false as const, misconfigured: false as const }
+  }
+
+  try {
+    const encodedCredentials = authorization.slice('Basic '.length)
+    const decodedCredentials = atob(encodedCredentials)
+    const separatorIndex = decodedCredentials.indexOf(':')
+
+    if (separatorIndex === -1) {
+      return { ok: false as const, misconfigured: false as const }
+    }
+
+    const username = decodedCredentials.slice(0, separatorIndex)
+    const password = decodedCredentials.slice(separatorIndex + 1)
+
+    return {
+      ok: username === studioUsername && password === studioPassword,
+      misconfigured: false as const,
+    }
+  } catch {
+    return { ok: false as const, misconfigured: false as const }
+  }
+}
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  if (pathname.startsWith(STUDIO_PREFIX)) {
+    const authState = isAuthorizedStudioRequest(request)
+
+    if (authState.misconfigured) {
+      return studioAuthMisconfiguredResponse()
+    }
+
+    if (!authState.ok) {
+      return unauthorizedStudioResponse()
+    }
+
+    return NextResponse.next()
+  }
 
   if (BYPASS_PREFIXES.some((p) => pathname.startsWith(p))) {
     return NextResponse.next()

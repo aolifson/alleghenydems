@@ -2,10 +2,15 @@ import Nav from '@/components/nav'
 import Footer from '@/components/footer'
 import ActionAlertBanner from '@/components/action-alert-banner'
 import { getSiteSettings, getMunicipalitySettings, getBannerAlert, getActiveMunicipalities } from '@/sanity/lib/queries'
-import type { MunicipalityListItem } from '@/sanity/lib/queries'
+import type { NavItem, MunicipalityListItem } from '@/sanity/lib/queries'
 import { getMunicipalitySlug, getMunicipalityPrefix } from '@/lib/tenant'
 import { MunicipalityPrefixProvider } from '@/lib/municipality-prefix-context'
 import { urlFor } from '@/sanity/lib/image'
+import { WORDPRESS_NAV_ITEMS, WORDPRESS_BASE_URL } from '@/lib/wordpress-nav'
+
+// WordPress hybrid mode: all nav links point to alleghenydems.com.
+// Set NEXT_PUBLIC_WP_NAV=false in Vercel env vars to disable (e.g. training project).
+const wpMode = process.env.NEXT_PUBLIC_WP_NAV !== 'false'
 
 export const revalidate = 300
 
@@ -26,6 +31,10 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const logoUrl = municipalitySettings?.logo ? urlFor(municipalitySettings.logo).width(80).height(80).url() : null
   const municipalityName = isCounty ? null : (municipalitySettings?.name ?? null)
 
+  const navItems: NavItem[] | null | undefined = wpMode
+    ? WORDPRESS_NAV_ITEMS as unknown as NavItem[]
+    : effectiveSettings?.navigationItems
+
   return (
     <MunicipalityPrefixProvider basePath={basePath}>
       {/* Inject per-municipality accent color override as CSS custom property */}
@@ -45,7 +54,14 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           </div>
         </div>
       )}
-      <Nav navItems={effectiveSettings?.navigationItems} logoUrl={logoUrl} municipalityName={municipalityName} municipalities={municipalities} />
+      <Nav
+        navItems={navItems}
+        logoUrl={logoUrl}
+        municipalityName={municipalityName}
+        municipalities={municipalities}
+        wordpressBaseUrl={wpMode ? WORDPRESS_BASE_URL : undefined}
+        localActivePath="/voter-guide"
+      />
       {bannerAlert && <ActionAlertBanner alert={bannerAlert} />}
       <main className="flex-1">{children}</main>
       <Footer settings={effectiveSettings} basePath={basePath} />

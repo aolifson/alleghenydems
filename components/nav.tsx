@@ -78,27 +78,45 @@ export default function Nav({
   logoUrl,
   municipalityName,
   municipalities = [],
+  wordpressBaseUrl,
+  localActivePath,
 }: {
   navItems?: NavItem[] | null
   logoUrl?: string | null
   municipalityName?: string | null
   municipalities?: MunicipalityListItem[]
+  // When set, all non-local, non-external links are prefixed with this URL
+  // and rendered as <a> tags pointing to the WordPress site.
+  wordpressBaseUrl?: string
+  // The local path that should show as active when wordpressBaseUrl is set
+  // (since all wp-prefixed links won't match usePathname()).
+  localActivePath?: string
 }) {
   const basePath = useMunicipalityPrefix()
   const resolvedLogoUrl = logoUrl ?? '/acdc-seal.png'
   const resolvedLogoAlt = municipalityName ?? 'Allegheny County Democratic Committee'
   const pathname = usePathname()
 
+  const wpMode = !!wordpressBaseUrl
+
   // Prefix all internal nav hrefs with the municipality basePath so navigation
   // stays within the demo path (e.g. /municipalities/northside/events).
   // When basePath is '' (county or subdomain), hrefs are returned unchanged.
+  // In WordPress mode, non-local hrefs are prefixed with the WordPress base URL instead.
   const rawItems = (navItems && navItems.length > 0) ? navItems : DEFAULT_NAV_ITEMS
+
+  function resolveHref(href: string, isLocal?: boolean): string {
+    if (href.startsWith('http')) return href
+    if (wpMode && !isLocal) return wordpressBaseUrl + href
+    return prefixHref(href, basePath)
+  }
+
   const items = rawItems.map((item) => ({
     ...item,
-    href: prefixHref(item.href, basePath),
+    href: resolveHref(item.href, (item as { local?: boolean }).local),
     children: item.children?.map((child) => ({
       ...child,
-      href: prefixHref(child.href, basePath),
+      href: resolveHref(child.href, (child as { local?: boolean }).local),
     })),
   }))
   const [open, setOpen] = useState(false)
@@ -106,13 +124,25 @@ export default function Nav({
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   function isActive(href: string) {
+    // In WordPress mode, only match against the designated local active path
+    if (wpMode) {
+      if (!localActivePath) return false
+      return href === localActivePath || href.startsWith(localActivePath + '/')
+    }
     if (href === '/') return pathname === '/'
     if (href.startsWith('http')) return false
     return pathname === href || pathname.startsWith(href + '/')
   }
 
   function isChildActive(href: string) {
-    if (!href || href.startsWith('http')) return false
+    if (!href) return false
+    // In WordPress mode, match the local active path against the original local href
+    if (wpMode) {
+      if (!localActivePath) return false
+      const hrefPath = href.split('#')[0]
+      return hrefPath === localActivePath || hrefPath.startsWith(localActivePath + '/')
+    }
+    if (href.startsWith('http')) return false
     const hrefPath = href.split('#')[0]
     return pathname === hrefPath || pathname.startsWith(hrefPath + '/')
   }
@@ -130,57 +160,72 @@ export default function Nav({
     <header className="bg-[var(--color-blue)] text-[var(--color-navy)] shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 flex items-center h-16">
         {/* Logo only */}
-        <Link href={prefixHref('/', basePath)} className="shrink-0 hover:opacity-90 transition-opacity">
-          <Image src={resolvedLogoUrl} alt={resolvedLogoAlt} width={40} height={40} className="rounded-full" />
-        </Link>
+        {wpMode ? (
+          <a href={wordpressBaseUrl + '/'} className="shrink-0 hover:opacity-90 transition-opacity">
+            <Image src={resolvedLogoUrl} alt={resolvedLogoAlt} width={40} height={40} className="rounded-full" />
+          </a>
+        ) : (
+          <Link href={prefixHref('/', basePath)} className="shrink-0 hover:opacity-90 transition-opacity">
+            <Image src={resolvedLogoUrl} alt={resolvedLogoAlt} width={40} height={40} className="rounded-full" />
+          </Link>
+        )}
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-1 ml-5 flex-1">
-          {items.map((item) => (
-            <div
-              key={item.href}
-              className="relative"
-              onMouseEnter={() => item.children && openDropdown(item.label)}
-              onMouseLeave={scheduleClose}
-            >
-              <Link
-                href={item.href}
-                className={
-                  isActive(item.href)
-                    ? "px-3 py-2 rounded text-sm font-semibold bg-[var(--color-navy)]/15 border-b-2 border-white/80 transition-colors flex items-center gap-1"
-                    : "px-3 py-2 rounded text-sm font-medium hover:bg-[var(--color-navy)]/10 transition-colors flex items-center gap-1"
-                }
+          {items.map((item) => {
+            const itemIsExternal = item.href.startsWith('http')
+            const NavLinkTag = itemIsExternal ? 'a' : Link
+            return (
+              <div
+                key={item.href}
+                className="relative"
+                onMouseEnter={() => item.children && openDropdown(item.label)}
+                onMouseLeave={scheduleClose}
               >
-                {item.label}
-                {item.children && <span className="text-xs opacity-60">▾</span>}
-              </Link>
-              {item.children && activeDropdown === item.label && (
-                <div
-                  className="absolute top-full left-0 mt-1 bg-white text-[var(--color-text)] shadow-lg rounded-md py-1 min-w-[200px]"
-                  onMouseEnter={() => { if (closeTimer.current) clearTimeout(closeTimer.current) }}
-                  onMouseLeave={scheduleClose}
+                <NavLinkTag
+                  href={item.href}
+                  className={
+                    isActive(item.href)
+                      ? "px-3 py-2 rounded text-sm font-semibold bg-[var(--color-navy)]/15 border-b-2 border-white/80 transition-colors flex items-center gap-1"
+                      : "px-3 py-2 rounded text-sm font-medium hover:bg-[var(--color-navy)]/10 transition-colors flex items-center gap-1"
+                  }
                 >
-                  {item.children.map((child) => (
-                    <Link
-                      key={child.href}
-                      href={child.href}
-                      target={'external' in child && child.external ? '_blank' : undefined}
-                      rel={'external' in child && child.external ? 'noopener noreferrer' : undefined}
-                      className={
-                        isChildActive(child.href)
-                          ? "block px-4 py-2 pl-3 text-sm font-semibold text-[var(--color-blue)] bg-[var(--color-blue-light)] border-l-2 border-[var(--color-blue)] transition-colors"
-                          : "block px-4 py-2 text-sm hover:bg-[var(--color-blue-light)] hover:text-[var(--color-blue)] transition-colors"
-                      }
-                      onClick={() => setActiveDropdown(null)}
-                    >
-                      {child.label}
-                      {'external' in child && child.external && <span className="ml-1 opacity-50 text-xs">↗</span>}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+                  {item.label}
+                  {item.children && <span className="text-xs opacity-60">▾</span>}
+                </NavLinkTag>
+                {item.children && activeDropdown === item.label && (
+                  <div
+                    className="absolute top-full left-0 mt-1 bg-white text-[var(--color-text)] shadow-lg rounded-md py-1 min-w-[200px]"
+                    onMouseEnter={() => { if (closeTimer.current) clearTimeout(closeTimer.current) }}
+                    onMouseLeave={scheduleClose}
+                  >
+                    {item.children.map((child) => {
+                      const childIsExternal = child.href.startsWith('http')
+                      const isChildExt = 'external' in child && child.external
+                      const ChildTag = childIsExternal ? 'a' : Link
+                      return (
+                        <ChildTag
+                          key={child.href}
+                          href={child.href}
+                          target={isChildExt ? '_blank' : undefined}
+                          rel={isChildExt ? 'noopener noreferrer' : undefined}
+                          className={
+                            isChildActive(child.href)
+                              ? "block px-4 py-2 pl-3 text-sm font-semibold text-[var(--color-blue)] bg-[var(--color-blue-light)] border-l-2 border-[var(--color-blue)] transition-colors"
+                              : "block px-4 py-2 text-sm hover:bg-[var(--color-blue-light)] hover:text-[var(--color-blue)] transition-colors"
+                          }
+                          onClick={() => setActiveDropdown(null)}
+                        >
+                          {child.label}
+                          {isChildExt && <span className="ml-1 opacity-50 text-xs">↗</span>}
+                        </ChildTag>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )
+          })}
 
           {/* Local Committees dropdown — county site only, hidden when empty */}
           {municipalities.length > 0 && (
@@ -289,37 +334,46 @@ export default function Nav({
       {/* Mobile menu */}
       {open && (
         <div className="md:hidden bg-[var(--color-navy)] border-t border-white/10 px-4 pb-4 text-white">
-          {items.map((item) => (
-            <div key={item.href}>
-              <Link
-                href={item.href}
-                className={
-                  isActive(item.href)
-                    ? "block py-2 pl-2 text-sm font-semibold border-b border-white/10 text-white border-l-2 border-l-white"
-                    : "block py-2 text-sm font-medium border-b border-white/10 text-white"
-                }
-                onClick={() => setOpen(false)}
-              >
-                {item.label}
-              </Link>
-              {item.children?.map((child) => (
-                <Link
-                  key={child.href}
-                  href={child.href}
-                  target={'external' in child && child.external ? '_blank' : undefined}
-                  rel={'external' in child && child.external ? 'noopener noreferrer' : undefined}
+          {items.map((item) => {
+            const itemIsExternal = item.href.startsWith('http')
+            const MobileNavTag = itemIsExternal ? 'a' : Link
+            return (
+              <div key={item.href}>
+                <MobileNavTag
+                  href={item.href}
                   className={
-                    isChildActive(child.href)
-                      ? "block py-1.5 pl-5 text-sm font-semibold text-white"
-                      : "block py-1.5 pl-4 text-sm text-white/70 hover:text-white"
+                    isActive(item.href)
+                      ? "block py-2 pl-2 text-sm font-semibold border-b border-white/10 text-white border-l-2 border-l-white"
+                      : "block py-2 text-sm font-medium border-b border-white/10 text-white"
                   }
                   onClick={() => setOpen(false)}
                 >
-                  {child.label}
-                </Link>
-              ))}
-            </div>
-          ))}
+                  {item.label}
+                </MobileNavTag>
+                {item.children?.map((child) => {
+                  const childIsExternal = child.href.startsWith('http')
+                  const isChildExt = 'external' in child && child.external
+                  const MobileChildTag = childIsExternal ? 'a' : Link
+                  return (
+                    <MobileChildTag
+                      key={child.href}
+                      href={child.href}
+                      target={isChildExt ? '_blank' : undefined}
+                      rel={isChildExt ? 'noopener noreferrer' : undefined}
+                      className={
+                        isChildActive(child.href)
+                          ? "block py-1.5 pl-5 text-sm font-semibold text-white"
+                          : "block py-1.5 pl-4 text-sm text-white/70 hover:text-white"
+                      }
+                      onClick={() => setOpen(false)}
+                    >
+                      {child.label}
+                    </MobileChildTag>
+                  )
+                })}
+              </div>
+            )
+          })}
           {municipalities.length > 0 && (
             <div className="border-b border-white/10 pb-2 mb-2">
               <p className="py-2 text-xs font-semibold text-white/50 uppercase tracking-wide">Local Committees</p>
