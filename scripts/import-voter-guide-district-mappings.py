@@ -34,6 +34,42 @@ RACE_CODE_BY_TITLE = {
     "Representative in Congress": "congress",
     "Senator in the General Assembly": "senate",
     "Representative in the General Assembly": "house",
+    "State Democratic Committee": "senate",
+}
+
+SUPPLEMENTAL_TERMS_BY_RACE_AND_DISTRICT = {
+    ("State Democratic Committee", "43"): [
+        "Allentown",
+        "Arlington",
+        "Arlington Heights",
+        "Beltzhoover",
+        "Bloomfield",
+        "Bon Air",
+        "Carrick",
+        "East Hills",
+        "East Liberty",
+        "Friendship",
+        "Glen Hazel",
+        "Greenfield",
+        "Hazelwood",
+        "Hayes",
+        "Homewood",
+        "Knoxville",
+        "Lincoln Place",
+        "Mount Washington",
+        "Mt. Oliver",
+        "New Homestead",
+        "Oakland",
+        "Point Breeze",
+        "Regent Square",
+        "Shadyside",
+        "Southside Flats",
+        "Southside Slopes",
+        "Squirrel Hill",
+        "St. Clair",
+        "Swisshelm Park",
+        "The Hill District",
+    ],
 }
 
 # Seed ZIP mappings are used as fallback/additions.
@@ -433,6 +469,9 @@ def main() -> None:
             districts_seen += 1
 
             incoming_terms = sorted(source_map[race_code].get(number, set()))
+            incoming_terms.extend(
+                SUPPLEMENTAL_TERMS_BY_RACE_AND_DISTRICT.get((office_title, number), [])
+            )
             existing_terms = list(district.get("searchTerms") or [])
             merged_terms, terms_added = merge_unique(
                 existing_terms,

@@ -12,6 +12,8 @@ import { getMunicipalitySlug } from '@/lib/tenant'
 export const metadata: Metadata = { title: '2026 Voter Guide' }
 export const revalidate = 3600
 
+const STATE_COMMITTEE_RACE_TITLE = 'State Democratic Committee'
+
 export default async function VoterGuidePage() {
   const municipalitySlug = await getMunicipalitySlug()
   const isCounty = municipalitySlug === 'allegheny-county'
@@ -33,6 +35,7 @@ export default async function VoterGuidePage() {
   }
 
   const races = [...(guide.races ?? [])].sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
+  const stateCommitteeRace = races.find((race) => race.officeTitle === STATE_COMMITTEE_RACE_TITLE)
 
   return (
     <main className="bg-[var(--color-blue-mid)] py-10">
@@ -68,7 +71,11 @@ export default async function VoterGuidePage() {
           </section>
         )}
 
-        <VoterGuideDistrictLookup races={races} initialQuery={initialQuery} />
+        <VoterGuideDistrictLookup
+          races={races}
+          initialQuery={initialQuery}
+          stateCommitteeRace={stateCommitteeRace}
+        />
       </div>
     </main>
   )

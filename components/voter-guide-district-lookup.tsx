@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import SocialLinks from '@/components/social-links'
+import VoterGuideStateCommittee from '@/components/voter-guide-state-committee'
 import { urlFor } from '@/sanity/lib/image'
 import type { VoterGuideCandidate, VoterGuideDistrict, VoterGuideRace } from '@/sanity/lib/queries'
 
@@ -14,6 +15,7 @@ interface LookupResult {
 interface Props {
   races: VoterGuideRace[]
   initialQuery?: string
+  stateCommitteeRace?: VoterGuideRace
 }
 
 const TARGET_RACE_TITLES = [
@@ -21,6 +23,14 @@ const TARGET_RACE_TITLES = [
   'Senator in the General Assembly',
   'Representative in the General Assembly',
 ]
+
+function extractDistrictNumber(label?: string) {
+  return (label?.match(/\d+/)?.[0] ?? '').trim()
+}
+
+function extractZipQuery(query: string) {
+  return query.match(/\b\d{5}\b/)?.[0] ?? null
+}
 
 function candidateStatusLabel(status?: VoterGuideCandidate['ballotStatus']) {
   if (status === 'alsoAppearing') return 'Also Appearing On Ballot'
@@ -105,11 +115,37 @@ function scoreDistrictByText(query: string, district: VoterGuideDistrict) {
   return best
 }
 
+function scoreDistrictByCandidate(query: string, district: VoterGuideDistrict) {
+  const normalizedQuery = normalize(query)
+  if (!normalizedQuery) return 0
+
+  let best = 0
+
+  for (const candidate of district.candidates ?? []) {
+    const normalizedName = normalize(candidate.name)
+    if (!normalizedName) continue
+
+    if (normalizedName === normalizedQuery) {
+      best = Math.max(best, 140)
+      continue
+    }
+    if (normalizedName.startsWith(normalizedQuery)) {
+      best = Math.max(best, 110)
+    } else if (normalizedName.includes(normalizedQuery)) {
+      best = Math.max(best, 95)
+    } else if (normalizedQuery.includes(normalizedName) && normalizedName.length >= 4) {
+      best = Math.max(best, 85)
+    }
+  }
+
+  return best
+}
+
 function matchRace(query: string, race: VoterGuideRace): LookupResult[] {
   const trimmed = query.trim()
   if (!trimmed) return []
 
-  const zip = trimmed.match(/^\d{5}$/)?.[0]
+  const zip = extractZipQuery(trimmed)
   if (zip) {
     return (race.districts ?? [])
       .map((district) => {
@@ -121,7 +157,10 @@ function matchRace(query: string, race: VoterGuideRace): LookupResult[] {
   }
 
   const ranked = (race.districts ?? [])
-    .map((district) => ({ district, score: scoreDistrictByText(trimmed, district) }))
+    .map((district) => ({
+      district,
+      score: Math.max(scoreDistrictByText(trimmed, district), scoreDistrictByCandidate(trimmed, district)),
+    }))
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score || (a.district.displayOrder ?? 999) - (b.district.displayOrder ?? 999))
 
@@ -258,7 +297,7 @@ function RaceSection({ race, districts }: { race: VoterGuideRace; districts: Vot
   )
 }
 
-export default function VoterGuideDistrictLookup({ races, initialQuery = '' }: Props) {
+export default function VoterGuideDistrictLookup({ races, initialQuery = '', stateCommitteeRace }: Props) {
   const [query, setQuery] = useState(initialQuery)
 
   const orderedRaces = useMemo(
@@ -274,9 +313,12 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '' }: P
   const statewideRaces = useMemo(
     () =>
       orderedRaces.filter(
-        (race) => !TARGET_RACE_TITLES.includes(race.officeTitle) && isStatewideRace(race)
+        (race) =>
+          race.officeTitle !== stateCommitteeRace?.officeTitle &&
+          !TARGET_RACE_TITLES.includes(race.officeTitle) &&
+          isStatewideRace(race)
       ),
-    [orderedRaces]
+    [orderedRaces, stateCommitteeRace]
   )
 
   const matchResults = useMemo(
@@ -291,7 +333,12 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '' }: P
 
   const hasQuery = query.trim().length > 0
   const hasAnyDistrictMatch = matchResults.some((race) => race.matches.length > 0)
-  const zipQuery = query.trim().match(/^\d{5}$/)?.[0]
+  const zipQuery = extractZipQuery(query)
+  const hasFullAddressQuery = hasQuery && Boolean(zipQuery) && normalize(query) !== zipQuery
+  const ambiguousZipRaces = useMemo(
+    () => matchResults.filter((result) => result.matches.length > 1),
+    [matchResults]
+  )
   const zipMatchSummary = useMemo(() => {
     if (!zipQuery) return []
     return matchResults.flatMap((result) =>
@@ -299,25 +346,53 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '' }: P
     )
   }, [matchResults, zipQuery])
 
-  const racesToRender = useMemo(() => {
-    if (!hasQuery) {
-      return orderedRaces.map((race) => ({ race, districts: race.districts ?? [] }))
+  const stateSenateMatchNumbers = useMemo(() => {
+    const senateMatches = matchResults.find((result) => result.race.officeTitle === 'Senator in the General Assembly')?.matches ?? []
+    return new Set(
+      senateMatches
+        .map((match) => extractDistrictNumber(match.district.districtLabel))
+        .filter((number): number is string => Boolean(number))
+    )
+  }, [matchResults])
+
+  const stateCommitteeMatches = useMemo(() => {
+    if (!stateCommitteeRace) return []
+
+    const byLabel = new Map<string, VoterGuideDistrict>()
+
+    for (const district of stateCommitteeRace.districts ?? []) {
+      const districtNumber = extractDistrictNumber(district.districtLabel)
+      if (districtNumber && stateSenateMatchNumbers.has(districtNumber)) {
+        byLabel.set(district.districtLabel, district)
+      }
     }
 
-    const filteredDistrictRaces = matchResults
+    if (hasQuery) {
+      for (const match of matchRace(query, stateCommitteeRace)) {
+        byLabel.set(match.district.districtLabel, match.district)
+      }
+    }
+
+    return [...byLabel.values()].sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
+  }, [hasQuery, query, stateCommitteeRace, stateSenateMatchNumbers])
+
+  const racesToRender = useMemo(() => {
+    if (!hasQuery) {
+      return districtRaces.map((race) => ({ race, districts: race.districts ?? [] }))
+    }
+
+    return matchResults
       .filter((result) => result.matches.length > 0)
       .map((result) => ({
         race: result.race,
         districts: result.matches.map((match) => match.district),
       }))
+  }, [districtRaces, hasQuery, matchResults])
 
-    const alwaysVisibleStatewide = statewideRaces.map((race) => ({
-      race,
-      districts: race.districts ?? [],
-    }))
-
-    return [...filteredDistrictRaces, ...alwaysVisibleStatewide]
-  }, [hasQuery, orderedRaces, matchResults, statewideRaces])
+  const hasSearchResults =
+    racesToRender.length > 0 ||
+    stateCommitteeMatches.length > 0 ||
+    statewideRaces.length > 0
 
   return (
     <div className="space-y-8">
@@ -326,7 +401,7 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '' }: P
           Find Your Representatives
         </h2>
         <p className="mt-2 text-sm text-[var(--color-text-muted)] max-w-3xl">
-          Search by municipality, neighborhood, district name/number, or ZIP code to filter down to your Congressional, State Senate, and State House races.
+          Search by municipality, neighborhood, district name/number, candidate name, or ZIP code to filter down to your Congressional, State Senate, and State House races.
         </p>
 
         <div className="mt-4 flex flex-col sm:flex-row gap-3">
@@ -334,9 +409,9 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '' }: P
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="e.g. Mt Lebanon, Squirrel Hill, District 42, 15217"
+            placeholder="e.g. Mt Lebanon, Summer Lee, District 42, 15217"
             className="w-full rounded-md border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-mid)]"
-            aria-label="Search district by name or ZIP code"
+            aria-label="Search district by location, candidate name, or ZIP code"
           />
           {hasQuery && (
             <button
@@ -360,23 +435,57 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '' }: P
           </p>
         )}
 
+        {hasFullAddressQuery && (
+          <p className="mt-2 text-xs text-[var(--color-text-muted)]">
+            Full street addresses are not matched precisely yet. We used ZIP {zipQuery} to narrow the ballot.
+          </p>
+        )}
+
+        {zipQuery && ambiguousZipRaces.length > 0 && (
+          <p className="mt-2 text-xs text-[var(--color-text-muted)]">
+            ZIP codes can cross district lines. For {zipQuery}, we show every possible district match so you do not miss a race you may be able to vote in.
+          </p>
+        )}
+
         {hasQuery && (
           <p className="mt-3 text-sm text-[var(--color-text-muted)]">
-            Showing matched district races first, followed by statewide offices.
+            Showing all races this search can place on your ballot. District-based races appear below, and any true statewide races are listed separately because every voter sees them.
           </p>
         )}
       </section>
 
-      {hasQuery && !hasAnyDistrictMatch && (
+      {hasQuery && !hasSearchResults && (
         <section className="bg-white/95 border border-white/50 rounded-lg p-6">
           <p className="text-sm text-[var(--color-text-muted)]">
-            No district matches found for &quot;{query.trim()}&quot;. Statewide offices are shown below.
+            No district matches found for &quot;{query.trim()}&quot;.
           </p>
         </section>
       )}
 
       {racesToRender.map(({ race, districts }) => (
         <RaceSection key={race._key ?? race.officeTitle} race={race} districts={districts} />
+      ))}
+
+      {stateCommitteeRace && (!hasQuery || stateCommitteeMatches.length > 0) && (
+        <VoterGuideStateCommittee
+          race={stateCommitteeRace}
+          districts={hasQuery ? stateCommitteeMatches : undefined}
+        />
+      )}
+
+      {statewideRaces.length > 0 && (
+        <section className="bg-white/95 border border-white/50 rounded-lg p-6 md:p-8">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-[var(--color-navy)]">
+            Statewide Races
+          </h2>
+          <p className="mt-2 text-sm text-[var(--color-text-muted)] max-w-3xl">
+            These races appear on every ballot, no matter where you live.
+          </p>
+        </section>
+      )}
+
+      {statewideRaces.map((race) => (
+        <RaceSection key={race._key ?? race.officeTitle} race={race} districts={race.districts ?? []} />
       ))}
     </div>
   )
