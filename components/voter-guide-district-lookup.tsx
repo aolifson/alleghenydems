@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { FormEvent, useMemo, useState, useTransition } from 'react'
 import Image from 'next/image'
 import SocialLinks from '@/components/social-links'
 import VoterGuideStateCommittee from '@/components/voter-guide-state-committee'
@@ -10,6 +10,19 @@ import type { VoterGuideCandidate, VoterGuideDistrict, VoterGuideRace } from '@/
 interface LookupResult {
   district: VoterGuideDistrict
   score: number
+}
+
+interface AddressLookupResult {
+  standardizedAddress: string
+  countyName?: string | null
+  congressionalDistrict?: string | null
+  stateSenateDistrict?: string | null
+  stateHouseDistrict?: string | null
+  coordinates?: {
+    longitude?: number | null
+    latitude?: number | null
+  }
+  source?: string
 }
 
 interface Props {
@@ -184,6 +197,16 @@ function isStatewideRace(race: VoterGuideRace) {
   return districts.every((district) => normalize(district.districtLabel) === 'statewide')
 }
 
+function findDistrictByNumber(race: VoterGuideRace, districtNumber?: string | null) {
+  if (!districtNumber) return null
+
+  return (
+    (race.districts ?? []).find(
+      (district) => extractDistrictNumber(district.districtLabel) === districtNumber
+    ) ?? null
+  )
+}
+
 function RaceSection({ race, districts }: { race: VoterGuideRace; districts: VoterGuideDistrict[] }) {
   const orderedDistricts = [...districts].sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
 
@@ -299,6 +322,10 @@ function RaceSection({ race, districts }: { race: VoterGuideRace; districts: Vot
 
 export default function VoterGuideDistrictLookup({ races, initialQuery = '', stateCommitteeRace }: Props) {
   const [query, setQuery] = useState(initialQuery)
+  const [address, setAddress] = useState('')
+  const [exactLookup, setExactLookup] = useState<AddressLookupResult | null>(null)
+  const [addressError, setAddressError] = useState<string | null>(null)
+  const [isAddressLookupPending, startAddressLookupTransition] = useTransition()
 
   const orderedRaces = useMemo(
     () => [...races].sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999)),
@@ -332,6 +359,7 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
   )
 
   const hasQuery = query.trim().length > 0
+  const hasExactLookup = Boolean(exactLookup)
   const hasAnyDistrictMatch = matchResults.some((race) => race.matches.length > 0)
   const zipQuery = extractZipQuery(query)
   const hasFullAddressQuery = hasQuery && Boolean(zipQuery) && normalize(query) !== zipQuery
@@ -376,7 +404,7 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
     return [...byLabel.values()].sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
   }, [hasQuery, query, stateCommitteeRace, stateSenateMatchNumbers])
 
-  const racesToRender = useMemo(() => {
+  const textRacesToRender = useMemo(() => {
     if (!hasQuery) {
       return districtRaces.map((race) => ({ race, districts: race.districts ?? [] }))
     }
@@ -389,10 +417,91 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
       }))
   }, [districtRaces, hasQuery, matchResults])
 
+  const exactRacesToRender = useMemo(() => {
+    if (!exactLookup) return []
+
+    return districtRaces.flatMap((race) => {
+      const districtNumber =
+        race.officeTitle === 'Representative in Congress'
+          ? exactLookup.congressionalDistrict
+          : race.officeTitle === 'Senator in the General Assembly'
+            ? exactLookup.stateSenateDistrict
+            : exactLookup.stateHouseDistrict
+
+      const district = findDistrictByNumber(race, districtNumber)
+      return district ? [{ race, districts: [district] }] : []
+    })
+  }, [districtRaces, exactLookup])
+
+  const exactStateCommitteeMatches = useMemo(() => {
+    if (!stateCommitteeRace || !exactLookup?.stateSenateDistrict) return []
+    const district = findDistrictByNumber(stateCommitteeRace, exactLookup.stateSenateDistrict)
+    return district ? [district] : []
+  }, [exactLookup, stateCommitteeRace])
+
+  const racesToRender = hasExactLookup ? exactRacesToRender : textRacesToRender
+  const activeStateCommitteeMatches = hasExactLookup ? exactStateCommitteeMatches : stateCommitteeMatches
+  const hasActiveSearch = hasExactLookup || hasQuery
   const hasSearchResults =
     racesToRender.length > 0 ||
-    stateCommitteeMatches.length > 0 ||
-    statewideRaces.length > 0
+    activeStateCommitteeMatches.length > 0 ||
+    (hasActiveSearch && statewideRaces.length > 0)
+
+  const exactLookupSummary = useMemo(() => {
+    if (!exactLookup) return []
+
+    return [
+      exactLookup.congressionalDistrict ? `Congress ${exactLookup.congressionalDistrict}` : null,
+      exactLookup.stateSenateDistrict ? `State Senate ${exactLookup.stateSenateDistrict}` : null,
+      exactLookup.stateHouseDistrict ? `State House ${exactLookup.stateHouseDistrict}` : null,
+    ].filter((item): item is string => Boolean(item))
+  }, [exactLookup])
+
+  function clearAllSearch() {
+    setQuery('')
+    setAddress('')
+    setExactLookup(null)
+    setAddressError(null)
+  }
+
+  function handleTextQueryChange(nextValue: string) {
+    setQuery(nextValue)
+    if (exactLookup) setExactLookup(null)
+    if (addressError) setAddressError(null)
+  }
+
+  async function handleAddressLookupSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    const trimmedAddress = address.trim()
+    if (!trimmedAddress) {
+      setAddressError('Enter a full street address to find an exact ballot.')
+      setExactLookup(null)
+      return
+    }
+
+    setAddressError(null)
+
+    startAddressLookupTransition(async () => {
+      try {
+        const response = await fetch(
+          `/api/voter-guide/address-lookup?address=${encodeURIComponent(trimmedAddress)}`,
+          { cache: 'no-store' }
+        )
+
+        const payload = (await response.json()) as AddressLookupResult & { error?: string }
+        if (!response.ok) {
+          throw new Error(payload.error || 'Address lookup failed.')
+        }
+
+        setExactLookup(payload)
+        setQuery('')
+      } catch (err) {
+        setExactLookup(null)
+        setAddressError(err instanceof Error ? err.message : 'Address lookup failed.')
+      }
+    })
+  }
 
   return (
     <div className="space-y-8">
@@ -408,15 +517,15 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
           <input
             type="search"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => handleTextQueryChange(event.target.value)}
             placeholder="e.g. Mt Lebanon, Summer Lee, District 42, 15217"
             className="w-full rounded-md border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-mid)]"
             aria-label="Search district by location, candidate name, or ZIP code"
           />
-          {hasQuery && (
+          {(hasQuery || address.trim().length > 0 || hasExactLookup) && (
             <button
               type="button"
-              onClick={() => setQuery('')}
+              onClick={clearAllSearch}
               className="rounded-md border border-[var(--color-border)] px-3 py-2 text-sm font-medium text-[var(--color-navy)] hover:bg-[var(--color-blue-light)]"
             >
               Clear
@@ -424,40 +533,90 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
           )}
         </div>
 
-        {zipQuery && (
+        <div className="mt-5 border-t border-[var(--color-border)] pt-5">
+          <p className="text-sm font-semibold text-[var(--color-navy)]">Exact Address Lookup</p>
+          <p className="mt-1 text-sm text-[var(--color-text-muted)] max-w-3xl">
+            Enter a full street address to match your exact ballot using the U.S. Census geocoder. This is more precise than ZIP or neighborhood search.
+          </p>
+
+          <form onSubmit={handleAddressLookupSubmit} className="mt-3 flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              value={address}
+              onChange={(event) => {
+                setAddress(event.target.value)
+                if (exactLookup) setExactLookup(null)
+                if (addressError) setAddressError(null)
+              }}
+              placeholder="e.g. 5843 Hobart St, Pittsburgh, PA 15217"
+              className="w-full rounded-md border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-mid)]"
+              aria-label="Enter a full street address for exact ballot lookup"
+            />
+            <button
+              type="submit"
+              disabled={isAddressLookupPending}
+              className="rounded-md bg-[var(--color-navy)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-blue-mid)] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isAddressLookupPending ? 'Looking Up...' : 'Find Exact Ballot'}
+            </button>
+          </form>
+
+          {addressError && (
+            <p className="mt-2 text-sm text-[var(--color-red)]">
+              {addressError}
+            </p>
+          )}
+
+          {exactLookup && (
+            <p className="mt-2 text-sm text-[var(--color-text-muted)]">
+              Using exact address lookup for {exactLookup.standardizedAddress}
+              {exactLookupSummary.length > 0 ? ` (${exactLookupSummary.join(' · ')})` : ''}.
+            </p>
+          )}
+        </div>
+
+        {!hasExactLookup && zipQuery && (
           <p className="mt-2 text-xs text-[var(--color-text-muted)]">
             ZIP results come from district ZIP mappings in Sanity. If a ZIP returns no district matches, add it under the district&apos;s `ZIP Codes` field.
           </p>
         )}
-        {zipQuery && hasAnyDistrictMatch && (
+        {!hasExactLookup && zipQuery && hasAnyDistrictMatch && (
           <p className="mt-2 text-xs text-[var(--color-text-muted)]">
             ZIP {zipQuery} matched {zipMatchSummary.length} district race{zipMatchSummary.length === 1 ? '' : 's'}: {zipMatchSummary.join(' · ')}.
           </p>
         )}
 
-        {hasFullAddressQuery && (
+        {!hasExactLookup && hasFullAddressQuery && (
           <p className="mt-2 text-xs text-[var(--color-text-muted)]">
             Full street addresses are not matched precisely yet. We used ZIP {zipQuery} to narrow the ballot.
           </p>
         )}
 
-        {zipQuery && ambiguousZipRaces.length > 0 && (
+        {!hasExactLookup && zipQuery && ambiguousZipRaces.length > 0 && (
           <p className="mt-2 text-xs text-[var(--color-text-muted)]">
             ZIP codes can cross district lines. For {zipQuery}, we show every possible district match so you do not miss a race you may be able to vote in.
           </p>
         )}
 
-        {hasQuery && (
+        {hasExactLookup && (
+          <p className="mt-3 text-sm text-[var(--color-text-muted)]">
+            Showing the races attached to this exact address, plus any true statewide races every voter sees.
+          </p>
+        )}
+
+        {!hasExactLookup && hasQuery && (
           <p className="mt-3 text-sm text-[var(--color-text-muted)]">
             Showing all races this search can place on your ballot. District-based races appear below, and any true statewide races are listed separately because every voter sees them.
           </p>
         )}
       </section>
 
-      {hasQuery && !hasSearchResults && (
+      {hasActiveSearch && !hasSearchResults && (
         <section className="bg-white/95 border border-white/50 rounded-lg p-6">
           <p className="text-sm text-[var(--color-text-muted)]">
-            No district matches found for &quot;{query.trim()}&quot;.
+            {hasExactLookup
+              ? `No ballot matches from ${exactLookup?.standardizedAddress}.`
+              : `No district matches found for "${query.trim()}".`}
           </p>
         </section>
       )}
@@ -466,14 +625,14 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
         <RaceSection key={race._key ?? race.officeTitle} race={race} districts={districts} />
       ))}
 
-      {stateCommitteeRace && (!hasQuery || stateCommitteeMatches.length > 0) && (
+      {stateCommitteeRace && (!hasActiveSearch || activeStateCommitteeMatches.length > 0) && (
         <VoterGuideStateCommittee
           race={stateCommitteeRace}
-          districts={hasQuery ? stateCommitteeMatches : undefined}
+          districts={hasActiveSearch ? activeStateCommitteeMatches : undefined}
         />
       )}
 
-      {statewideRaces.length > 0 && (
+      {hasActiveSearch && statewideRaces.length > 0 && (
         <section className="bg-white/95 border border-white/50 rounded-lg p-6 md:p-8">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-[var(--color-navy)]">
             Statewide Races
