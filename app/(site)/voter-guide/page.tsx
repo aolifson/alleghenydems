@@ -13,6 +13,7 @@ export const metadata: Metadata = { title: '2026 Voter Guide' }
 export const revalidate = 3600
 
 const STATE_COMMITTEE_RACE_TITLE = 'State Democratic Committee'
+const HERO_EYEBROW = 'Allegheny County Democratic Committee'
 
 export default async function VoterGuidePage() {
   const municipalitySlug = await getMunicipalitySlug()
@@ -42,15 +43,15 @@ export default async function VoterGuidePage() {
       <div className="max-w-6xl mx-auto px-4 space-y-8">
         <section className="bg-white/95 border border-white/50 rounded-lg p-6 md:p-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-center">
           <div>
-            <p className="text-sm font-semibold text-[var(--color-blue-mid)] tracking-wide uppercase">Allegheny County Democratic Committee</p>
+            <p className="text-sm font-semibold text-[var(--color-blue-mid)] tracking-wide uppercase">{HERO_EYEBROW}</p>
             <h1 className="font-display text-4xl md:text-5xl font-bold text-[var(--color-navy)] mt-2">
               {guide.heroHeadline ?? guide.title}
             </h1>
-            {guide.heroSubhead && (
-              <p className="text-lg text-[var(--color-text-muted)] mt-4 max-w-3xl">{guide.heroSubhead}</p>
+            {guide.heroSubhead && guide.heroSubhead.trim() !== HERO_EYEBROW && (
+              <p className="text-lg text-[var(--color-text)] mt-4 max-w-3xl">{guide.heroSubhead}</p>
             )}
             {guide.electionDate && (
-              <p className="text-sm text-[var(--color-text-muted)] mt-3">
+              <p className="text-sm text-[var(--color-text)] mt-3">
                 Election date: {guide.electionDate}
               </p>
             )}

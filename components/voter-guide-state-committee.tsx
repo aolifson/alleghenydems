@@ -48,7 +48,7 @@ export default function VoterGuideStateCommittee({ race, districts }: Props) {
         <h2 className="font-display text-2xl md:text-3xl font-bold text-[var(--color-navy)]">
           {race.officeTitle}
         </h2>
-        <p className="mt-3 text-sm text-[var(--color-text-muted)] max-w-4xl leading-relaxed">
+        <p className="mt-3 text-base text-[var(--color-text)] max-w-4xl leading-relaxed">
           {GENDER_PARITY_NOTE}
         </p>
       </section>
@@ -67,7 +67,7 @@ export default function VoterGuideStateCommittee({ race, districts }: Props) {
                 {district.districtLabel}
               </h4>
               {district.districtDescription && (
-                <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">
+                <p className="text-base text-[var(--color-text)] leading-relaxed">
                   {district.districtDescription}
                 </p>
               )}

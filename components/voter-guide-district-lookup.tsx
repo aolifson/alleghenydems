@@ -14,6 +14,7 @@ interface LookupResult {
 
 interface AddressLookupResult {
   standardizedAddress: string
+  submittedAddress?: string
   countyName?: string | null
   congressionalDistrict?: string | null
   stateSenateDistrict?: string | null
@@ -36,6 +37,8 @@ const TARGET_RACE_TITLES = [
   'Senator in the General Assembly',
   'Representative in the General Assembly',
 ]
+const STREET_TYPE_PATTERN =
+  /\b(?:st|street|ave|avenue|rd|road|dr|drive|ln|lane|blvd|boulevard|way|ct|court|cir|circle|pl|place|pkwy|parkway|trl|trail|ter|terrace)\b/i
 
 function extractDistrictNumber(label?: string) {
   return (label?.match(/\d+/)?.[0] ?? '').trim()
@@ -43,6 +46,19 @@ function extractDistrictNumber(label?: string) {
 
 function extractZipQuery(query: string) {
   return query.match(/\b\d{5}\b/)?.[0] ?? null
+}
+
+function looksLikeAddressQuery(query: string) {
+  const trimmed = query.trim()
+  if (!trimmed) return false
+
+  const startsWithStreetNumber = /^\d+[a-zA-Z\-]?\s+/.test(trimmed)
+  const hasZip = Boolean(extractZipQuery(trimmed))
+  const hasStreetType = STREET_TYPE_PATTERN.test(trimmed)
+  const hasComma = trimmed.includes(',')
+  const wordCount = trimmed.split(/\s+/).length
+
+  return startsWithStreetNumber && (hasStreetType || hasZip || hasComma || wordCount >= 3)
 }
 
 function candidateStatusLabel(status?: VoterGuideCandidate['ballotStatus']) {
@@ -247,16 +263,25 @@ function RaceSection({ race, districts }: { race: VoterGuideRace; districts: Vot
             <article key={district._key ?? district.districtLabel} className="space-y-3">
               <h3 className="text-xl font-bold text-[var(--color-blue-mid)] uppercase tracking-wide">{district.districtLabel}</h3>
               {district.districtDescription && (
-                <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">
+                <p className="text-base text-[var(--color-text)] leading-relaxed">
                   {district.districtDescription}
                 </p>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div
+                className={
+                  sortCandidates(district.candidates ?? []).length <= 1
+                    ? 'grid grid-cols-1 gap-4'
+                    : 'grid grid-cols-1 md:grid-cols-2 gap-4'
+                }
+              >
                 {sortCandidates(district.candidates ?? []).map((candidate) => {
                   const status = candidateStatusLabel(candidate.ballotStatus)
                   return (
-                    <div key={candidate._key ?? candidate.name} className="rounded-lg border border-[var(--color-border)] p-4 bg-white">
+                    <div
+                      key={candidate._key ?? candidate.name}
+                      className="rounded-lg border border-[var(--color-border)] p-4 md:p-5 bg-white"
+                    >
                       {candidate.endorsedByAcdc && (
                         <div className="mb-3 inline-flex items-center rounded-r-sm bg-[var(--color-navy)] text-white px-3 py-1 text-xs font-bold uppercase tracking-wide">
                           Endorsed by ACDC
@@ -322,9 +347,8 @@ function RaceSection({ race, districts }: { race: VoterGuideRace; districts: Vot
 
 export default function VoterGuideDistrictLookup({ races, initialQuery = '', stateCommitteeRace }: Props) {
   const [query, setQuery] = useState(initialQuery)
-  const [address, setAddress] = useState('')
   const [exactLookup, setExactLookup] = useState<AddressLookupResult | null>(null)
-  const [addressError, setAddressError] = useState<string | null>(null)
+  const [lookupNotice, setLookupNotice] = useState<{ tone: 'error' | 'info'; message: string } | null>(null)
   const [isAddressLookupPending, startAddressLookupTransition] = useTransition()
 
   const orderedRaces = useMemo(
@@ -360,9 +384,9 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
 
   const hasQuery = query.trim().length > 0
   const hasExactLookup = Boolean(exactLookup)
+  const shouldOfferExactLookup = looksLikeAddressQuery(query)
   const hasAnyDistrictMatch = matchResults.some((race) => race.matches.length > 0)
   const zipQuery = extractZipQuery(query)
-  const hasFullAddressQuery = hasQuery && Boolean(zipQuery) && normalize(query) !== zipQuery
   const ambiguousZipRaces = useMemo(
     () => matchResults.filter((result) => result.matches.length > 1),
     [matchResults]
@@ -459,46 +483,55 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
 
   function clearAllSearch() {
     setQuery('')
-    setAddress('')
     setExactLookup(null)
-    setAddressError(null)
+    setLookupNotice(null)
   }
 
   function handleTextQueryChange(nextValue: string) {
     setQuery(nextValue)
     if (exactLookup) setExactLookup(null)
-    if (addressError) setAddressError(null)
+    if (lookupNotice) setLookupNotice(null)
   }
 
-  async function handleAddressLookupSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    const trimmedAddress = address.trim()
-    if (!trimmedAddress) {
-      setAddressError('Enter a full street address to find an exact ballot.')
-      setExactLookup(null)
+    const trimmedQuery = query.trim()
+    if (!trimmedQuery || !looksLikeAddressQuery(trimmedQuery)) {
       return
     }
 
-    setAddressError(null)
+    setLookupNotice(null)
 
     startAddressLookupTransition(async () => {
       try {
         const response = await fetch(
-          `/api/voter-guide/address-lookup?address=${encodeURIComponent(trimmedAddress)}`,
+          `/api/voter-guide/address-lookup?address=${encodeURIComponent(trimmedQuery)}`,
           { cache: 'no-store' }
         )
 
         const payload = (await response.json()) as AddressLookupResult & { error?: string }
         if (!response.ok) {
-          throw new Error(payload.error || 'Address lookup failed.')
+          const fallbackMessage =
+            response.status === 404 || response.status === 422
+              ? 'We could not confirm an exact address from that search, so the results below are using text, neighborhood, district, and ZIP matching.'
+              : 'Exact address lookup is unavailable right now, so the results below are using text, neighborhood, district, and ZIP matching.'
+          setExactLookup(null)
+          setLookupNotice({ tone: 'info', message: fallbackMessage })
+          return
         }
 
         setExactLookup(payload)
-        setQuery('')
+        setLookupNotice(null)
       } catch (err) {
         setExactLookup(null)
-        setAddressError(err instanceof Error ? err.message : 'Address lookup failed.')
+        setLookupNotice({
+          tone: 'info',
+          message:
+            err instanceof Error && err.message
+              ? `${err.message} Showing text, neighborhood, district, and ZIP matches below instead.`
+              : 'Exact address lookup failed. Showing text, neighborhood, district, and ZIP matches below instead.',
+        })
       }
     })
   }
@@ -509,20 +542,27 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
         <h2 className="font-display text-2xl md:text-3xl font-bold text-[var(--color-navy)]">
           Find Your Representatives
         </h2>
-        <p className="mt-2 text-sm text-[var(--color-text-muted)] max-w-3xl">
-          Search by municipality, neighborhood, district name/number, candidate name, or ZIP code to filter down to your Congressional, State Senate, and State House races.
+        <p className="mt-2 text-base text-[var(--color-text)] max-w-3xl leading-relaxed">
+          Search by municipality, neighborhood, district name/number, candidate name, ZIP code, or street address to filter down to your Congressional, State Senate, and State House races.
         </p>
 
-        <div className="mt-4 flex flex-col sm:flex-row gap-3">
+        <form onSubmit={handleSearchSubmit} className="mt-4 flex flex-col sm:flex-row gap-3">
           <input
             type="search"
             value={query}
             onChange={(event) => handleTextQueryChange(event.target.value)}
-            placeholder="e.g. Mt Lebanon, Summer Lee, District 42, 15217"
+            placeholder="e.g. Mt Lebanon, Summer Lee, District 42, 15217, 5843 Hobart St"
             className="w-full rounded-md border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-mid)]"
-            aria-label="Search district by location, candidate name, or ZIP code"
+            aria-label="Search district by location, candidate name, ZIP code, or street address"
           />
-          {(hasQuery || address.trim().length > 0 || hasExactLookup) && (
+          <button
+            type="submit"
+            disabled={isAddressLookupPending || !shouldOfferExactLookup}
+            className="rounded-md bg-[var(--color-navy)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-blue-mid)] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isAddressLookupPending ? 'Checking Address...' : 'Check Address'}
+          </button>
+          {(hasQuery || hasExactLookup) && (
             <button
               type="button"
               onClick={clearAllSearch}
@@ -531,49 +571,26 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
               Clear
             </button>
           )}
-        </div>
+        </form>
 
-        <div className="mt-5 border-t border-[var(--color-border)] pt-5">
-          <p className="text-sm font-semibold text-[var(--color-navy)]">Exact Address Lookup</p>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)] max-w-3xl">
-            Enter a full street address to match your exact ballot using the U.S. Census geocoder. This is more precise than ZIP or neighborhood search.
+        {shouldOfferExactLookup && !hasExactLookup && (
+          <p className="mt-2 text-sm text-[var(--color-text-muted)] max-w-3xl leading-relaxed">
+            This looks like a street address. Press Enter or click `Check Address` to try an exact ballot lookup first. If you leave off the state, we&apos;ll assume Pennsylvania.
           </p>
+        )}
 
-          <form onSubmit={handleAddressLookupSubmit} className="mt-3 flex flex-col sm:flex-row gap-3">
-            <input
-              type="text"
-              value={address}
-              onChange={(event) => {
-                setAddress(event.target.value)
-                if (exactLookup) setExactLookup(null)
-                if (addressError) setAddressError(null)
-              }}
-              placeholder="e.g. 5843 Hobart St, Pittsburgh, PA 15217"
-              className="w-full rounded-md border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-mid)]"
-              aria-label="Enter a full street address for exact ballot lookup"
-            />
-            <button
-              type="submit"
-              disabled={isAddressLookupPending}
-              className="rounded-md bg-[var(--color-navy)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-blue-mid)] disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {isAddressLookupPending ? 'Looking Up...' : 'Find Exact Ballot'}
-            </button>
-          </form>
+        {lookupNotice && (
+          <p className={`mt-2 text-sm leading-relaxed ${lookupNotice.tone === 'error' ? 'text-[var(--color-red)]' : 'text-[var(--color-text-muted)]'}`}>
+            {lookupNotice.message}
+          </p>
+        )}
 
-          {addressError && (
-            <p className="mt-2 text-sm text-[var(--color-red)]">
-              {addressError}
-            </p>
-          )}
-
-          {exactLookup && (
-            <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-              Using exact address lookup for {exactLookup.standardizedAddress}
-              {exactLookupSummary.length > 0 ? ` (${exactLookupSummary.join(' · ')})` : ''}.
-            </p>
-          )}
-        </div>
+        {exactLookup && (
+          <p className="mt-2 text-base text-[var(--color-text)] leading-relaxed">
+            Using exact address lookup for {exactLookup.standardizedAddress}
+            {exactLookupSummary.length > 0 ? ` (${exactLookupSummary.join(' · ')})` : ''}.
+          </p>
+        )}
 
         {!hasExactLookup && zipQuery && (
           <p className="mt-2 text-xs text-[var(--color-text-muted)]">
@@ -586,12 +603,6 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
           </p>
         )}
 
-        {!hasExactLookup && hasFullAddressQuery && (
-          <p className="mt-2 text-xs text-[var(--color-text-muted)]">
-            Full street addresses are not matched precisely yet. We used ZIP {zipQuery} to narrow the ballot.
-          </p>
-        )}
-
         {!hasExactLookup && zipQuery && ambiguousZipRaces.length > 0 && (
           <p className="mt-2 text-xs text-[var(--color-text-muted)]">
             ZIP codes can cross district lines. For {zipQuery}, we show every possible district match so you do not miss a race you may be able to vote in.
@@ -599,13 +610,13 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
         )}
 
         {hasExactLookup && (
-          <p className="mt-3 text-sm text-[var(--color-text-muted)]">
+          <p className="mt-3 text-base text-[var(--color-text)] leading-relaxed">
             Showing the races attached to this exact address, plus any true statewide races every voter sees.
           </p>
         )}
 
         {!hasExactLookup && hasQuery && (
-          <p className="mt-3 text-sm text-[var(--color-text-muted)]">
+          <p className="mt-3 text-base text-[var(--color-text)] leading-relaxed">
             Showing all races this search can place on your ballot. District-based races appear below, and any true statewide races are listed separately because every voter sees them.
           </p>
         )}

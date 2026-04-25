@@ -4,6 +4,20 @@ const CENSUS_GEOCODER_URL =
   'https://geocoding.geo.census.gov/geocoder/geographies/onelineaddress'
 const CENSUS_BENCHMARK = 'Public_AR_Current'
 const CENSUS_VINTAGE = 'Current_Current'
+const STATE_PATTERNS = [
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
+  'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+  'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+  'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi',
+  'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico',
+  'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania',
+  'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+  'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming',
+] as const
 
 type CensusGeographyEntry = Record<string, string | number | null>
 
@@ -41,6 +55,16 @@ function firstMatchingEntry(
   return null
 }
 
+function hasExplicitState(address: string) {
+  const stateRegex = new RegExp(`\\b(?:${STATE_PATTERNS.join('|')})\\b`, 'i')
+  return stateRegex.test(address)
+}
+
+function normalizeLookupAddress(address: string) {
+  if (hasExplicitState(address)) return address
+  return `${address.replace(/,\s*$/, '')}, PA`
+}
+
 export async function GET(req: NextRequest) {
   const address = req.nextUrl.searchParams.get('address')?.trim()
 
@@ -48,8 +72,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Address is required.' }, { status: 400 })
   }
 
+  const lookupAddress = normalizeLookupAddress(address)
+
   const params = new URLSearchParams({
-    address,
+    address: lookupAddress,
     benchmark: CENSUS_BENCHMARK,
     vintage: CENSUS_VINTAGE,
     format: 'json',
@@ -97,6 +123,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       standardizedAddress: match.matchedAddress ?? address,
+      submittedAddress: lookupAddress,
       countyName: countyName || null,
       congressionalDistrict:
         parseDistrictNumber(congressionalDistrict?.CD119) ??
