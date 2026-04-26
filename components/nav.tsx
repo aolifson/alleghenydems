@@ -147,6 +147,13 @@ export default function Nav({
     return pathname === hrefPath || pathname.startsWith(hrefPath + '/')
   }
 
+  function itemHasActiveChild(item: { children?: Array<{ href: string }> }) {
+    return item.children?.some((child) => isChildActive(child.href)) ?? false
+  }
+
+  const activeParentItem = items.find((item) => itemHasActiveChild(item)) ?? null
+  const activeChildItem = activeParentItem?.children?.find((child) => isChildActive(child.href)) ?? null
+
   function openDropdown(label: string) {
     if (closeTimer.current) clearTimeout(closeTimer.current)
     setActiveDropdown(label)
@@ -175,6 +182,7 @@ export default function Nav({
           {items.map((item) => {
             const itemIsExternal = item.href.startsWith('http')
             const NavLinkTag = itemIsExternal ? 'a' : Link
+            const parentIsActive = isActive(item.href) || itemHasActiveChild(item)
             return (
               <div
                 key={item.href}
@@ -185,7 +193,7 @@ export default function Nav({
                 <NavLinkTag
                   href={item.href}
                   className={
-                    isActive(item.href)
+                    parentIsActive
                       ? "px-3 py-2 rounded text-sm font-semibold bg-[var(--color-navy)]/15 border-b-2 border-white/80 transition-colors flex items-center gap-1"
                       : "px-3 py-2 rounded text-sm font-medium hover:bg-[var(--color-navy)]/10 transition-colors flex items-center gap-1"
                   }
@@ -331,18 +339,31 @@ export default function Nav({
         </div>
       </div>
 
+      {activeParentItem && activeChildItem && (
+        <div className="border-t border-[var(--color-navy)]/10 bg-white/20 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-4 py-2">
+            <p className="text-sm font-medium text-[var(--color-navy)]">
+              {activeParentItem.label}
+              <span className="mx-2 text-[var(--color-navy)]/45">/</span>
+              <span className="font-semibold text-white drop-shadow-sm">{activeChildItem.label}</span>
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Mobile menu */}
       {open && (
         <div className="md:hidden bg-[var(--color-navy)] border-t border-white/10 px-4 pb-4 text-white">
           {items.map((item) => {
             const itemIsExternal = item.href.startsWith('http')
             const MobileNavTag = itemIsExternal ? 'a' : Link
+            const parentIsActive = isActive(item.href) || itemHasActiveChild(item)
             return (
               <div key={item.href}>
                 <MobileNavTag
                   href={item.href}
                   className={
-                    isActive(item.href)
+                    parentIsActive
                       ? "block py-2 pl-2 text-sm font-semibold border-b border-white/10 text-white border-l-2 border-l-white"
                       : "block py-2 text-sm font-medium border-b border-white/10 text-white"
                   }

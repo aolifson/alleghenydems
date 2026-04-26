@@ -540,10 +540,10 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
     <div className="space-y-8">
       <section className="bg-white/95 border border-white/50 rounded-lg p-6 md:p-8">
         <h2 className="font-display text-2xl md:text-3xl font-bold text-[var(--color-navy)]">
-          Find Your Representatives
+          Find Your Candidates
         </h2>
         <p className="mt-2 text-base text-[var(--color-text)] max-w-3xl leading-relaxed">
-          Search by municipality, neighborhood, district name/number, candidate name, ZIP code, or street address to filter down to your Congressional, State Senate, and State House races.
+          For best results, search by your full street address. You can also search by municipality (Clairton) or neighborhood (e.g. Beltzhoover), but those can include multiple candidates’ districts. 
         </p>
 
         <form onSubmit={handleSearchSubmit} className="mt-4 flex flex-col sm:flex-row gap-3">

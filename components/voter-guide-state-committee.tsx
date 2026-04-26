@@ -11,7 +11,7 @@ interface Props {
 }
 
 const GENDER_PARITY_NOTE =
-  'Members are elected with gender parity in mind. If 6 total members are elected, it must be 3 women and 3 men. If 7 total members are elected, it must be at least 3 women and at least 3 men, with the 7th person being the next highest vote getter of any gender.'
+  'Number of seats varies by district size. And, members are elected with gender balance in mind: e.g. 3 women and 3 men if there are 6 members.'
 
 function candidateStatusLabel(status?: VoterGuideCandidate['ballotStatus']) {
   if (status === 'alsoAppearing') return 'Also Appearing On Ballot'
@@ -72,11 +72,20 @@ export default function VoterGuideStateCommittee({ race, districts }: Props) {
                 </p>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div
+                className={
+                  sortCandidates(district.candidates ?? []).length <= 1
+                    ? 'grid grid-cols-1 gap-4'
+                    : 'grid grid-cols-1 md:grid-cols-2 gap-4'
+                }
+              >
                 {sortCandidates(district.candidates ?? []).map((candidate) => {
                   const status = candidateStatusLabel(candidate.ballotStatus)
                   return (
-                    <div key={candidate._key ?? candidate.name} className="rounded-lg border border-[var(--color-border)] p-4 bg-white">
+                    <div
+                      key={candidate._key ?? candidate.name}
+                      className="rounded-lg border border-[var(--color-border)] p-4 md:p-5 bg-white"
+                    >
                       {candidate.endorsedByAcdc && (
                         <div className="mb-3 inline-flex items-center rounded-r-sm bg-[var(--color-navy)] text-white px-3 py-1 text-xs font-bold uppercase tracking-wide">
                           Endorsed by ACDC
