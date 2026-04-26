@@ -238,8 +238,102 @@ function findDistrictByNumber(race: VoterGuideRace, districtNumber?: string | nu
   )
 }
 
-function RaceSection({ race, districts }: { race: VoterGuideRace; districts: VoterGuideDistrict[] }) {
+function CandidateGrid({ candidates }: { candidates: VoterGuideCandidate[] }) {
+  const orderedCandidates = sortCandidates(candidates)
+
+  if (orderedCandidates.length === 0) return null
+
+  return (
+    <div
+      className={
+        orderedCandidates.length <= 1
+          ? 'grid grid-cols-1 gap-4'
+          : 'grid grid-cols-1 md:grid-cols-2 gap-4'
+      }
+    >
+      {orderedCandidates.map((candidate) => {
+        const status = candidateStatusLabel(candidate.ballotStatus)
+        return (
+          <div
+            key={candidate._key ?? candidate.name}
+            className="rounded-lg border border-[var(--color-border)] p-4 md:p-5 bg-white"
+          >
+            {candidate.endorsedByAcdc && (
+              <div className="mb-3 inline-flex items-center rounded-r-sm bg-[var(--color-navy)] text-white px-3 py-1 text-xs font-bold uppercase tracking-wide">
+                Endorsed by ACDC
+              </div>
+            )}
+            <div className="flex gap-3">
+              {candidate.photo ? (
+                <div className="relative h-20 w-20 shrink-0 rounded overflow-hidden border border-[var(--color-border)]">
+                  <Image
+                    src={urlFor(candidate.photo).width(160).height(160).url()}
+                    alt={candidate.photo.alt ?? candidate.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="h-20 w-20 shrink-0 rounded bg-[var(--color-blue-light)] border border-[var(--color-border)] flex items-center justify-center font-bold text-[var(--color-blue-mid)]">
+                  {candidate.name.charAt(0)}
+                </div>
+              )}
+
+              <div className="min-w-0">
+                <h4 className="font-semibold text-[var(--color-navy)]">{candidate.name}</h4>
+                {candidate.campaignWebsite && (
+                  <a
+                    href={candidate.campaignWebsite}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[var(--color-blue-mid)] hover:underline break-all"
+                  >
+                    {candidate.campaignWebsite.replace(/^https?:\/\//, '')}
+                  </a>
+                )}
+                {status && (
+                  <p className="mt-1 text-xs font-semibold text-[var(--color-red)] uppercase tracking-wide">{status}</p>
+                )}
+              </div>
+            </div>
+
+            {candidate.description && (
+              <p className="mt-3 text-sm text-[var(--color-text)] leading-relaxed whitespace-pre-line">
+                {candidate.description}
+              </p>
+            )}
+
+            <SocialLinks
+              className="justify-start mt-3"
+              facebookUrl={candidate.facebookUrl}
+              instagramUrl={candidate.instagramUrl}
+              xUrl={candidate.xUrl}
+            />
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function RaceSection({
+  race,
+  districts,
+  intro,
+}: {
+  race: VoterGuideRace
+  districts: VoterGuideDistrict[]
+  intro?: string
+}) {
   const orderedDistricts = [...districts].sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
+  const statewideDistrictCandidates =
+    orderedDistricts.length === 1 && normalize(orderedDistricts[0].districtLabel) === 'statewide'
+      ? orderedDistricts[0].candidates ?? []
+      : []
+  const racewideCandidates =
+    race.candidates && race.candidates.length > 0 ? race.candidates : statewideDistrictCandidates
+  const shouldRenderRacewide = racewideCandidates.length > 0
+  const shouldRenderDistricts = !shouldRenderRacewide
 
   return (
     <section key={race._key ?? race.officeTitle} className="bg-white rounded-lg overflow-visible border border-white/40 shadow-sm">
@@ -247,6 +341,14 @@ function RaceSection({ race, districts }: { race: VoterGuideRace; districts: Vot
         <p className="text-xs font-semibold uppercase tracking-wide text-white/70">Viewing Race</p>
         <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide">{race.officeTitle}</h2>
       </div>
+
+      {intro && (
+        <div className="border-b border-[var(--color-border)] bg-white px-6 py-4">
+          <p className="text-sm md:text-base text-[var(--color-text)] leading-relaxed max-w-4xl">
+            {intro}
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr]">
         <aside className="bg-[var(--color-blue-light)] px-6 py-5 border-b lg:border-b-0 lg:border-r border-[var(--color-border)]">
@@ -275,7 +377,9 @@ function RaceSection({ race, districts }: { race: VoterGuideRace; districts: Vot
         </aside>
 
         <div className="px-6 py-6 space-y-6">
-          {orderedDistricts.length === 0 && (
+          {shouldRenderRacewide && <CandidateGrid candidates={racewideCandidates} />}
+
+          {shouldRenderDistricts && orderedDistricts.length === 0 && (
             <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-blue-light)] px-4 py-3">
               <p className="text-sm font-semibold text-[var(--color-navy)]">Details coming soon</p>
               <p className="mt-1 text-sm text-[var(--color-text-muted)]">
@@ -284,7 +388,7 @@ function RaceSection({ race, districts }: { race: VoterGuideRace; districts: Vot
             </div>
           )}
 
-          {orderedDistricts.map((district) => (
+          {shouldRenderDistricts && orderedDistricts.map((district) => (
             <article key={district._key ?? district.districtLabel} className="space-y-3">
               <h3 className="text-xl font-bold text-[var(--color-blue-mid)] uppercase tracking-wide">{district.districtLabel}</h3>
               {district.districtDescription && (
@@ -293,75 +397,7 @@ function RaceSection({ race, districts }: { race: VoterGuideRace; districts: Vot
                 </p>
               )}
 
-              <div
-                className={
-                  sortCandidates(district.candidates ?? []).length <= 1
-                    ? 'grid grid-cols-1 gap-4'
-                    : 'grid grid-cols-1 md:grid-cols-2 gap-4'
-                }
-              >
-                {sortCandidates(district.candidates ?? []).map((candidate) => {
-                  const status = candidateStatusLabel(candidate.ballotStatus)
-                  return (
-                    <div
-                      key={candidate._key ?? candidate.name}
-                      className="rounded-lg border border-[var(--color-border)] p-4 md:p-5 bg-white"
-                    >
-                      {candidate.endorsedByAcdc && (
-                        <div className="mb-3 inline-flex items-center rounded-r-sm bg-[var(--color-navy)] text-white px-3 py-1 text-xs font-bold uppercase tracking-wide">
-                          Endorsed by ACDC
-                        </div>
-                      )}
-                      <div className="flex gap-3">
-                        {candidate.photo ? (
-                          <div className="relative h-20 w-20 shrink-0 rounded overflow-hidden border border-[var(--color-border)]">
-                            <Image
-                              src={urlFor(candidate.photo).width(160).height(160).url()}
-                              alt={candidate.photo.alt ?? candidate.name}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        ) : (
-                          <div className="h-20 w-20 shrink-0 rounded bg-[var(--color-blue-light)] border border-[var(--color-border)] flex items-center justify-center font-bold text-[var(--color-blue-mid)]">
-                            {candidate.name.charAt(0)}
-                          </div>
-                        )}
-
-                        <div className="min-w-0">
-                          <h4 className="font-semibold text-[var(--color-navy)]">{candidate.name}</h4>
-                          {candidate.campaignWebsite && (
-                            <a
-                              href={candidate.campaignWebsite}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-sm text-[var(--color-blue-mid)] hover:underline break-all"
-                            >
-                              {candidate.campaignWebsite.replace(/^https?:\/\//, '')}
-                            </a>
-                          )}
-                          {status && (
-                            <p className="mt-1 text-xs font-semibold text-[var(--color-red)] uppercase tracking-wide">{status}</p>
-                          )}
-                        </div>
-                      </div>
-
-                      {candidate.description && (
-                        <p className="mt-3 text-sm text-[var(--color-text)] leading-relaxed whitespace-pre-line">
-                          {candidate.description}
-                        </p>
-                      )}
-
-                      <SocialLinks
-                        className="justify-start mt-3"
-                        facebookUrl={candidate.facebookUrl}
-                        instagramUrl={candidate.instagramUrl}
-                        xUrl={candidate.xUrl}
-                      />
-                    </div>
-                  )
-                })}
-              </div>
+              <CandidateGrid candidates={district.candidates ?? []} />
             </article>
           ))}
         </div>
@@ -672,19 +708,13 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
         />
       )}
 
-      {hasActiveSearch && statewideRaces.length > 0 && (
-        <section className="bg-white/95 border border-white/50 rounded-lg p-6 md:p-8">
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-[var(--color-navy)]">
-            Statewide Races
-          </h2>
-          <p className="mt-2 text-sm text-[var(--color-text-muted)] max-w-3xl">
-            These races appear on every ballot, no matter where you live.
-          </p>
-        </section>
-      )}
-
       {statewideRaces.map((race) => (
-        <RaceSection key={race._key ?? race.officeTitle} race={race} districts={race.districts ?? []} />
+        <RaceSection
+          key={race._key ?? race.officeTitle}
+          race={race}
+          districts={race.districts ?? []}
+          intro="This race appears on every ballot, no matter where you live."
+        />
       ))}
     </div>
   )

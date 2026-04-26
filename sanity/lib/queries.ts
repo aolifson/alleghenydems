@@ -192,7 +192,8 @@ export interface VoterGuideRace {
   term?: string
   annualSalary?: string
   powersAndDuties?: string[]
-  districts: VoterGuideDistrict[]
+  candidates?: VoterGuideCandidate[]
+  districts?: VoterGuideDistrict[]
   displayOrder?: number
 }
 

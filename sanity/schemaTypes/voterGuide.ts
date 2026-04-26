@@ -220,12 +220,18 @@ export const voterGuideRaceType = defineType({
       description: 'Bullet-point list of what this office does. Add one item per line.',
     }),
     defineField({
+      name: 'candidates',
+      title: 'Statewide / Racewide Candidates',
+      type: 'array',
+      of: [{ type: 'voterGuideCandidate' }],
+      description: 'Use this for races where districts do not apply, such as Governor or Lieutenant Governor.',
+    }),
+    defineField({
       name: 'districts',
       title: 'Districts / Jurisdictions',
       type: 'array',
       of: [{ type: 'voterGuideDistrict' }],
-      description: 'Add a district for each geographic area covered by this race. Most countywide races have just one district.',
-      validation: (rule) => rule.min(1).error('Add at least one district.'),
+      description: 'Use this only when the race varies by geography, such as congressional, state senate, state house, or state committee districts.',
     }),
     defineField({
       name: 'displayOrder',
@@ -238,13 +244,18 @@ export const voterGuideRaceType = defineType({
     select: {
       title: 'officeTitle',
       term: 'term',
+      candidates: 'candidates',
       districts: 'districts',
     },
-    prepare({ title, term, districts }) {
+    prepare({ title, term, candidates, districts }) {
+      const candidateCount = Array.isArray(candidates) ? candidates.length : 0
       const districtCount = Array.isArray(districts) ? districts.length : 0
+      const scope = districtCount > 0
+        ? `${districtCount} district${districtCount === 1 ? '' : 's'}`
+        : `${candidateCount} candidate${candidateCount === 1 ? '' : 's'}`
       return {
         title,
-        subtitle: [term, `${districtCount} district${districtCount === 1 ? '' : 's'}`].filter(Boolean).join(' · '),
+        subtitle: [term, scope].filter(Boolean).join(' · '),
       }
     },
   },
@@ -309,7 +320,7 @@ export const voterGuideType = defineType({
       title: 'Races',
       type: 'array',
       of: [{ type: 'voterGuideRace' }],
-      description: 'Add one entry per elected office (e.g. Sheriff, District Attorney). Each race contains districts and candidates.',
+      description: 'Add one entry per elected office. District races contain districts; statewide races can contain candidates directly.',
       validation: (rule) => rule.min(1).error('Add at least one race.'),
     }),
     defineField({

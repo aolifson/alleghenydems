@@ -43,16 +43,7 @@ export default function VoterGuideStateCommittee({ race, districts }: Props) {
   if (orderedDistricts.length === 0) return null
 
   return (
-    <div className="space-y-8">
-      <section className="bg-white/95 border border-white/50 rounded-lg p-6 md:p-8">
-        <h2 className="font-display text-2xl md:text-3xl font-bold text-[var(--color-navy)]">
-          {race.officeTitle}
-        </h2>
-        <p className="mt-3 text-base text-[var(--color-text)] max-w-4xl leading-relaxed">
-          {GENDER_PARITY_NOTE}
-        </p>
-      </section>
-
+    <div>
       <section className="bg-white rounded-lg overflow-visible border border-white/40 shadow-sm">
         <div className="sticky top-0 z-20 bg-[var(--color-navy)] text-white px-6 py-4 rounded-t-lg shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-wide text-white/70">Viewing Race</p>
@@ -61,6 +52,12 @@ export default function VoterGuideStateCommittee({ race, districts }: Props) {
           </h3>
           <p className="mt-1 text-sm font-semibold uppercase tracking-wide text-white/80">
             State Senate Districts
+          </p>
+        </div>
+
+        <div className="border-b border-[var(--color-border)] bg-white px-6 py-4">
+          <p className="text-sm md:text-base text-[var(--color-text)] leading-relaxed max-w-4xl">
+            {GENDER_PARITY_NOTE}
           </p>
         </div>
 
