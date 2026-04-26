@@ -53,11 +53,15 @@ export default function VoterGuideStateCommittee({ race, districts }: Props) {
         </p>
       </section>
 
-      <section className="bg-white rounded-lg overflow-hidden border border-white/40 shadow-sm">
-        <div className="bg-[var(--color-navy)] text-white px-6 py-4">
+      <section className="bg-white rounded-lg overflow-visible border border-white/40 shadow-sm">
+        <div className="sticky top-0 z-20 bg-[var(--color-navy)] text-white px-6 py-4 rounded-t-lg shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-white/70">Viewing Race</p>
           <h3 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide">
-            State Senate Districts
+            {race.officeTitle}
           </h3>
+          <p className="mt-1 text-sm font-semibold uppercase tracking-wide text-white/80">
+            State Senate Districts
+          </p>
         </div>
 
         <div className="px-6 py-6 space-y-8">

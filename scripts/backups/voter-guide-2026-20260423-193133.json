@@ -1,0 +1,2213 @@
+{
+  "metadata": {
+    "backedUpAt": "2026-04-23T19:31:33.055080+00:00",
+    "projectId": "mfzgc4rr",
+    "dataset": "production",
+    "documentId": "voter-guide-2026"
+  },
+  "document": {
+    "_createdAt": "2026-02-25T22:30:16Z",
+    "_id": "voter-guide-2026",
+    "_rev": "pn7GvmYaTH5iJ6kzunvrbR",
+    "_system": {
+      "base": {
+        "id": "voter-guide-2026",
+        "rev": "xfUCZ6xEEeYQ6HWfApP76O"
+      }
+    },
+    "_type": "voterGuide",
+    "_updatedAt": "2026-04-23T19:09:39Z",
+    "cycleYear": 2026,
+    "heroHeadline": "2026 Endorsement Voter Guide",
+    "heroSubhead": "Allegheny County Democratic Committee",
+    "races": [
+      {
+        "_key": "48256e6f178b",
+        "_type": "voterGuideRace",
+        "annualSalary": "$176,000",
+        "displayOrder": 0,
+        "districts": [
+          {
+            "_key": "3e0a386f7c77",
+            "candidates": [
+              {
+                "_key": "f962135e9e04",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://summerforpa.com",
+                "description": "In a political era dominated by billionaire checkbooks, corporate influence, and rising extremism, Congresswoman Summer Lee is proving that organized people can still win. A rising force in the Democratic Party, Summer is a fearless organizer, coalition-builder, and fighter who refuses to play small or back down. As the first Black woman ever elected to Congress from Pennsylvania, she brings bold leadership, moral clarity, and deep accountability to her work in Washington. Since taking office in 2023, Summer has delivered $2.7 billion in federal investment to Pennsylvania\u2019s 12th District \u2014 securing transformative resources for working families, seniors, students, and historically neglected communities. Her work has helped modernize infrastructure, expand clean energy, strengthen public transit, invest in affordable housing, protect clean air and water, and revitalize neighborhoods across Western Pennsylvania. Her constituent services are equally relentless: returning millions of dollars directly to residents, resolving thousands of casework issues, and maintaining a constant presence through town halls, community meetings, and local events. In Congress, Summer pairs results with resolve. She has never missed a single vote during her tenure, demonstrating unwavering commitment to the people she represents. She has also pushed for transparency and accountability at the highest levels, introducing the motion to subpoena the Epstein files and passing it with bipartisan support. Grounded in community and driven by justice, Summer Lee represents a new generation of leadership \u2014 one rooted not in politics as usual, but in the power of organized people and the promise of a more equitable democracy.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "SUMMER LEE",
+                "photo": {
+                  "_type": "image",
+                  "alt": "SUMMER LEE",
+                  "asset": {
+                    "_ref": "image-567a02c67e0ab37b3b94116f296a4e642cd677d8-219x305-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 0,
+            "districtLabel": "DISTRICT 12",
+            "searchTerms": [
+              "Baldwin",
+              "Baldwin Borough",
+              "Bethel Park",
+              "Bethel Park Borough",
+              "Braddock",
+              "Braddock Borough",
+              "Brentwood",
+              "Brentwood Borough",
+              "Bridgeville",
+              "Bridgeville Borough",
+              "Chalfant",
+              "Chalfant Borough",
+              "Clairton",
+              "Clairton City",
+              "Dravosburg",
+              "Dravosburg Borough",
+              "Duquesne",
+              "Duquesne City",
+              "East McKeesport",
+              "East McKeesport Borough",
+              "East Pittsburgh",
+              "East Pittsburgh Borough",
+              "Elizabeth",
+              "Elizabeth Borough",
+              "Elizabeth Township",
+              "Elizabeth Twp",
+              "Forward",
+              "Forward Township",
+              "Forward Twp",
+              "Glassport",
+              "Glassport Borough",
+              "Homestead",
+              "Homestead Borough",
+              "Jefferson Hills",
+              "Jefferson Hills Borough",
+              "Liberty",
+              "Liberty Borough",
+              "Lincoln",
+              "Lincoln Borough",
+              "McKeesport",
+              "McKeesport City",
+              "Monroeville",
+              "Monroeville Borough",
+              "Mount Oliver",
+              "Mount Oliver Borough",
+              "Mt Oliver",
+              "Mt Oliver Borough",
+              "Munhall",
+              "Munhall Borough",
+              "North Braddock",
+              "North Braddock Borough",
+              "North Versailles",
+              "North Versailles Township",
+              "North Versailles Twp",
+              "Pitcairn",
+              "Pitcairn Borough",
+              "Pittsburgh",
+              "Pittsburgh City",
+              "Pleasant Hills",
+              "Pleasant Hills Borough",
+              "Plum",
+              "Plum Borough",
+              "Port Vue",
+              "Port Vue Borough",
+              "Rankin",
+              "Rankin Borough",
+              "South Park",
+              "South Park Township",
+              "South Park Twp",
+              "South Versailles",
+              "South Versailles Township",
+              "South Versailles Twp",
+              "Swissvale",
+              "Swissvale Borough",
+              "Trafford",
+              "Trafford Borough",
+              "Turtle Creek",
+              "Turtle Creek Borough",
+              "Upper St. Clair",
+              "Upper St. Clair Township",
+              "Upper St. Clair Twp",
+              "Versailles",
+              "Versailles Borough",
+              "Wall",
+              "Wall Borough",
+              "West Elizabeth",
+              "West Elizabeth Borough",
+              "West Homestead",
+              "West Homestead Borough",
+              "West Mifflin",
+              "West Mifflin Borough",
+              "Whitaker",
+              "Whitaker Borough",
+              "White Oak",
+              "White Oak Borough",
+              "Whitehall",
+              "Whitehall Borough",
+              "Wilkins",
+              "Wilkins Township",
+              "Wilkins Twp",
+              "Wilmerding",
+              "Wilmerding Borough"
+            ],
+            "zipCodes": [
+              "15017",
+              "15018",
+              "15020",
+              "15025",
+              "15028",
+              "15034",
+              "15035",
+              "15037",
+              "15045",
+              "15047",
+              "15063",
+              "15068",
+              "15083",
+              "15085",
+              "15088",
+              "15089",
+              "15102",
+              "15104",
+              "15106",
+              "15110",
+              "15112",
+              "15120",
+              "15122",
+              "15123",
+              "15129",
+              "15131",
+              "15132",
+              "15133",
+              "15135",
+              "15137",
+              "15139",
+              "15140",
+              "15145",
+              "15146",
+              "15147",
+              "15148",
+              "15201",
+              "15203",
+              "15204",
+              "15205",
+              "15206",
+              "15207",
+              "15208",
+              "15210",
+              "15211",
+              "15212",
+              "15213",
+              "15214",
+              "15215",
+              "15216",
+              "15217",
+              "15218",
+              "15219",
+              "15220",
+              "15221",
+              "15222",
+              "15224",
+              "15226",
+              "15227",
+              "15228",
+              "15232",
+              "15233",
+              "15234",
+              "15235",
+              "15236",
+              "15239",
+              "15241",
+              "15243",
+              "15260",
+              "15282",
+              "15290",
+              "15332",
+              "15642",
+              "15668"
+            ]
+          },
+          {
+            "_key": "70eb29451087",
+            "candidates": [
+              {
+                "_key": "543723dcc95c",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://chrisforpa.com",
+                "description": "Congressman Chris Deluzio is a Thornburg native and Iraq War veteran in his second term representing the 17th district of Pennsylvania in the U.S. House of Representatives. In Congress, Chris is committed to fighting for our Western Pennsylvania priorities and standing up for our Constitution. Chris is all in to ensure strong labor unions, create good-paying jobs, make stuff here at home, take on corruption, protect reproductive freedom, stand up for our veterans, and lower costs. Chris believes that if you work hard and play by the rules, you deserve a real shot at the American Dream. Prior to his election in 2022, Chris worked as an attorney and protected voting rights and fair elections as the policy director at Pitt Cyber, and previously at the Brennan Center for Justice. He also fought alongside fellow faculty members and the United Steelworkers as a member of the Pitt Faculty Organizing Committee to secure a faculty union at Pitt\u2014the biggest union election in the country in 2021. Chris lives with his wife, Zo\u00eb, four young children, and their dog, Yankee Doodle, in PA-17.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "CHRIS DELUZIO",
+                "photo": {
+                  "_type": "image",
+                  "alt": "CHRIS DELUZIO",
+                  "asset": {
+                    "_ref": "image-2b7286d2d96d727131b1fe0beb1381b3d9b04f10-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 1,
+            "districtLabel": "DISTRICT 17",
+            "searchTerms": [
+              "Aleppo",
+              "Aleppo Township",
+              "Aleppo Twp",
+              "Aspinwall",
+              "Aspinwall Borough",
+              "Avalon",
+              "Avalon Borough",
+              "Baldwin",
+              "Baldwin Township",
+              "Baldwin Twp",
+              "Bell Acres",
+              "Bell Acres Borough",
+              "Bellevue",
+              "Bellevue Borough",
+              "Ben Avon",
+              "Ben Avon Borough",
+              "Ben Avon Heights",
+              "Ben Avon Heights Borough",
+              "Blawnox",
+              "Blawnox Borough",
+              "Brackenridge",
+              "Brackenridge Borough",
+              "Braddock Hills",
+              "Braddock Hills Borough",
+              "Bradford Woods",
+              "Bradford Woods Borough",
+              "Carnegie",
+              "Carnegie Borough",
+              "Castle Shannon",
+              "Castle Shannon Borough",
+              "Cheswick",
+              "Cheswick Borough",
+              "Churchill",
+              "Churchill Borough",
+              "Collier",
+              "Collier Township",
+              "Collier Twp",
+              "Coraopolis",
+              "Coraopolis Borough",
+              "Crafton",
+              "Crafton Borough",
+              "Crescent",
+              "Crescent Township",
+              "Crescent Twp",
+              "Dormont",
+              "Dormont Borough",
+              "East Deer",
+              "East Deer Township",
+              "East Deer Twp",
+              "Edgewood",
+              "Edgewood Borough",
+              "Edgeworth",
+              "Edgeworth Borough",
+              "Emsworth",
+              "Emsworth Borough",
+              "Etna",
+              "Etna Borough",
+              "Fawn",
+              "Fawn Township",
+              "Fawn Twp",
+              "Findlay",
+              "Findlay Township",
+              "Findlay Twp",
+              "Forest Hills",
+              "Forest Hills Borough",
+              "Fox Chapel",
+              "Fox Chapel Borough",
+              "Franklin Park",
+              "Franklin Park Borough",
+              "Frazer",
+              "Frazer Township",
+              "Frazer Twp",
+              "Glen Osborne",
+              "Glen Osborne Borough",
+              "Glenfield",
+              "Glenfield Borough",
+              "Green Tree",
+              "Green Tree Borough",
+              "Hampton",
+              "Hampton Township",
+              "Hampton Twp",
+              "Harmar",
+              "Harmar Township",
+              "Harmar Twp",
+              "Harrison",
+              "Harrison Township",
+              "Harrison Twp",
+              "Haysville",
+              "Haysville Borough",
+              "Heidelberg",
+              "Heidelberg Borough",
+              "Indiana",
+              "Indiana Township",
+              "Indiana Twp",
+              "Ingram",
+              "Ingram Borough",
+              "Kennedy",
+              "Kennedy Township",
+              "Kennedy Twp",
+              "Kilbuck",
+              "Kilbuck Township",
+              "Kilbuck Twp",
+              "Leet",
+              "Leet Township",
+              "Leet Twp",
+              "Leetsdale",
+              "Leetsdale Borough",
+              "Marshall",
+              "Marshall Township",
+              "Marshall Twp",
+              "McCandless",
+              "McCandless Township",
+              "McCandless Twp",
+              "McDonald",
+              "McDonald Borough",
+              "McKees Rocks",
+              "McKees Rocks Borough",
+              "Millvale",
+              "Millvale Borough",
+              "Moon",
+              "Moon Township",
+              "Moon Twp",
+              "Mount Lebanon",
+              "Mount Lebanon Township",
+              "Mount Lebanon Twp",
+              "Mt Lebanon",
+              "Mt Lebanon Township",
+              "Mt Lebanon Twp",
+              "Neville",
+              "Neville Township",
+              "Neville Twp",
+              "North Fayette",
+              "North Fayette Township",
+              "North Fayette Twp",
+              "O'Hara",
+              "O'Hara Township",
+              "O'Hara Twp",
+              "Oakdale",
+              "Oakdale Borough",
+              "Oakmont",
+              "Oakmont Borough",
+              "Ohio",
+              "Ohio Township",
+              "Ohio Twp",
+              "Penn Hills",
+              "Penn Hills Township",
+              "Penn Hills Twp",
+              "Pennsbury Village",
+              "Pennsbury Village Borough",
+              "Pine",
+              "Pine Township",
+              "Pine Twp",
+              "Reserve",
+              "Reserve Township",
+              "Reserve Twp",
+              "Richland",
+              "Richland Township",
+              "Richland Twp",
+              "Robinson",
+              "Robinson Township",
+              "Robinson Twp",
+              "Ross",
+              "Ross Township",
+              "Ross Twp",
+              "Rosslyn Farms",
+              "Rosslyn Farms Borough",
+              "Scott",
+              "Scott Township",
+              "Scott Twp",
+              "Sewickley",
+              "Sewickley Borough",
+              "Sewickley Heights",
+              "Sewickley Heights Borough",
+              "Sewickley Hills",
+              "Sewickley Hills Borough",
+              "Shaler",
+              "Shaler Township",
+              "Shaler Twp",
+              "Sharpsburg",
+              "Sharpsburg Borough",
+              "South Fayette",
+              "South Fayette Township",
+              "South Fayette Twp",
+              "Springdale",
+              "Springdale Borough",
+              "Springdale Township",
+              "Springdale Twp",
+              "Stowe",
+              "Stowe Township",
+              "Stowe Twp",
+              "Swissvale",
+              "Swissvale Borough",
+              "Tarentum",
+              "Tarentum Borough",
+              "Thornburg",
+              "Thornburg Borough",
+              "Verona",
+              "Verona Borough",
+              "West Deer",
+              "West Deer Township",
+              "West Deer Twp",
+              "West View",
+              "West View Borough",
+              "Wilkinsburg",
+              "Wilkinsburg Borough"
+            ],
+            "zipCodes": [
+              "15238",
+              "15003",
+              "15005",
+              "15006",
+              "15007",
+              "15014",
+              "15015",
+              "15017",
+              "15024",
+              "15026",
+              "15030",
+              "15031",
+              "15044",
+              "15046",
+              "15049",
+              "15051",
+              "15056",
+              "15057",
+              "15064",
+              "15065",
+              "15071",
+              "15075",
+              "15076",
+              "15082",
+              "15084",
+              "15086",
+              "15090",
+              "15101",
+              "15106",
+              "15108",
+              "15116",
+              "15126",
+              "15136",
+              "15139",
+              "15142",
+              "15143",
+              "15144",
+              "15145",
+              "15147",
+              "15202",
+              "15204",
+              "15205",
+              "15206",
+              "15208",
+              "15209",
+              "15212",
+              "15214",
+              "15215",
+              "15216",
+              "15218",
+              "15220",
+              "15221",
+              "15223",
+              "15225",
+              "15226",
+              "15228",
+              "15229",
+              "15234",
+              "15235",
+              "15236",
+              "15237",
+              "15241",
+              "15243",
+              "15275",
+              "15321",
+              "16046",
+              "16055",
+              "16059"
+            ]
+          }
+        ],
+        "officeTitle": "Representative in Congress",
+        "powersAndDuties": [
+          "1 of 435 Elected Members, 17 in Pennsylvania",
+          "Create new laws and change laws",
+          "Introduce the annual budget and revenue bills",
+          "Provide oversight of the executive branch",
+          "Power to impeach the president and elect president in case of tie"
+        ],
+        "term": "2 Years"
+      },
+      {
+        "_key": "8952d7cac5ab",
+        "_type": "voterGuideRace",
+        "annualSalary": "$106,422",
+        "displayOrder": 1,
+        "districts": [
+          {
+            "candidates": [
+              {
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://lindseyforpa.com",
+                "description": "Senator Williams represents District 38 in Allegheny County, which includes parts of the City of Pittsburgh and most of Northern Allegheny County. She serves as the Minority Chair of the Senate Education Committee and as a Board Member of Pittsburgh Regional Transit (PRT), the Pennsylvania Higher Education Assistance Agency (PHEAA), and the State Board of Education. Lindsey earned her undergraduate degree from Dickinson College in Carlisle. Lindsey then attended Duquesne University School of Law, where she focused on protecting workers\u2019 rights, following the example of her dad, who supported their family as an Operating Engineer in his local union. After law school, Lindsey joined the National Whistleblower Center, where she worked to expose corruption and advocate for whistleblower protections. When she and several coworkers attempted to unionize, they were illegally fired. Lindsey refused to be silenced and took her case to the National Labor Relations Board. Lindsey continued her work on behalf of working people at the International Brotherhood of Teamsters, helping members organize strikes and labor actions across the country. She then returned to Pittsburgh to work for the Pittsburgh Federation of Teachers. In 2018, with the support of workers, educators, parents, and community members across the district, Lindsey won her race for State Senate by just 793 votes. She\u2019s taken that responsibility seriously every day since by fighting for working families, honest government, and policies that better people\u2019s lives. In her spare time, Lindsey enjoys being with friends, family, and her adorable dog, Willow.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "LINDSEY WILLIAMS"
+              }
+            ],
+            "displayOrder": 0,
+            "districtDescription": "East Deer, Fawn, Frazer, Hampton, Harmar, Harrison, Indiana, McCandless, O'Hara, Pine, Richland, Ross, Shaler, Springdale and West Deer, Aspinwall, Blawnox, Brackenridge, Cheswick, Etna, Fox Chapel, Sharpsburg, Springdale, Tarentum and West View, and several neighborhoods in the City of Pittsburgh including Highland Park, Morningside, Belmar, Garfield, East Liberty and Lincoln-Lemington.",
+            "districtLabel": "DISTRICT 38",
+            "searchTerms": [
+              "Aspinwall",
+              "Aspinwall Borough",
+              "Blawnox",
+              "Blawnox Borough",
+              "Brackenridge",
+              "Brackenridge Borough",
+              "Cheswick",
+              "Cheswick Borough",
+              "East Deer",
+              "East Deer Township",
+              "East Deer Twp",
+              "Etna",
+              "Etna Borough",
+              "Fawn",
+              "Fawn Township",
+              "Fawn Twp",
+              "Fox Chapel",
+              "Fox Chapel Borough",
+              "Frazer",
+              "Frazer Township",
+              "Frazer Twp",
+              "Hampton",
+              "Hampton Township",
+              "Hampton Twp",
+              "Harmar",
+              "Harmar Township",
+              "Harmar Twp",
+              "Harrison",
+              "Harrison Township",
+              "Harrison Twp",
+              "Indiana",
+              "Indiana Township",
+              "Indiana Twp",
+              "McCandless",
+              "McCandless Township",
+              "McCandless Twp",
+              "O'Hara",
+              "O'Hara Township",
+              "O'Hara Twp",
+              "Pine",
+              "Pine Township",
+              "Pine Twp",
+              "Pittsburgh",
+              "Pittsburgh City",
+              "Richland",
+              "Richland Township",
+              "Richland Twp",
+              "Ross",
+              "Ross Township",
+              "Ross Twp",
+              "Shaler",
+              "Shaler Township",
+              "Shaler Twp",
+              "Sharpsburg",
+              "Sharpsburg Borough",
+              "Springdale",
+              "Springdale Borough",
+              "Springdale Township",
+              "Springdale Twp",
+              "Tarentum",
+              "Tarentum Borough",
+              "West Deer",
+              "West Deer Township",
+              "West Deer Twp",
+              "West View",
+              "West View Borough"
+            ],
+            "zipCodes": [
+              "15006",
+              "15007",
+              "15014",
+              "15024",
+              "15030",
+              "15044",
+              "15049",
+              "15051",
+              "15065",
+              "15075",
+              "15076",
+              "15084",
+              "15090",
+              "15101",
+              "15116",
+              "15144",
+              "15201",
+              "15202",
+              "15206",
+              "15208",
+              "15209",
+              "15212",
+              "15214",
+              "15215",
+              "15223",
+              "15224",
+              "15229",
+              "15235",
+              "15237",
+              "15238",
+              "16046",
+              "16055",
+              "16059"
+            ]
+          },
+          {
+            "candidates": [
+              {
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://votefontana.com",
+                "description": "I am excited to announce my candidacy for another term as the State Senator representing the 42nd Senatorial District. It continues to be a privilege to serve the residents of the district. I have a long history of fighting for working families in my district and I am committed to continuing the fight for four more years. During my time in the Senate, I have worked tirelessly and built relationships that have helped to secure hundreds of millions of dollars for projects in my district, projects that have brought jobs and revitalized communities. I am eager to continue that work to make all our communities safer and stronger. I am proud to have authored legislation that became law that enabled communities to replace lead service lines. The City of Pittsburgh alone has been able to replace more than 14,000 lead service lines due to my legislation. I am equally as proud to have had my bill that strengthened child abuse reporting requirements for school employees signed into law. Going forward, I am committed to continue fighting for safety, whether it pertains to the water we drink or the neighborhoods where we raise our kids and grandkids. I will continue supporting policies that create family-sustaining jobs, lower costs, increase housing stock and utilize my experience to secure state funding for worthy, shovel-ready projects that revitalize neighborhoods.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "WAYNE FONTANA"
+              },
+              {
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://paulforpa.com",
+                "description": "I was born and raised here in Pittsburgh, and now own a small home in the city where I work as a software engineer. I have a bachelor\u2019s degree in math and a master\u2019s degree in computer science from Stanford University. After graduating and beginning my career in Silicon Valley, I moved back home for good. For the past several years, the focus of my career has been using software to strengthen communities and support the marginalized and underprivileged. I have devoted my efforts to mission-focused startups and personal projects, including using AI and augmented reality to improve accessibility technologies for those with disabilities. I am running for State Senate because I want to realize policy changes that will strengthen our community. My campaign is focused on issues that will improve the lives of Pennsylvanians, including public transit, affordable housing, and public K-12 and higher education. I believe I can go to Harrisburg and bring back real, measurable results. My professional experience uniquely positions me to protect our community from the newest dangers facing our state. We need leaders who understand the AI models that are being used by landlords to illegally raise rents and push families out of our neighborhoods. We need leaders who understand the data centers that are consuming enormous amounts of electricity and water, causing our utility bills to skyrocket. I feel deeply connected and indebted to this community, and I want to work to make our region a better place to work, learn, and live.",
+                "displayOrder": 1,
+                "endorsedByAcdc": false,
+                "name": "PAUL STEENKISTE"
+              }
+            ],
+            "displayOrder": 1,
+            "districtDescription": "Kennedy Township, Mount Lebanon, Neville Township, Reserve, Scott Township, Stowe, Avalon, Bellevue, Ben Avon, Carnegie, Crafton, Dormont, Emsworth, Green Tree, Ingram, McKees Rocks, Millvale, and several neighborhoods in the City of Pittsburgh including Perry North, Northside, Manchester, Perry Hilltop, Allegheny Center, Sheridan, Corliss, Elliot, Duquesne Heights, Mt. Washington, Beechview, Banksville, West Liberty, Brookline, Summer Hill, City View, Northview Heights, Spring Garden, Spring Hill, Troy Hill, Lawrenceville, Downtown, the Strip District, the Lower Hill, and the Bluff.",
+            "districtLabel": "DISTRICT 42",
+            "searchTerms": [
+              "Avalon",
+              "Avalon Borough",
+              "Bellevue",
+              "Bellevue Borough",
+              "Ben Avon",
+              "Ben Avon Borough",
+              "Carnegie",
+              "Carnegie Borough",
+              "Crafton",
+              "Crafton Borough",
+              "Dormont",
+              "Dormont Borough",
+              "Emsworth",
+              "Emsworth Borough",
+              "Green Tree",
+              "Green Tree Borough",
+              "Ingram",
+              "Ingram Borough",
+              "Kennedy",
+              "Kennedy Township",
+              "Kennedy Twp",
+              "McKees Rocks",
+              "McKees Rocks Borough",
+              "Millvale",
+              "Millvale Borough",
+              "Mount Lebanon",
+              "Mount Lebanon Township",
+              "Mount Lebanon Twp",
+              "Mt Lebanon",
+              "Mt Lebanon Township",
+              "Mt Lebanon Twp",
+              "Neville",
+              "Neville Township",
+              "Neville Twp",
+              "Pittsburgh",
+              "Pittsburgh City",
+              "Reserve",
+              "Reserve Township",
+              "Reserve Twp",
+              "Scott",
+              "Scott Township",
+              "Scott Twp",
+              "Stowe",
+              "Stowe Township",
+              "Stowe Twp"
+            ],
+            "zipCodes": [
+              "15017",
+              "15106",
+              "15108",
+              "15136",
+              "15201",
+              "15202",
+              "15204",
+              "15205",
+              "15209",
+              "15210",
+              "15211",
+              "15212",
+              "15213",
+              "15214",
+              "15216",
+              "15219",
+              "15220",
+              "15222",
+              "15224",
+              "15225",
+              "15226",
+              "15227",
+              "15228",
+              "15233",
+              "15234",
+              "15241",
+              "15243",
+              "15282",
+              "15290"
+            ]
+          }
+        ],
+        "officeTitle": "Senator in the General Assembly",
+        "powersAndDuties": [
+          "Chamber of 50 members",
+          "With House of Representatives, retains legislative authority of the Commonwealth",
+          "Adopt capital budget for each fiscal year",
+          "Create the rules of conduct and business of the Senate at the beginning of each session"
+        ],
+        "term": "4 Years"
+      },
+      {
+        "_key": "20625ba9f2fe",
+        "_type": "voterGuideRace",
+        "annualSalary": "$106,422",
+        "displayOrder": 2,
+        "districts": [
+          {
+            "_key": "58ad1006da5a",
+            "candidates": [
+              {
+                "_key": "10a2c5e866f6",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://voteaerionabney.com",
+                "description": "Aerion is a social worker who currently lives his professional life at the intersection of civil rights, philanthropy and politics. Aerion is State Representative for the 19th District since April 2022. He is currently the Chairman of the Allegheny County House Democratic Delegation. He is the former Pennsylvania Director of Special Projects for a national voting rights advocacy organization. In this role he has led efforts to expand voting access to people in jail and work with elections officials to break down barriers to the ballot so every eligible Pennsylvanian can exercise their right to vote. Prior to working in the voting rights space, Aerion served as a Program Officer at the POISE Foundation, a Black owned and operated institution where he was responsible for identifying strategic grantmaking opportunities aligned with the Foundation\u2019s mission and priority areas. He authorized more than $1.2 million in grants to non-profit organizations supporting critical programming across the region. Aerion is politically engaged within the City of Pittsburgh, having served as a Committeeman for the 21st Ward, 4th District. He currently sits on the boards of the Hill District Federal Credit Union and the Human Services Center Corporation, as well as the advisory board for the African American Achievement Trust Collective Focus. Additionally, he serves on the City of Pittsburgh and Allegheny County\u2019s My Brother\u2019s Keeper taskforce, an initiative to create action plans around the opportunity gaps that impact young men and boys of color.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "AERION ABNEY",
+                "photo": {
+                  "_type": "image",
+                  "alt": "AERION ANDREW ABNEY",
+                  "asset": {
+                    "_ref": "image-c26afb050f50c35b43ad81a71079625a78e41531-219x303-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 0,
+            "districtDescription": "Pittsburgh neighborhoods of Allentown, Chartiers City, Central Business District, Esplen, Glen Hazel, Hazelwood, Knoxville, South Oakland, and Uptown, includes most of the North Side and portions of Beltzhoover, Elliott, Fineview, Mount Washington, Sheraden, South Side Flats, and South Oakland",
+            "districtLabel": "DISTRICT 19",
+            "searchTerms": [
+              "Pittsburgh",
+              "Pittsburgh City"
+            ],
+            "zipCodes": [
+              "15203",
+              "15204",
+              "15207",
+              "15210",
+              "15211",
+              "15212",
+              "15213",
+              "15214",
+              "15217",
+              "15219",
+              "15220",
+              "15222",
+              "15226",
+              "15233",
+              "15282",
+              "15290"
+            ]
+          },
+          {
+            "_key": "44cb9b888579",
+            "candidates": [
+              {
+                "_key": "ac3fbb1df3bd",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://emily4pa20.com",
+                "description": "Since 2020, State Rep. Emily Kinkead has served Pennsylvania\u2019s 20th House District \u2013 Ross Township, Avalon, Bellevue, and West View Boroughs, and parts of the city of Pittsburgh. She serves on the House Appropriations, Judiciary, Labor & Industry, Human Services, and Agriculture & Rural Affairs committees. She is the chair of the Legislative Hunger Caucus and on the leadership team of the Pennsylvania Progressive Caucus. After earning degrees in biology and political science at Bloomsburg University of Pennsylvania, Rep. Kinkead went on to earn her Law Degree from the University of Pittsburgh. Following her graduation, Kinkead clerked for the Honorable Judge Michael H. Wojcik of the Commonwealth Court before entering private practice. A staunch believer that government\u2019s calling is to do the most good for the most people, as a legislator, Kinkead has vocally championed the policies that help working families and raise up communities \u2013 criminal justice reform, addressing food insecurity, affordable housing, livable wages, worker protections, health care, LGBTQIA+ equality, reproductive justice, adequately funding education, and more. She\u2019s also focused on local issues like addressing blight and landslides. A native Northsider, Emily lives in Brighton Heights with her cats and dog.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "EMILY KINKEAD",
+                "photo": {
+                  "_type": "image",
+                  "alt": "EMILY KINKEAD",
+                  "asset": {
+                    "_ref": "image-2f948b5f3efc8ee51d2f84da7d1080ef3204cf3b-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 1,
+            "districtDescription": "Avalon, Bellevue, West View, Ross Township and Pittsburgh neighborhoods of Brighton Heights, Perry North, and some of Summer Hill",
+            "districtLabel": "DISTRICT 20",
+            "searchTerms": [
+              "Avalon",
+              "Avalon Borough",
+              "Bellevue",
+              "Bellevue Borough",
+              "Pittsburgh",
+              "Pittsburgh City",
+              "Ross",
+              "Ross Township",
+              "Ross Twp",
+              "West View",
+              "West View Borough"
+            ],
+            "zipCodes": [
+              "15116",
+              "15202",
+              "15209",
+              "15212",
+              "15214",
+              "15229",
+              "15237"
+            ]
+          },
+          {
+            "_key": "d5e85ffdf7be",
+            "candidates": [
+              {
+                "_key": "5bd546dc3ed0",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://lindsaypowellforpa.com",
+                "description": "Lindsay Powell was elected to the House in 2023 to represent the 21st Legislative District in Allegheny County. She earned a Bachelor of Arts degree in Sociology from Wheaton College and a Master of Science degree in Public Policy Management from Carnegie Mellon University's Heinz College. She also won CMU Heinz College\u2019s Otto A. Davis Award, which recognizes a graduate\u2019s commitment to racial and social justice. Powell has worked for progressive officials such as U.S. Sen. Chuck Schumer and U.S. Rep. Hakeem Jeffries and, upon proudly receiving a Fulbright Scholarship, taught English in Malaysia to rural high school students. Powell served as a City of Pittsburgh Assistant Chief of Staff for almost half a decade and directed legislation and policy for city departments. Powell oversaw the creation of the first citywide digital equity initiative and the implementation of Avenues of Hope, a catalyst for small businesses to open on city main streets. She served as director of workforce strategies for InnovatePGH, with a focus on creating employment opportunities for underrepresented technologists in the Pittsburgh tech ecosystem. Powell currently serves as the City Vice Chair for the PA House of Representatives' Allegheny County Delegation, as Secretary for the Pennsylvania Legislative Latino Caucus, and serves as a board member on the Urban Redevelopment Authority. Key issues for Powell include safe and dignified housing for all, helping working families, assisting small businesses and strengthening the local economy, and increasing the number of community assets.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "LINDSAY POWELL",
+                "photo": {
+                  "_type": "image",
+                  "alt": "LINDSAY POWELL",
+                  "asset": {
+                    "_ref": "image-631c19662c3901567c685f158bd625171c78a073-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 2,
+            "districtDescription": "Etna, Reserve, Millville, Shaler Township and Pittsburgh neighborhoods of East Allegheny, Lawrenceville, Spring Garden, the Strip District, and Troy Hill, and portions of Bloomfield, Morningside, and Spring Hill-City View",
+            "districtLabel": "DISTRICT 21",
+            "searchTerms": [
+              "Etna",
+              "Etna Borough",
+              "Millvale",
+              "Millvale Borough",
+              "Pittsburgh",
+              "Pittsburgh City",
+              "Reserve",
+              "Reserve Township",
+              "Reserve Twp",
+              "Shaler",
+              "Shaler Township",
+              "Shaler Twp"
+            ],
+            "zipCodes": [
+              "15101",
+              "15116",
+              "15201",
+              "15206",
+              "15209",
+              "15212",
+              "15213",
+              "15214",
+              "15215",
+              "15219",
+              "15222",
+              "15223",
+              "15224",
+              "15237"
+            ]
+          },
+          {
+            "_key": "ed154d458356",
+            "candidates": [
+              {
+                "_key": "f435072f3fa7",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://electdanfrankel.com",
+                "description": "Representative Dan Frankel has long been an outspoken advocate for civil rights, public health, and safe communities. Throughout his career, he has championed legislation to advance equality for LGBTQ+ Pennsylvanians, stood firmly against efforts to restrict women\u2019s healthcare, and worked tirelessly to reduce gun violence through common-sense, evidence-based policies. Following the tragic 2018 attack at the Tree of Life building, Representative Frankel brought together a broad coalition of community members, faith leaders, and organizations to modernize Pennsylvania\u2019s hate crime laws and better address acts of bias and violence. Currently, Representative Frankel serves as the Democratic Chairman of the Pennsylvania House Health Committee, where he promotes science-driven policies to improve health outcomes across the Commonwealth. He also serves on the Pennsylvania Health Care Cost Containment Council, helping to control healthcare costs while supporting high-quality care. In addition, he is co-chair of the PA SAFE Caucus and the founder and former chair of both the PA Women\u2019s Health Caucus and the LGBTQ+ Equality Caucus. Representative Frankel proudly represents the heart of Pittsburgh, including Squirrel Hill, Shadyside, Greenfield, Oakland, Point Breeze, and Regent Square. He leads these neighborhoods with the same compassion, engagement, and activism reflected by his constituents. His public service extends to roles on Allegheny County\u2019s Area Agency on Aging Advisory Council, the State Employees\u2019 Retirement System Board, and the Western Pennsylvania Conservancy\u2019s Board of Directors. He also serves as the Governor\u2019s representative to the University of Pittsburgh Board of Trustees. A graduate of the Pennington School and Kenyon College, Representative Frankel later completed an executive program at Harvard University\u2019s Kennedy School of Government. He lives in Squirrel Hill with his wife, Debra, and they have three adult children.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "DAN FRANKEL",
+                "photo": {
+                  "_type": "image",
+                  "alt": "DAN FRANKEL",
+                  "asset": {
+                    "_ref": "image-d38a056db50da6a3ffa5cfb32d1c031e918ac6ac-240x334-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 3,
+            "districtDescription": "Pittsburgh Neighborhoods of Central Oakland, Greenfield, Regent Square, Squirrel Hill, Swisshelm Park, portions of North Oakland, Point Breeze, Shadyside, and South Oakland",
+            "districtLabel": "DISTRICT 23",
+            "searchTerms": [
+              "Pittsburgh",
+              "Pittsburgh City"
+            ],
+            "zipCodes": [
+              "15206",
+              "15207",
+              "15208",
+              "15213",
+              "15217",
+              "15218",
+              "15221",
+              "15232",
+              "15260"
+            ]
+          },
+          {
+            "_key": "d727c721d318",
+            "candidates": [
+              {
+                "_key": "7e3b471b3098",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://latashaforpa.com",
+                "description": "La\u2019Tasha D. Mayes is the State Representative for House District 24, and she unapologetically advocates for racial, gender, and economic justice that centers marginalized communities. With 25 years of national leadership in the reproductive health, rights and justice movements, she has brought this depth and breadth of leadership to the House. Mayes is running for re-election to fight for our families, our freedoms and our futures with a focus on healthcare, childcare and an economy for working people. In her first three years in office, Mayes has been a standout among her colleagues, and she is highly respected in Harrisburg and in her district. In her first year, Mayes became Co-Founder and Co-Chair of the groundbreaking Pennsylvania Black Maternal Health Caucus that has passed multiple bills into law through the PA MOMNIBUS legislative package. Mayes is also a leader in both the PA Legislative Black Caucus, the PA Women's Health Caucus, and the PA LGBTQ Equality Caucus. She is a Member of the Appropriations, Judiciary, Health, Housing & Community Development, and Human Services Committees. Mayes is the prime sponsor of the CROWN Act or House Bill 439 to end race-based hair discrimination. She launched the Pennsylvania CROWN Act Coalition with Speaker Joanna McClinton and the Coalition comprised of over 100 endorsers. The CROWN Act passed out of the Senate in November 2025 with overwhelming bipartisan support and was signed into law on November 25th. The CROWN Act took effect on January 24th to codify protections from discrimination based on hair type, hair texture or hair style. Since January 2023, Mayes has secured over $50 million in state funds for her district, provided over 52,000 high-quality constituent services to her community members and, she sponsored or co-sponsored 442 bills and resolutions in 2025. Her dedication to House District 24 and to Pennsylvania is unwavering. Mayes will continue to lead with purpose and compassion to protect the health, dignity, and the futures of Pennsylvanians.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "LA\u2019TASHA D. MAYES",
+                "photo": {
+                  "_type": "image",
+                  "alt": "LA\u2019TASHA D. MAYES",
+                  "asset": {
+                    "_ref": "image-a05f87cb0637e39044fe8dd2893e5809a27713f5-219x307-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 4,
+            "districtDescription": "Pittsburgh neighborhoods of Bloomfield, East Liberty, East Hills, Friendship, Garfield, Highland Park, the Hill District, Larimer, Lincoln-Lemington-Belmar, Morningside and portions of Homewood, North Oakland, Shadyside, Stanton Heights, and West Oakland",
+            "districtLabel": "DISTRICT 24",
+            "searchTerms": [
+              "Pittsburgh",
+              "Pittsburgh City"
+            ],
+            "zipCodes": [
+              "15201",
+              "15206",
+              "15208",
+              "15213",
+              "15215",
+              "15219",
+              "15221",
+              "15224",
+              "15232",
+              "15235",
+              "15260"
+            ]
+          },
+          {
+            "_key": "c04ba9db4631",
+            "candidates": [
+              {
+                "_key": "aa4de255b7ab",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://facebook.com/MarkosekPA25/",
+                "description": "I am currently serving in my 4th term as the State Representative in the 25th District. The district includes the towns of Monroeville, North Versailles, Pitcairn, Turtle Creek, East McKeesport, Wilmerding, Wall, a large portion of Plum Borough, and a portion of Trafford Borough. As State Representative, I have focused on numerous issues. I have been a vocal advocate for issues that involve Transportation, Healthcare, Education, Housing, Economic Development, and Veterans Services, as well as many other topics. This session I was chosen by Speaker McClinton to be the Majority Chairman of the Housing and Community Development Committee in Harrisburg. It is my honor to chair this vital committee and help to create laws that make Housing more equitable for all. As a person that talks with a stutter I have also been a vocal advocate for the speech community as well as a strong supporter of mental health services.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "BRANDON MARKOSEK",
+                "photo": {
+                  "_type": "image",
+                  "alt": "BRANDON J. MARKOSEK",
+                  "asset": {
+                    "_ref": "image-9035be052946e1e43cba09951c6df6b0b9c9ba2b-219x310-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 5,
+            "districtDescription": "East McKeesport, Monroeville, North Versailles, Pitcairn, Trafford (Allegheny County Portion), Turtle Creek, Wall, Wilmerding and part of Plum Borough",
+            "districtLabel": "DISTRICT 25",
+            "searchTerms": [
+              "East McKeesport",
+              "East McKeesport Borough",
+              "Monroeville",
+              "Monroeville Borough",
+              "North Versailles",
+              "North Versailles Township",
+              "North Versailles Twp",
+              "Pitcairn",
+              "Pitcairn Borough",
+              "Plum",
+              "Plum Borough",
+              "Trafford",
+              "Trafford Borough",
+              "Turtle Creek",
+              "Turtle Creek Borough",
+              "Wall",
+              "Wall Borough",
+              "Wilmerding",
+              "Wilmerding Borough"
+            ],
+            "zipCodes": [
+              "15035",
+              "15085",
+              "15131",
+              "15132",
+              "15137",
+              "15140",
+              "15145",
+              "15146",
+              "15148",
+              "15239",
+              "15668"
+            ]
+          },
+          {
+            "_key": "e772cd5da4d2",
+            "candidates": [
+              {
+                "_key": "0abe185833be",
+                "ballotStatus": "listed",
+                "description": "Dan Deasy was first elected to the state House of Representatives in 2008. He attended Canevin Catholic High School and the University of Pittsburgh, worked as a supervisor at Pittsburgh's Public Works Department, and served four years as a Pittsburgh city councilman. He is the Democratic chairman of the House Liquor Control Committee. His legislative priorities include, but are not limited to, expanding access to health care; supporting funding for education; strengthening penalties for crimes against children; supporting economic development that leads to job creation; expanding services for senior citizens and veterans; and addressing blight and abandoned properties in communities. Deasy has a long history of community service, working to address housing concerns; securing funding for playgrounds and other community resources; obtaining grant money for neighborhood revitalization; and advocating for public safety. While serving on Pittsburgh City Council, Deasy fought for the reopening of Pittsburgh\u2019s Zone 6 Police Station, which remains open today. His community service continues as he serves on many local nonprofit boards of directors. A lifelong native of the 27th Legislative District, Deasy is married to the former Kelly Skeba. They have four children and reside in Westwood.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "DAN DEASY",
+                "photo": {
+                  "_type": "image",
+                  "alt": "DANIEL J. DEASY",
+                  "asset": {
+                    "_ref": "image-a04586aa0bd6b031686818a031ee83099f2004a0-220x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 6,
+            "districtDescription": "Crafton, Green Tree, Heidelberg, Ingram, Rosslyn Farms, Scott Township,Thornburg, and Pittsburgh neighborhoods of Banksville, Crafton Heights, Duquesne Heights, East Carnegie, Fairywood, Oakwood, Ridgemont, West End, Westwood, and Windgap with portions of Beechview, Elliott, Mount Washington, Sheraden, and South Shore",
+            "districtLabel": "DISTRICT 27",
+            "searchTerms": [
+              "Crafton",
+              "Crafton Borough",
+              "Green Tree",
+              "Green Tree Borough",
+              "Heidelberg",
+              "Heidelberg Borough",
+              "Ingram",
+              "Ingram Borough",
+              "Pittsburgh",
+              "Pittsburgh City",
+              "Rosslyn Farms",
+              "Rosslyn Farms Borough",
+              "Scott",
+              "Scott Township",
+              "Scott Twp",
+              "Thornburg",
+              "Thornburg Borough"
+            ],
+            "zipCodes": [
+              "15017",
+              "15106",
+              "15204",
+              "15205",
+              "15211",
+              "15216",
+              "15219",
+              "15220",
+              "15241",
+              "15243"
+            ]
+          },
+          {
+            "_key": "7642115a6e91",
+            "candidates": [
+              {
+                "ballotStatus": "listed",
+                "description": "I was born and raised just outside Pennsylvania\u2019s 28th House District on my family\u2019s organic farm, where I learned early that hard work, responsibility, and community support are the foundation of a meaningful life. After graduating from Mars High School, I earned a degree in Environmental Science with a minor in Spanish from Allegheny College and moved to Miami, Florida, where I spent 17 years building a career in environmental consulting. My work in indoor air quality and environmental health required clear communication, steady leadership, and evidence\u2011based decision\u2011making. Early in my career, I oversaw on\u2011site operations following the 9/11 tragedy, conducting health and safety monitoring for multiple agencies and supporting first responders during an extraordinarily challenging time. That experience shaped my commitment to public health, accountability, and practical problem\u2011solving, and reinforced the importance of community that I carry with me today. Living in Miami exposed me to a wide range of cultures and perspectives, and communicating in two languages broadened my understanding of the diverse communities that make up our country. When my wife and I returned to Pennsylvania to raise our children near family, I brought that expanded perspective home with me. Today, I serve as Vice President of Operations for my family\u2019s natural foods distribution business, where I manage daily operations, support local partners, and understand firsthand the challenges facing small businesses and working families. I stay active in the Pine\u2011Richland community by coaching youth soccer, volunteering in our schools, and participating in the district\u2019s recent book review committee\u2014an experience that reinforced my belief that constructive, respectful dialogue is still possible even on difficult issues. These experiences\u2014rural roots, crisis\u2011response work, business leadership, and community involvement\u2014shape the perspective and steadiness I would bring to this office.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "JEREMY FERDERBER"
+              },
+              {
+                "ballotStatus": "listed",
+                "description": "Robert Bertha is a lifelong resident of West Deer who believes that government works best when it listens to its community. Growing up in a union family, he learned the values of hard work, fairness, and helping your neighbor. During his early career, Robert worked in international affairs with the federal government, where he helped to oversee the communication and outreach strategy for an international development agency. Through this work, he saw firsthand how policy decisions can directly impact communities. He currently works for a local Chamber of Commerce and helps connect business leaders in the Pittsburgh region. In this campaign for the state house, Robert wants to bring practical, compassionate leadership to the General Assembly. He will fight for strong public schools, affordable healthcare, safe communities, and an economy that works for everyone. Robert lives in Bairdford with his wife and 3 dogs and is proud to call this community home.",
+                "displayOrder": 1,
+                "endorsedByAcdc": false,
+                "name": "ROBERT BERTHA"
+              }
+            ],
+            "displayOrder": 7,
+            "districtDescription": "Bradford Woods, Marshall, Pine, Richland, West Deer and part of Hampton Township",
+            "districtLabel": "DISTRICT 28",
+            "searchTerms": [
+              "Bradford Woods",
+              "Bradford Woods Borough",
+              "Hampton",
+              "Hampton Township",
+              "Hampton Twp",
+              "Marshall",
+              "Marshall Township",
+              "Marshall Twp",
+              "Pine",
+              "Pine Township",
+              "Pine Twp",
+              "Richland",
+              "Richland Township",
+              "Richland Twp",
+              "West Deer",
+              "West Deer Township",
+              "West Deer Twp"
+            ],
+            "zipCodes": [
+              "15005",
+              "15006",
+              "15007",
+              "15015",
+              "15024",
+              "15044",
+              "15076",
+              "15084",
+              "15086",
+              "15090",
+              "15101",
+              "15116",
+              "16046",
+              "16059"
+            ]
+          },
+          {
+            "_key": "36bc9bc7c66d",
+            "candidates": [
+              {
+                "_key": "26140d0472ff",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://venkatforpa.com",
+                "description": "My life has always been focused on family, service, and community. My parents immigrated to the United States, and I saw how hard they worked to build a good life for our family. It was this ethic of hard work and commitment to service that inspired me to become a physician. As an ER doc, I care for any patient that comes through the doors of the hospital, no questions asked. I have always believed that the ER should not only treat patients in crisis, but also work to address the health issues facing our community. I have always looked for ways to give back to the community that has meant so much to me and my family. I served on the McCandless-Franklin Park Ambulance Authority where I worked to make sure our vital EMS services are available for our entire community. As our state representative, I have focused on making health care more affordable and accessible, investing in public education and our first responders, protecting reproductive rights, passing gun safety legislation, and preserving ballot access and respect for our election results regardless of their outcome. All of these areas reinforce my philosophy that we need pragmatic and compassionate servant-leadership for our community. I am running for reelection to the State House because we need a representative who has served our community through crises big and small and will use these experiences to advocate for everyone in the district.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "ARVIND VENKAT",
+                "photo": {
+                  "_type": "image",
+                  "alt": "ARVIND VENKAT",
+                  "asset": {
+                    "_ref": "image-2109b20e24f0b1b598ca3537d272fb20bccab0ad-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 8,
+            "districtDescription": "Ben Avon, Ben Avon Heights, Emsworth, Franklin Park, Kilbuck, McCandless, Ohio Township, and part of Hampton Township",
+            "districtLabel": "DISTRICT 30",
+            "searchTerms": [
+              "Ben Avon",
+              "Ben Avon Borough",
+              "Ben Avon Heights",
+              "Ben Avon Heights Borough",
+              "Emsworth",
+              "Emsworth Borough",
+              "Franklin Park",
+              "Franklin Park Borough",
+              "Hampton",
+              "Hampton Township",
+              "Hampton Twp",
+              "Kilbuck",
+              "Kilbuck Township",
+              "Kilbuck Twp",
+              "McCandless",
+              "McCandless Township",
+              "McCandless Twp",
+              "Ohio",
+              "Ohio Township",
+              "Ohio Twp"
+            ],
+            "zipCodes": [
+              "15044",
+              "15090",
+              "15101",
+              "15143",
+              "15202",
+              "15237"
+            ]
+          },
+          {
+            "_key": "bb4f38b5e5f8",
+            "candidates": [
+              {
+                "_key": "f4a76efd283c",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://secure.actblue.com/donate/friends-of-joe-mcandrew-1",
+                "description": "Joe grew up in a working family\u2014his mom is a bus garage manager and his dad is a union mechanic. Joe honors the value of hard work and became State Rep. to make sure our State Legislature is putting working Pennsylvanians first. In his role as State Representative, Joe has stood for Democratic Policies that have brought PA forward. Joe and his wife, Michelle (Bertoni) McAndrew, own his great-grandmother\u2019s house in Penn Hills, where they\u2019re raising their three daughters. Joe is a husband, father and dedicated public servant. As your State Representative, Joe will always: - Work to fully fund our public schools and reduce property taxes -Support local businesses and bring high paying jobs -Fight against Corporate Greed -Protect women's rights and ensure reproductive freedom for all -Look after our families and neighborhoods by fully funding our police & fire and our family & youth services",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "JOE MCANDREW",
+                "photo": {
+                  "_type": "image",
+                  "alt": "JOE MCANDREW",
+                  "asset": {
+                    "_ref": "image-71c6f44456cc371ea146cb5f8c36d56d0dc4638e-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 9,
+            "districtDescription": "Oakmont, Penn Hills, Verona, and part of Plum Borough",
+            "districtLabel": "DISTRICT 32",
+            "searchTerms": [
+              "Oakmont",
+              "Oakmont Borough",
+              "Penn Hills",
+              "Penn Hills Township",
+              "Penn Hills Twp",
+              "Plum",
+              "Plum Borough",
+              "Verona",
+              "Verona Borough"
+            ],
+            "zipCodes": [
+              "15068",
+              "15139",
+              "15147",
+              "15206",
+              "15208",
+              "15221",
+              "15235",
+              "15239"
+            ]
+          },
+          {
+            "_key": "d05ed5b523ce",
+            "candidates": [
+              {
+                "_key": "7c09a799a6ec",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://steeleforpa.com",
+                "description": "Representative Mandy Steele proudly serves House District 33 in the Pennsylvania House of Representatives, representing communities throughout the Allegheny Valley, from Sharpsburg Borough to Harrison Township. First elected in 2022, she has prioritized policies that support working families, strengthen public education, protect workers\u2019 rights, support first responders, and safeguard our environment. Growing up in the district, Mandy learned early the value of hard work, public service, and community. She developed a deep commitment to giving back and ensuring that government works for the people it serves. That commitment continues to guide her work as a legislator. In the House, Representative Steele has been a consistent advocate for organized labor, environmental protection, women\u2019s rights, and a fair economy that works for everyone. She works collaboratively with colleagues, local leaders, and community organizations to deliver results for her constituents and to advance Democratic values across the Commonwealth. Mandy lives in Fox Chapel Borough and remains deeply engaged in the community she represents. She is seeking the endorsement of the Allegheny County Democratic Committee to continue fighting for a cleaner environment, safer communities, and economic opportunity for all.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "MANDY STEELE",
+                "photo": {
+                  "_type": "image",
+                  "alt": "MANDY STEELE",
+                  "asset": {
+                    "_ref": "image-66515669349b96ebf6912efbb5be19f75f75978a-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 10,
+            "districtDescription": "Aspinwall, Blawnox, Brackenridge, Cheswick, East Deer, Fawn, Fox Chapel, Frazer, Harmar, Harrison, Indiana Township, O\u2019Hara Township, Sharpsburg, Springdale Borough, Springdale Township, Tarentum",
+            "districtLabel": "DISTRICT 33",
+            "searchTerms": [
+              "Aspinwall",
+              "Aspinwall Borough",
+              "Blawnox",
+              "Blawnox Borough",
+              "Brackenridge",
+              "Brackenridge Borough",
+              "Cheswick",
+              "Cheswick Borough",
+              "East Deer",
+              "East Deer Township",
+              "East Deer Twp",
+              "Fawn",
+              "Fawn Township",
+              "Fawn Twp",
+              "Fox Chapel",
+              "Fox Chapel Borough",
+              "Frazer",
+              "Frazer Township",
+              "Frazer Twp",
+              "Harmar",
+              "Harmar Township",
+              "Harmar Twp",
+              "Harrison",
+              "Harrison Township",
+              "Harrison Twp",
+              "Indiana",
+              "Indiana Township",
+              "Indiana Twp",
+              "O'Hara",
+              "O'Hara Township",
+              "O'Hara Twp",
+              "Sharpsburg",
+              "Sharpsburg Borough",
+              "Springdale",
+              "Springdale Borough",
+              "Springdale Township",
+              "Springdale Twp",
+              "Tarentum",
+              "Tarentum Borough"
+            ],
+            "zipCodes": [
+              "15238",
+              "15014",
+              "15024",
+              "15030",
+              "15049",
+              "15051",
+              "15065",
+              "15075",
+              "15084",
+              "15101",
+              "15116",
+              "15144",
+              "15215",
+              "16055"
+            ]
+          },
+          {
+            "_key": "1a070551660d",
+            "candidates": [
+              {
+                "_key": "21b2317424d6",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://salisburyforpa.com",
+                "description": "Abigail Salisbury is in her second term as State Representative for District 34. Previously, she served on Swissvale Borough Council for five years. Salisbury was previously self-employed as a sole practitioner attorney for nonprofits and small businesses. Salisbury is the founder and Chair of the PA Charitable Nonprofit Caucus, a bipartisan and bicameral entity aimed at improving the state's relationship with and services to charities in the state. She is also the Chair of the PA Autism Caucus and is the first openly autistic individual to serve in that capacity. Salisbury is the first openly-LGBTQIA individual, the first Jew, and the first openly non-neurotypical person to serve as State Rep in District 34.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "ABIGAIL SALISBURY",
+                "photo": {
+                  "_type": "image",
+                  "alt": "ABIGAIL SALISBURY",
+                  "asset": {
+                    "_ref": "image-ba7745fec49f2628a4d3635f9b5e052719d9e711-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 11,
+            "districtDescription": "Braddock, Braddock Hills, Chalfant, Churchill, East Pittsburgh, Edgewood, Forest Hills, North Braddock, Rankin, Swissvale, Wilkins, Wilkinsburg, and Pittsburgh neighborhoods of Point Breeze North, and portions of Homewood South, and Point Breeze",
+            "districtLabel": "DISTRICT 34",
+            "searchTerms": [
+              "Braddock",
+              "Braddock Borough",
+              "Braddock Hills",
+              "Braddock Hills Borough",
+              "Chalfant",
+              "Chalfant Borough",
+              "Churchill",
+              "Churchill Borough",
+              "East Pittsburgh",
+              "East Pittsburgh Borough",
+              "Edgewood",
+              "Edgewood Borough",
+              "Forest Hills",
+              "Forest Hills Borough",
+              "North Braddock",
+              "North Braddock Borough",
+              "Pittsburgh",
+              "Pittsburgh City",
+              "Rankin",
+              "Rankin Borough",
+              "Swissvale",
+              "Swissvale Borough",
+              "Wilkins",
+              "Wilkins Township",
+              "Wilkins Twp",
+              "Wilkinsburg",
+              "Wilkinsburg Borough"
+            ],
+            "zipCodes": [
+              "15104",
+              "15112",
+              "15145",
+              "15208",
+              "15217",
+              "15218",
+              "15221",
+              "15235"
+            ]
+          },
+          {
+            "_key": "a31515d5ade0",
+            "candidates": [
+              {
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://facebook.com/DanForPA/",
+                "description": "Dan Goughnour was elected to the Pennsylvania House of Representatives in a March 2025 special election to serve the 35th Legislative District in Allegheny County, stepping into office on April 7, 2025. He is a lifelong resident of McKeesport, where he graduated from the McKeesport School District and the Allegheny County Police Academy. Before serving in Harrisburg, Dan devoted over 19 years to the McKeesport Police Department, rising to Captain of Police Detectives and gaining deep experience in public safety and community service.He has also served on the McKeesport Area School District board and is a proud member of Teamsters Local 205. His legislative priorities include strengthening public safety, expanding job training and economic opportunities, supporting public education, and reducing the cost of everyday essentials for families. Dan lives in McKeesport with his wife, Lauren, and their three children, all of whom attend McKeesport public schools.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "DAN GOUGHNOUR"
+              }
+            ],
+            "displayOrder": 12,
+            "districtDescription": "The cities of Clairton, Duquesne and McKeesport and the township of South Versailles and the borough of Homestead, Liberty, Lincoln, Munhall, Port Vue, Versailles, West Homestead, West Mifflin (part, Districts 03, 04 and 15), Whitaker and White Oak.",
+            "districtLabel": "DISTRICT 35",
+            "searchTerms": [
+              "Clairton",
+              "Clairton City",
+              "Duquesne",
+              "Duquesne City",
+              "Homestead",
+              "Homestead Borough",
+              "Liberty",
+              "Liberty Borough",
+              "Lincoln",
+              "Lincoln Borough",
+              "McKeesport",
+              "McKeesport City",
+              "Munhall",
+              "Munhall Borough",
+              "Port Vue",
+              "Port Vue Borough",
+              "South Versailles",
+              "South Versailles Township",
+              "South Versailles Twp",
+              "Versailles",
+              "Versailles Borough",
+              "West Homestead",
+              "West Homestead Borough",
+              "West Mifflin",
+              "West Mifflin Borough",
+              "Whitaker",
+              "Whitaker Borough",
+              "White Oak",
+              "White Oak Borough"
+            ],
+            "zipCodes": [
+              "15025",
+              "15028",
+              "15037",
+              "15110",
+              "15120",
+              "15122",
+              "15131",
+              "15132",
+              "15133",
+              "15135",
+              "15137",
+              "15642"
+            ]
+          },
+          {
+            "_key": "1b7c9c0f30fd",
+            "candidates": [
+              {
+                "_key": "9fe3e2860d5b",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://benhamforpa.com",
+                "description": "Jessica Benham is the State Representative for Pennsylvania House District 36, covering portions of the City of Pittsburgh and its suburbs. As a state representative, she has focused on increasing public safety, fighting for access to healthcare, a clean and healthy environment, fair funding for education, and LGBTQ and disability rights. \u200b Since her election in 2020, Jessica has brought millions of dollars into the district to invest in infrastructure, green spaces, education, violence prevention, and public safety. Her office has expanded services for seniors by hosting senior fairs and health clinics. In 2024, the Governor signed her landmark healthcare legislation into law, which regulates predatory middlemen to help stop them from raising prescription drug prices and putting pharmacies out of business. \u200b Prior to her election, Jessica was the Director of Development for the Pittsburgh Center for Autistic Advocacy (PCAA). Jessica is an alum of the University of Pittsburgh, where she was involved in the effort to organize a union of graduate workers. She knows firsthand the importance of organizing and the power that collective bargaining can have. Jessica has BA degrees in Political Science and in Communication Studies from Bethel University, an MA in Communication from Minnesota State University, an MA in Bioethics and Ph.D in Communication from the University of Pittsburgh. She lives in the Southside Slopes with her cat, Ravi and dog, Teddy.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "JESSICA BENHAM",
+                "photo": {
+                  "_type": "image",
+                  "alt": "JESSICA BENHAM",
+                  "asset": {
+                    "_ref": "image-7f808164313a384eddfe8b585491c0d3a0e3ec7d-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 13,
+            "districtDescription": "Brentwood, Mount Oliver, and Pittsburgh Neighborhoods of Arlington, Arlington Heights, Bon Air, Brookline, Carrick, Mt. Oliver, Overbook, St. Clair, South Side Slopes and portions of Beechview, Beltzhoover, Mount Washington and South Side Flats",
+            "districtLabel": "DISTRICT 36",
+            "searchTerms": [
+              "Brentwood",
+              "Brentwood Borough",
+              "Mount Oliver",
+              "Mount Oliver Borough",
+              "Mt Oliver",
+              "Mt Oliver Borough",
+              "Pittsburgh",
+              "Pittsburgh City"
+            ],
+            "zipCodes": [
+              "15203",
+              "15210",
+              "15211",
+              "15216",
+              "15226",
+              "15227",
+              "15234",
+              "15236"
+            ]
+          },
+          {
+            "_key": "cd3ccf17ffc1",
+            "candidates": [
+              {
+                "_key": "b992969c090d",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://inforinglis.com",
+                "description": "John Inglis was first elected to the PA House of Representatives for the 38th District in 2024. As a former teacher, school counselor, and borough councilman in West Mifflin, John brings a unique perspective to the General Assembly. His priorities have always included investments in education, public safety with a focus on first responders, economic development with a focus on unions, infrastructure improvements, community project funding, and supporting our veterans. He also takes pride in his constituent services and outreach, mainly benefitting senior citizens in the district. John serves on the following committees in the House of Representatives: Labor & Industry, Energy, Veterans Affairs & Emergency Preparedness, Communications & Technology, Game & Fisheries, and State Government. He is proud of the work he has accomplished in Harrisburg so far, passing two bills of his own while introducing many more. In addition to passing the EDGE Tax Credits and the Veteran-Owned Business Logo bills, Inglis is now looking to address housing reform through multiple pieces of legislation. His support for last year\u2019s budget and this current year\u2019s budget align with his dedication to improving the quality of life for all who he represents in the Mon Valley and South Hills areas. His voting record in Harrisburg reflects his commitment to bettering the lives of families, addressing affordability, and supporting workers across his district and the Commonwealth. John Inglis knows there is plenty of more work to be done, and welcomes those challenges ahead.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "JOHN INGLIS",
+                "photo": {
+                  "_type": "image",
+                  "alt": "JOHN INGLIS",
+                  "asset": {
+                    "_ref": "image-f05a6488e4e0a19df46c7d4ffe3d2f063724c8a2-229x323-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 14,
+            "districtDescription": "Baldwin, Dravosburg, Glassport, Whitehall, a portion of West Mifflin, and Pittsburgh neighborhoods of Hays, Lincoln Place, and New Homestead",
+            "districtLabel": "DISTRICT 38",
+            "searchTerms": [
+              "Baldwin",
+              "Baldwin Borough",
+              "Dravosburg",
+              "Dravosburg Borough",
+              "Glassport",
+              "Glassport Borough",
+              "Pittsburgh",
+              "Pittsburgh City",
+              "West Mifflin",
+              "West Mifflin Borough",
+              "Whitehall",
+              "Whitehall Borough"
+            ],
+            "zipCodes": [
+              "15025",
+              "15034",
+              "15045",
+              "15120",
+              "15122",
+              "15123",
+              "15207",
+              "15210",
+              "15227",
+              "15234",
+              "15236"
+            ]
+          },
+          {
+            "_key": "f03cba605eaa",
+            "candidates": [
+              {
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://dylan4pa.com",
+                "description": "Dylan is a fourth-generation native of the SWPA . His roots have profoundly influenced his leadership style, which is grounded in a vision of open and honest leadership that aligns with the daily struggles of his neighbors. Over his decade-plus career, Dylan has worked in K-12 education, higher education, nonprofits, and the federal government, while also serving as a local labor leader, Chair of the Elizabeth Township Democratic Committee, and President of the PA Equality Project. He is ready to draw on those experiences to start working on day one in Harrisburg, making government work for regular people.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "DYLAN ALTEMARA"
+              },
+              {
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://ka4pa.com",
+                "description": "Kellianne Frketic is a lifelong Mon Valley resident, working mother, community advocate, and progressive candidate for Pennsylvania State Representative in House District 39. Born in McKeesport and raised in Elizabeth Township, she comes from a multigenerational working-class family of public servants and union workers who taught her the value of hard work, solidarity, and standing up for neighbors. Kellianne has centered her career in service. She previously served as a Food Service Director in local school districts and now manages the Commodity Supplemental Food Program (CSFP) for seniors as Inventory Control Coordinator at the Greater Pittsburgh Community Food Bank. She was recently elected to the National CSFP Board and serves on its Education Committee, helping shape national best practices to fight senior hunger. A single mother to a teenage son and part of the sandwich generation, Kellianne has personally relied on support services during tough times. She is active in local politics and civic life, serving on the Elizabeth Township Democratic Committee, formerly as Vice President of Three Rivers Democratic Women, and holding leadership roles with the Business & Professional Women\u2019s Club \u2013 McKeesport Chapter. Kellianne volunteers with Casa San Jos\u00e9, Food & Water Watch PA, Moms Demand Action, Allegheny CleanWays, Pittsburgh Women for Democracy, and more, advocating for reproductive freedom, LGBTQ+ rights, environmental justice, and workers\u2019 rights. She holds a bachelor\u2019s degree in Marketing & Entrepreneurship from Duquesne University and an MBA in Operations & Supply Chain Management from Ohio University. Kellianne is running for State Representative because she believes government should work for working people. Her campaign is grounded in lived experience, community engagement, and accountability. Her guiding principle: One of Us. Working for All of Us.",
+                "displayOrder": 1,
+                "endorsedByAcdc": false,
+                "name": "KELLIANNE FRKETIC"
+              }
+            ],
+            "displayOrder": 15,
+            "districtDescription": "Elizabeth, West Elizabeth, Forward, Jefferson Hills, Pleasant Hills, South Park, and parts of Washington County including Monongahela, Carroll, New Eagle, Finleyville, and Union.",
+            "districtLabel": "DISTRICT 39",
+            "searchTerms": [
+              "Elizabeth",
+              "Elizabeth Borough",
+              "Elizabeth Township",
+              "Elizabeth Twp",
+              "Forward",
+              "Forward Township",
+              "Forward Twp",
+              "Jefferson Hills",
+              "Jefferson Hills Borough",
+              "Pleasant Hills",
+              "Pleasant Hills Borough",
+              "South Park",
+              "South Park Township",
+              "South Park Twp",
+              "West Elizabeth",
+              "West Elizabeth Borough"
+            ],
+            "zipCodes": [
+              "15018",
+              "15020",
+              "15025",
+              "15037",
+              "15047",
+              "15063",
+              "15083",
+              "15088",
+              "15089",
+              "15102",
+              "15122",
+              "15129",
+              "15135",
+              "15236",
+              "15332"
+            ]
+          },
+          {
+            "candidates": [
+              {
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://jlforpa.com",
+                "description": "Jon Lloyd is a candidate for Pennsylvania House of Representatives in District 40, running to build a community that is affordable, accessible, and accountable to the people it serves. Jon moved to Pennsylvania in 2013 and quickly put down deep roots in Bethel Park, where he and his wife, Nikki\u2014married for 22 years\u2014are raising their three children. Their family reflects the full arc of life in District 40, from public schools to higher education and workforce preparation, grounding Jon\u2019s belief that government should support families at every stage. A lifelong learner and advocate for public service, Jon studied trumpet performance at the University of North Carolina and completed graduate-level coursework in organizational leadership at Trinity International University. His commitment to public education is longstanding. He served as President of the Bethel Park Music Boosters\u2014the district\u2019s largest booster organization\u2014after previously holding roles as Vice President and Secretary. Jon also ran for Mayor of Bethel Park, earning record-breaking community engagement and demonstrating his dedication to local leadership. Professionally, Jon brings more than 20 years of experience in the technology sector, working across public, private, and nonprofit organizations. This experience gives him a practical understanding of innovation, workforce development, and responsible economic growth. Jon is running for the Pennsylvania House because he believes families deserve a government that makes life easier, not harder. Focused on affordability, accessibility, and accountability, he is committed to representing every neighbor in District 40, especially those who too often feel left out of the process.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "JON LLOYD"
+              }
+            ],
+            "displayOrder": 16,
+            "districtDescription": "Bethel Park, part of Upper Saint Clair, and Peters Township (in Washington County).",
+            "districtLabel": "DISTRICT 40",
+            "searchTerms": [
+              "Bethel Park",
+              "Bethel Park Borough",
+              "Upper St. Clair",
+              "Upper St. Clair Township",
+              "Upper St. Clair Twp"
+            ],
+            "zipCodes": [
+              "15102",
+              "15129",
+              "15228",
+              "15234",
+              "15236",
+              "15241",
+              "15332"
+            ]
+          },
+          {
+            "_key": "1c6d5cc4292a",
+            "candidates": [
+              {
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://jenforpa.com",
+                "description": "Jen has devoted her career to public service as an elected official, public school teacher, union leader, and community organizer. Jen lives in Dormont with her husband and two daughters. She attended the University of Pittsburgh for both her undergraduate degree and Master of Arts in Teaching. She has taught English for 15 years at Allderdice High School and is an active member of her union, the Pittsburgh Federation of Teachers. She has served as a building representative, led their Political Action Committee from 2018 until 2025, and currently serves as a Secondary Schools Representative on the Executive Board. Jen has worked hard in two terms on council to make Dormont a livable and thriving community. As a leader on Dormont Council, she wrote the borough\u2019s Complete Streets policy and has partnered closely with Mt. Lebanon to develop a regional active transportation plan. She helped create the Dormont Human Relations Commission, advanced a non-cooperation agreement with ICE, and has fought for policies to make Dormont an inclusive place, including a non-discrimination ordinance with protections for the LGBTQ+ community. Jen is also an active community volunteer, serving on the Dormont Pride in the Park planning committee and as Co-Chair of the Dormont Free Pantry, both as part of her role as a board member of the Dormont Community Development Corporation. If elected as State Representative for District 42, Jen will fight for strong public schools, policies that support affordability for working families, and support to create livable communities in our district.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "JENNIFER MAZZOCCO"
+              }
+            ],
+            "displayOrder": 17,
+            "districtDescription": "Baldwin, Castle Shannon, Dormont, Mt. Lebanon, and part of Upper St. Clair",
+            "districtLabel": "DISTRICT 42",
+            "searchTerms": [
+              "Baldwin",
+              "Baldwin Township",
+              "Baldwin Twp",
+              "Castle Shannon",
+              "Castle Shannon Borough",
+              "Dormont",
+              "Dormont Borough",
+              "Mount Lebanon",
+              "Mount Lebanon Township",
+              "Mount Lebanon Twp",
+              "Mt Lebanon",
+              "Mt Lebanon Township",
+              "Mt Lebanon Twp",
+              "Upper St. Clair",
+              "Upper St. Clair Township",
+              "Upper St. Clair Twp"
+            ],
+            "zipCodes": [
+              "15216",
+              "15220",
+              "15226",
+              "15228",
+              "15234",
+              "15236",
+              "15241",
+              "15243"
+            ]
+          },
+          {
+            "_key": "d386b43dc3ab",
+            "candidates": [
+              {
+                "_key": "3c9adc66c286",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://hadleyforpa.com",
+                "description": "A Pittsburgh native, Hadley graduated from the University of Michigan with a degree in economics and communications and began a career in marketing. She was a Director of Business Marketing at AT&T, Director of Marketing at NueVista LLC and the Director of Marketing and Analytics for Wolf Consulting Group, a small Chicago-based firm. Hadley\u2019s two sons, now young adults, were both born deaf. They received cochlear implants and learned to communicate using listening and spoken language. Over the past two decades, Hadley has done extensive advocacy and fundraising work in support of other families of children with hearing loss. In 2009, Hadley helped establish the Friends of the Hearing Center at Children's Hospital of Pittsburgh which raised money to hire an educational liaison to advocate for families. Hadley also served on the Pennsylvania newborn hearing screening committee. In 2020, Hadley became a leader with Moms Demand Action and served as the elections lead, local group co-lead for the Pittsburgh region and state legislative co-lead. In these roles, she worked closely with community partners, organized large scale events and lobbied in Harrisburg for gun safety legislation. In 2024, Hadley ran for State Representative in House District 44, comprising the west hills of Allegheny County. While ultimately unsuccessful, her campaign was considered one of the most effective challenger races during a difficult cycle for Democratic candidates. Hadley resides near Sewickley with her husband, Scott, and their two children.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "HADLEY HAAS",
+                "photo": {
+                  "_type": "image",
+                  "alt": "HADLEY HAAS",
+                  "asset": {
+                    "_ref": "image-2471fb4c2316c454e1aa3b14792a373f00431707-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 18,
+            "districtDescription": "Aleppo, Bell Acres, Crescent, Edgeworth, Findlay, Glen Osborne, Glenfield, Haysville, Leet, Leetsdale, Moon, North Fayette, Sewickley, Sewickley Heights, and Sewickley Hills",
+            "districtLabel": "DISTRICT 44",
+            "searchTerms": [
+              "Aleppo",
+              "Aleppo Township",
+              "Aleppo Twp",
+              "Bell Acres",
+              "Bell Acres Borough",
+              "Crescent",
+              "Crescent Township",
+              "Crescent Twp",
+              "Edgeworth",
+              "Edgeworth Borough",
+              "Findlay",
+              "Findlay Township",
+              "Findlay Twp",
+              "Glen Osborne",
+              "Glen Osborne Borough",
+              "Glenfield",
+              "Glenfield Borough",
+              "Haysville",
+              "Haysville Borough",
+              "Leet",
+              "Leet Township",
+              "Leet Twp",
+              "Leetsdale",
+              "Leetsdale Borough",
+              "Moon",
+              "Moon Township",
+              "Moon Twp",
+              "North Fayette",
+              "North Fayette Township",
+              "North Fayette Twp",
+              "Sewickley",
+              "Sewickley Borough",
+              "Sewickley Heights",
+              "Sewickley Heights Borough",
+              "Sewickley Hills",
+              "Sewickley Hills Borough"
+            ],
+            "zipCodes": [
+              "15003",
+              "15026",
+              "15046",
+              "15056",
+              "15057",
+              "15071",
+              "15108",
+              "15126",
+              "15143",
+              "15275"
+            ]
+          },
+          {
+            "_key": "f1fbee827d77",
+            "candidates": [
+              {
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://brittany4pa.com",
+                "description": "Brittany Bloam is a working mom, lawyer, and community advocate running for State Representative because right now, we all deserve leaders who know what\u2019s at stake and aren\u2019t backing down. Brittany\u2019s commitment to public service is rooted in Democratic values: fairness, opportunity, and standing up for people who work hard. She put herself through school with scholarships and part-time jobs, earned her law degree from University of Pittsburgh School of Law, and built a legal career focused on problem-solving and accountability. This experience is foundational to Brittany\u2019s ability to navigate complex policy and to govern effectively. As a mother raising her family with her husband, Brittany knows that business-as-usual doesn\u2019t cut it anymore, and it\u2019s time to demand more from the leaders at every level. That means high quality public education, safe neighborhoods, an economy that works for us all, and a commitment to civil rights and the Constitution, no matter what. She is firmly committed to defending civil rights, expanding access to affordable healthcare, protecting women\u2019s rights, and safeguarding our democracy from extremism. During her legal career, Brittany has witnessed firsthand how state-level decisions shape outcomes for municipalities, unions, small businesses, and families. Brittany\u2019s unique perspective on governance includes a commitment to collaboration and a deep respect for the role local government plays in delivering key services and driving progress. Brittany believes in building coalitions, supporting organized labor, and strengthening our community. She is committed to serving as a principled, effective voice for all of the 45th District.",
+                "displayOrder": 0,
+                "endorsedByAcdc": false,
+                "name": "BRITTANY BLOAM"
+              },
+              {
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://friendsofpatcatena.com",
+                "description": "Councilman Catena was appointed to Allegheny County Council District 4 in 2017 and served as President since 2020. Patrick\u2019s family are third generation residents of Carnegie. Pat believes in strong family values, raising his son, Jack, and giving future generations the same opportunities he had. A graduate of Sts. Simon and Jude, Bishop Canevin High School, he received a B.A. in Political Science and Communications and a Certificate in Public Service from the University of Pittsburgh. President Catena\u2019s action in legislation and initiatives includes:\n\n\u2022 Public Safety, Economic Development, Budgeting, Property Tax Appeals, Human Services, and Government Efficiency.\n\n\u2022 Reforming the County\u2019s property tax appeal system \u2013 he is a staunch advocate for increased budgetary oversight.\n\n\u2022 County\u2019s Department of Human Services, whose budget is nearly a quarter of the County\u2019s operating expenditure.\n\n\u2022 Sponsored /Co-sponsored ordinances establishing a demolition fund aiding blighted properties, forbidding discrimination in medical treatment, assisting police departments in acquiring body camera equipment, improving readiness at the 9-1-1 Call Center and Jail, refining the owner occupant tax discount program, and creating a property tax credit program for volunteer firefighters and nonprofit EMS employees.\n\n\u2022 Advocated for the County\u2019s paid sick leave regulations.\n\nPat works with Council members on both sides of the aisle and to increase the Council\u2019s ability to function as both partner to and check and balance to the County\u2019s Chief Executive. His professionalism, vision, persistence and motivation show in his leadership skills and help County Council and his many constituents. He is ready to lead in Harrisburg.",
+                "displayOrder": 1,
+                "endorsedByAcdc": true,
+                "name": "PATRICK CATENA"
+              },
+              {
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://fredfor45.com",
+                "description": "CAMPAIGN SUSPENDED - HMM!!!\n\nFred Coleman is the vice-chair of the Carnegie Democrats with years of grassroots campaign experience at every level of government, including campaigns for Bernie Sanders, Hillary Clinton, Beto O'Rourke, and numerous state and local candidates. In Pennsylvania, Fred has remained consistently engaged in federal, state, and local races. Fred has served on the executive committees of both the Young Democrats of Allegheny County and the Pennsylvania Young Democrats. An active organizer and community volunteer, Fred has protested threats to democracy, advocated for increased public transit funding, contacted elected officials on behalf of groups like Fair Districts PA and PennEnvironment, and contributed to local organizations like the Carnegie Historical Society. This work has given Fred a clear understanding of the challenges facing HD 45. He believes Pennsylvania must establish sustainable funding for public transit, expand support for green initiatives, and continue fighting the cost-of-living crisis impacting families. In his professional career, Fred has helped build two startups from the ground up, bringing problem-solving skills in managing people, navigating conflict, and negotiating solutions while staying true to his values of fairness and equity. Fred is ready to bring his organizing experience and problem-solving skills to Harrisburg to fight for working families across HD 45.",
+                "displayOrder": 2,
+                "endorsedByAcdc": false,
+                "name": "FRED COLEMAN"
+              }
+            ],
+            "displayOrder": 19,
+            "districtDescription": "Bridgeville, Carnegie, Collier, Coraopolis, Kennedy, McKees Rocks, Neville Island, Pennsbury Village, Robinson, and Stowe",
+            "districtLabel": "DISTRICT 45",
+            "searchTerms": [
+              "Bridgeville",
+              "Bridgeville Borough",
+              "Carnegie",
+              "Carnegie Borough",
+              "Collier",
+              "Collier Township",
+              "Collier Twp",
+              "Coraopolis",
+              "Coraopolis Borough",
+              "Kennedy",
+              "Kennedy Township",
+              "Kennedy Twp",
+              "McKees Rocks",
+              "McKees Rocks Borough",
+              "Neville",
+              "Neville Township",
+              "Neville Twp",
+              "Pennsbury Village",
+              "Pennsbury Village Borough",
+              "Robinson",
+              "Robinson Township",
+              "Robinson Twp",
+              "Stowe",
+              "Stowe Township",
+              "Stowe Twp"
+            ],
+            "zipCodes": [
+              "15017",
+              "15071",
+              "15106",
+              "15108",
+              "15136",
+              "15142",
+              "15205",
+              "15225"
+            ]
+          },
+          {
+            "_key": "cdf12f5e4d83",
+            "candidates": [
+              {
+                "ballotStatus": "listed",
+                "description": "Never retired, Mike consults as a Business Broker and Life Coach. Mike and his wife Eileen have been married over 50 years. They have two successful children and five fantastic grandchildren. Mike Crossey was a classroom teacher for 34 years: certified in seven instructional areas. He spent most of his classroom days teaching emotional and behavioral support students. Always a strong leader, Mike became his local union president in his second year teaching, and served over 20 years as local president, negotiating 5 contracts and handling all grievances personally. He was elected Vice President of PSEA (Pennsylvania State Education Association) in 2007, and State President in 2011. As President, he co-chaired the State Labor Table with the President of the PA AFL-CIO working together to protect pensions in Pennsylvania. Always working to build our communities, Mike was elected Mt. Lebanon Commissioner, and then to the very first Allegheny County Council where he led the committee authoring the code for how the new county government would operate. Today, Mike is active as Chair of the South Fayette Democratic Committee and serves as State Committee person in the 37th Senatorial District. Statewide Mike is President of the PA Alliance for Retired Americans protecting Social Security, Medicare, Medicaid, and SNAP.",
+                "displayOrder": 0,
+                "endorsedByAcdc": true,
+                "name": "MIKE CROSSEY"
+              }
+            ],
+            "displayOrder": 20,
+            "districtDescription": "South Fayette Township, and McDonald Borough, Oakdale, and a part of Washington County",
+            "districtLabel": "DISTRICT 46",
+            "searchTerms": [
+              "McDonald",
+              "McDonald Borough",
+              "Oakdale",
+              "Oakdale Borough",
+              "South Fayette",
+              "South Fayette Township",
+              "South Fayette Twp"
+            ],
+            "zipCodes": [
+              "15017",
+              "15031",
+              "15057",
+              "15064",
+              "15071",
+              "15082",
+              "15142",
+              "15321"
+            ]
+          }
+        ],
+        "officeTitle": "Representative in the General Assembly",
+        "powersAndDuties": [
+          "Chamber of 203 members",
+          "With State Senate, make up the sole legislative authority of the Commonwealth",
+          "Adopt capital budget for each fiscal year",
+          "Create the rules of conduct and business of the chamber at the beginning of each session"
+        ],
+        "term": "2 Years"
+      },
+      {
+        "_key": "6143f9286bcd",
+        "_type": "voterGuideRace",
+        "annualSalary": "$400,000",
+        "displayOrder": 3,
+        "districts": [
+          {
+            "_key": "411d7dbda760",
+            "_type": "voterGuideDistrict",
+            "candidates": [
+              {
+                "_key": "312df37f7fb9",
+                "_type": "voterGuideCandidate",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://joebiden.com",
+                "description": "President Biden and Vice President Harris are delivering results for working families, keeping families safe, and protecting fundamental freedoms that Trump wants to rip away. The Biden-Harris Administration is creating good-paying jobs, lowering costs for families, protecting reproductive rights, keeping our communities safe, and rebuilding the Commonwealth\u2019s infrastructure. Under President Biden, more than $14 billion has been invested in hundreds of specific Pennsylvania infrastructure projects including rebuilding roads and bridges, revitalizing public transit, ports and airports, creating clean water infrastructure, and providing affordable, reliable high-speed internet. Since taking office, the Biden-Harris administration has overseen the creation of 547,000 Pennsylvania jobs, took on Big Pharma to bring down prescription drug costs, capped the cost of insulin at $35 a month for the over 2.8 million Pennsylvania residents with Medicare, and delivered student debt relief for 66,000 Pennsylvanians through improvements to public service loan forgiveness and income-driven repayment programs alone.",
+                "displayOrder": 1,
+                "endorsedByAcdc": false,
+                "name": "JOSEPH R. BIDEN, JR.",
+                "photo": {
+                  "_type": "image",
+                  "alt": "JOSEPH R. BIDEN, JR.",
+                  "asset": {
+                    "_ref": "image-99025519084811380e309ef84cfcfbeb984cc01b-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 0,
+            "districtLabel": "STATEWIDE"
+          }
+        ],
+        "officeTitle": "President of the United States",
+        "powersAndDuties": [
+          "Head of State",
+          "Commander in Chief",
+          "Appoint heads of federal agencies",
+          "Conduct diplomacy",
+          "Sign or veto bills that passed by Congress",
+          "Execute and enforce federal laws",
+          "Extend pardons or clemency"
+        ],
+        "term": "4 Years"
+      },
+      {
+        "_key": "b1582bc7f649",
+        "_type": "voterGuideRace",
+        "annualSalary": "$176,000",
+        "displayOrder": 4,
+        "districts": [
+          {
+            "_key": "b3415d89f170",
+            "_type": "voterGuideDistrict",
+            "candidates": [
+              {
+                "_key": "7d748cdd2b73",
+                "_type": "voterGuideCandidate",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://bobcasey.com",
+                "description": "Bob Casey was born and raised in Scranton, where he lives today. He brings the Pennsylvania values of hard work and perseverance to his service in the U.S. Senate. He believes that all of us must strive to make Pennsylvania a Commonwealth in life as well as in name, facing our biggest challenges head-on, and facing them together. Bob Casey has dedicated his career to fighting for the most vulnerable among us. His ABLE Act, which allows people with disabilities to save for their future, has been called the most significant disability legislation passed into law since the Americans with Disabilities Act. He worked to cap the cost of insulin at $35 for seniors, and helped pass the PACT Act to provide care to veterans who have suffered after being exposed to toxic burn pits. Throughout his time in public service, Bob Casey has been a steadfast and nationally recognized advocate for Pennsylvania\u2019s children.",
+                "displayOrder": 0,
+                "endorsedByAcdc": false,
+                "name": "ROBERT P. CASEY, JR.",
+                "photo": {
+                  "_type": "image",
+                  "alt": "ROBERT P. CASEY, JR.",
+                  "asset": {
+                    "_ref": "image-86f3b96ba6a2bf94af2e40754fb96cdbc355e4bd-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              }
+            ],
+            "displayOrder": 0,
+            "districtLabel": "STATEWIDE"
+          }
+        ],
+        "officeTitle": "United States Senator",
+        "powersAndDuties": [
+          "Create and change existing laws",
+          "Confirm presidential appointments",
+          "Power to ratify treaties",
+          "Oversight of executive branch",
+          "Serve on Senate committees that examine certain policy areas"
+        ],
+        "term": "6 Years"
+      },
+      {
+        "_key": "a4b4e00d82a3",
+        "_type": "voterGuideRace",
+        "annualSalary": "$197,748",
+        "displayOrder": 5,
+        "districts": [
+          {
+            "_key": "deab1ab57767",
+            "_type": "voterGuideDistrict",
+            "candidates": [
+              {
+                "_key": "0e53784a18e3",
+                "_type": "voterGuideCandidate",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://keirforag.com",
+                "description": "Pennsylvania has never elected a woman of color to any statewide executive office \u2014 Keir Bradford-Grey will change that, and fight for us as the progressive People\u2019s Attorney. Raised in a proud union household, Keir saw as a young girl the impact the law could have on families like hers, and dedicated herself to using the law to protect people. Now a nationally-recognized state and federal defender for more than two decades, Keir has worked to create a justice system that makes our communities safer. Keir was the first African American to lead public defender offices in Montgomery County\u2014where she was appointed by now-Governor Josh Shapiro\u2014and Philadelphia County, ultimately overseeing a staff of 500+ and a $50M budget. As Attorney General, she\u2019ll use her legal acumen to defend abortion rights and stand up to powerful interests who take advantage of working people, fighting financial scams, gun violence, and more.",
+                "displayOrder": 0,
+                "endorsedByAcdc": false,
+                "name": "KEIR BRADFORD-GREY",
+                "photo": {
+                  "_type": "image",
+                  "alt": "KEIR BRADFORD-GREY",
+                  "asset": {
+                    "_ref": "image-43577ebe04aa31c800572b79c9b50f78e4050498-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              },
+              {
+                "_key": "dec9d484b73f",
+                "_type": "voterGuideCandidate",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://depasqualeforag.com",
+                "description": "A Pittsburgh native, Eugene DePasquale is the former two-term Auditor General of Pennsylvania\u2014the state\u2019s top fiscal watchdog. His leadership exposed nearly $2 billion in waste, fraud and abuse. Eugene has a record of taking on tough fights and delivering real results, including reducing the statewide backlog of thousands of untested rape kits, reforming the child-abuse hotline, securing our voting systems, and holding charter schools accountable to parents and taxpayers. Prior to serving as Auditor, Eugene was a Representative to the General Assembly, where he fought for fairer funding for public schools, investing in clean energy, and making government more transparent. He has a 100% pro-choice lifetime rating from Planned Parenthood and 100% pro-labor record with the PA AFL-CIO. Eugene has a MPA from the University of Pittsburgh, and a JD from Widener University School of Law. He is currently an Adjunct Professor at the University of Pittsburgh.",
+                "displayOrder": 1,
+                "endorsedByAcdc": false,
+                "name": "EUGENE DEPASQUALE",
+                "photo": {
+                  "_type": "image",
+                  "alt": "EUGENE DEPASQUALE",
+                  "asset": {
+                    "_ref": "image-cfd6f3e834d9ab67e7b5113e8fd38eee8c606ba9-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              },
+              {
+                "_key": "8c9229171096",
+                "_type": "voterGuideCandidate",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://joekhan.com",
+                "description": "The most experienced prosecutor of all the candidates, Joe is the battle-tested Democrat who has protected Pennsylvania for 24 years. Raised by a Muslim immigrant and a Catholic nurse in a Jewish neighborhood, Joe stands up for everyone. Guided by his law professor, Barack Obama, Joe became a federal prosecutor who protected our kids and took on corruption. He sued Big Pharma over the opioid crisis before becoming the Bucks County Solicitor. Joe\u2019s enforcement of our environmental protections earned him the endorsement of Clean Air Action. His advocacy for abortion rights earned him a target from MAGA extremists. And Joe\u2019s leadership of County Solicitors to stop Trump from stealing the 2020 election earned him \u2014 at the recommendation of the Allegheny County Solicitor \u2014 PA\u2019s Outstanding Solicitor Award. Joe is proud to be a public school dad and grad who helped kick the \u201cMoms for Liberty\u201d off of his kids\u2019 school board.",
+                "displayOrder": 2,
+                "endorsedByAcdc": false,
+                "name": "JOE KHAN",
+                "photo": {
+                  "_type": "image",
+                  "alt": "JOE KHAN",
+                  "asset": {
+                    "_ref": "image-40b72b82768c64ba04778093cba80921f53ebe88-219x307-jpg",
+                    "_type": "reference"
+                  }
+                }
+              },
+              {
+                "_key": "c788c4d57d2f",
+                "_type": "voterGuideCandidate",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://jackforag.com",
+                "description": "In one of America\u2019s most violent cities, Jack reduced gun incidents in Chester by 72% and gun homicides by 68%. Jack eliminated the only private prisons in PA, and reduced the prison population by 40%. He created the first environmental crimes unit in Pennsylvania, ensuring the protection of our planet for future generations. Jack fought for women\u2019s rights, fighting the Dobbs decision by signing a pledge along with Attorney General Shapiro vowing to never to prosecute a woman for having an abortion. Jack decriminalized marijuana and sued opioid manufacturers. Jack\u2019s diverse experience, from prosecuting criminals to advocating for safer schools positions him as a candidate for Attorney General with a proven legal track record. Endorsed by EAS Carpenters, Pittsburgh Philadelphia and Pennsylvania Building Trades. Jack is the only candidate in this race with a track record of real impactful change, and if you don\u2019t know that, you don\u2019t know Jack.",
+                "displayOrder": 3,
+                "endorsedByAcdc": false,
+                "name": "JACK STOLLSTEIMER",
+                "photo": {
+                  "_type": "image",
+                  "alt": "JACK STOLLSTEIMER",
+                  "asset": {
+                    "_ref": "image-92a6665c175a7e79f9f0f9154bf027a450b982ce-219x309-jpg",
+                    "_type": "reference"
+                  }
+                }
+              },
+              {
+                "_key": "b34439668950",
+                "_type": "voterGuideCandidate",
+                "ballotStatus": "alsoAppearing",
+                "campaignWebsite": "https://jaredsolomon.com",
+                "displayOrder": 4,
+                "endorsedByAcdc": false,
+                "name": "JARED SOLOMON"
+              }
+            ],
+            "displayOrder": 0,
+            "districtDescription": "4 Years $197,748 \u00bb Chief law enforcement officer for the Commonwealth \u00bb Represent the Commonwealth in any lawsuit involving the Commonwealth \u00bb Administer consumer protection laws \u00bb Represent the Commonwealth or residents in antitrust suits brought by the Federal Government",
+            "districtLabel": "STATEWIDE"
+          }
+        ],
+        "officeTitle": "Attorney General",
+        "powersAndDuties": [
+          "Chief law enforcement officer for the Commonwealth",
+          "Represent the Commonwealth in any lawsuit involving the Commonwealth",
+          "Administer consumer protection laws",
+          "Represent the Commonwealth or residents in antitrust suits brought by the Federal Government"
+        ],
+        "term": "4 Years"
+      },
+      {
+        "_key": "6a294a98c51e",
+        "_type": "voterGuideRace",
+        "annualSalary": "$197,748",
+        "displayOrder": 6,
+        "districts": [
+          {
+            "_key": "3e644f0b1b8c",
+            "_type": "voterGuideDistrict",
+            "candidates": [
+              {
+                "_key": "33e723cda794",
+                "_type": "voterGuideCandidate",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://teambizzpa.com",
+                "description": "Ryan Bizzarro is running for Treasurer to protect important programs, protect our pensions, and to protect Pennsylvanians from extremists. Ryan, an award-winning legislator from Erie, serves as House Majority Policy Committee Chairman. He has been recognized for his statewide leadership working across Pennsylvania to ensure all voices are heard in Harrisburg. Ryan is the only candidate in this race that is battle- tested and proven, beating Republicans and outperforming the top of the ticket for over a decade. He is also the only candidate with both direct state budget and legislative experience. Pledging to be the \u201cPeople\u2019s Treasurer\u201d by opening regional offices, Ryan will offer enhanced financial literacy programs and more efficiently and effectively return billions of dollars in unclaimed property. Ryan will enact programs to help Pennsylvanians be financially secure well into their retirement. He is running against Pennsylvania\u2019s highest-ranking extremist officeholder, Treasurer Stacy Garrity, who worked to overturn election results and supports criminalizing abortion. Ryan Bizzarro will defend Pennsylvania from extremism; protect women\u2019s rights in Pennsylvania; and restore sanity, stability, and sensibility to the Treasurer\u2019s Office.",
+                "displayOrder": 0,
+                "endorsedByAcdc": false,
+                "name": "RYAN BIZZARRO",
+                "photo": {
+                  "_type": "image",
+                  "alt": "RYAN BIZZARRO",
+                  "asset": {
+                    "_ref": "image-bfecf7fc207dc0852c0b9561d8e8581f48fe9d47-219x305-jpg",
+                    "_type": "reference"
+                  }
+                }
+              },
+              {
+                "_key": "f1180c1ce2f3",
+                "_type": "voterGuideCandidate",
+                "ballotStatus": "alsoAppearing",
+                "campaignWebsite": "https://erinmcclelland.com",
+                "displayOrder": 1,
+                "endorsedByAcdc": false,
+                "name": "ERIN MCCLELLAND"
+              }
+            ],
+            "displayOrder": 0,
+            "districtDescription": "4 Years $197,748 \u00bb Chief financial officer for the state \u00bb Serves as Chair of the Board of Finance and Revenue \u00bb Hears and decides state tax appeals \u00bb Responsible for receipt and deposit of state monies, investment management \u00bb Reunites unclaimed property with rightful owner 22 Wabash Street Ste 205 Pittsburgh, PA 15220 Allegheny County leads Pennsylvania in Vote by Mail Ballots. This year drop boxes will be available to return your ballot safely and in time. Save our Democracy. Sign up to Vote by Mail and Stop Trump Now.",
+            "districtLabel": "STATEWIDE"
+          }
+        ],
+        "officeTitle": "State Treasurer",
+        "powersAndDuties": [
+          "Chief financial officer for the state",
+          "Serves as Chair of the Board of Finance and Revenue",
+          "Hears and decides state tax appeals",
+          "Responsible for receipt and deposit of state monies, investment management",
+          "Reunites unclaimed property with rightful owner ENDORSED by PADems MAKE CHECKS OUT TO: Allegheny County Democratic Committee 22 Wabash Street Ste 205 Pittsburgh, PA 15220 Allegheny County leads Pennsylvania in Vote by Mail Ballots. This year drop boxes will be available to return your ballot safely and in time. Save our Democracy. Sign up to Vote by Mail and Stop Trump Now. APPLY AT VOTE.PA.GOV OR CALL US AT (412) 481-5646 SIGN UP FOR VOTE BY MAIL"
+        ],
+        "term": "4 Years"
+      },
+      {
+        "_key": "b9cfa1fbf89f",
+        "_type": "voterGuideRace",
+        "annualSalary": "$197,748",
+        "displayOrder": 7,
+        "districts": [
+          {
+            "_key": "daa2eb314884",
+            "_type": "voterGuideDistrict",
+            "candidates": [
+              {
+                "_key": "3fbb32af4251",
+                "_type": "voterGuideCandidate",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://malcolmkenyatta.com",
+                "displayOrder": 0,
+                "endorsedByAcdc": false,
+                "name": "MALCOM KENYATTA"
+              },
+              {
+                "_key": "e90edad92754",
+                "_type": "voterGuideCandidate",
+                "ballotStatus": "listed",
+                "campaignWebsite": "https://votemarkpinsley.com",
+                "displayOrder": 1,
+                "endorsedByAcdc": false,
+                "name": "MARK PINSLEY"
+              }
+            ],
+            "displayOrder": 0,
+            "districtDescription": "4 Years $197,748 \u00bb Chief fiscal watchdog of the Commonwealth \u00bb Conducts performance audits, fiscal audits, and attestestation engagements \u00bb Auditing oversight of state agencies, funds and programs, district courts, county row offices, corporate tax returns, and others Donations from Democrats across Allegheny County show strong, local support, which is instrumental in fighting against Super PAC dollars streaming in against Democrats. Use the QR Code to set up a recurring donation!",
+            "districtLabel": "STATEWIDE"
+          }
+        ],
+        "officeTitle": "Auditor General",
+        "powersAndDuties": [
+          "Chief fiscal watchdog of the Commonwealth",
+          "Conducts performance audits, fiscal audits, and attestestation engagements",
+          "Auditing oversight of state agencies, funds and programs, district courts, county row offices, corporate tax returns, and others ENDORSED by PADems Donations from Democrats across Allegheny County show strong, local support, which is instrumental in fighting against Super PAC dollars streaming in against Democrats. Use the QR Code to set up a recurring donation! FIGHT FOR DEMOCRACY, CONTRIBUTE TO ACDC NOW!"
+        ],
+        "term": "4 Years"
+      }
+    ],
+    "slug": {
+      "_type": "slug",
+      "current": "voter-guide-2026"
+    },
+    "sourcePdfTitle": "2026-ACDC-VoterGuide-Digital.pdf",
+    "title": "2026 Endorsement Voter Guide"
+  }
+}

@@ -32,11 +32,13 @@ interface Props {
   stateCommitteeRace?: VoterGuideRace
 }
 
-const TARGET_RACE_TITLES = [
-  'Representative in Congress',
-  'Senator in the General Assembly',
-  'Representative in the General Assembly',
-]
+const DISTRICT_RACE_TITLE_ALIASES = {
+  congress: ['Representative in Congress', 'Representative in U.S. Congress'],
+  stateSenate: ['Senator in the General Assembly', 'Senator in the PA General Assembly'],
+  stateHouse: ['Representative in the General Assembly', 'Representative in the PA General Assembly'],
+} as const
+
+const TARGET_RACE_TITLES: string[] = Object.values(DISTRICT_RACE_TITLE_ALIASES).flat()
 const STREET_TYPE_PATTERN =
   /\b(?:st|street|ave|avenue|rd|road|dr|drive|ln|lane|blvd|boulevard|way|ct|court|cir|circle|pl|place|pkwy|parkway|trl|trail|ter|terrace)\b/i
 
@@ -209,8 +211,21 @@ function sortCandidates(candidates: VoterGuideCandidate[]) {
 
 function isStatewideRace(race: VoterGuideRace) {
   const districts = race.districts ?? []
-  if (districts.length === 0) return false
+  if (districts.length === 0) return true
   return districts.every((district) => normalize(district.districtLabel) === 'statewide')
+}
+
+function findRaceByTitles(races: VoterGuideRace[], titles: readonly string[]) {
+  const normalizedTitles = new Set(titles.map(normalize))
+  return races.find((race) => normalizedTitles.has(normalize(race.officeTitle))) ?? null
+}
+
+function getDistrictRaceKind(race: VoterGuideRace) {
+  const normalizedTitle = normalize(race.officeTitle)
+  if (DISTRICT_RACE_TITLE_ALIASES.congress.map(normalize).includes(normalizedTitle)) return 'congress'
+  if (DISTRICT_RACE_TITLE_ALIASES.stateSenate.map(normalize).includes(normalizedTitle)) return 'stateSenate'
+  if (DISTRICT_RACE_TITLE_ALIASES.stateHouse.map(normalize).includes(normalizedTitle)) return 'stateHouse'
+  return null
 }
 
 function findDistrictByNumber(race: VoterGuideRace, districtNumber?: string | null) {
@@ -227,8 +242,9 @@ function RaceSection({ race, districts }: { race: VoterGuideRace; districts: Vot
   const orderedDistricts = [...districts].sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
 
   return (
-    <section key={race._key ?? race.officeTitle} className="bg-white rounded-lg overflow-hidden border border-white/40 shadow-sm">
-      <div className="bg-[var(--color-navy)] text-white px-6 py-4">
+    <section key={race._key ?? race.officeTitle} className="bg-white rounded-lg overflow-visible border border-white/40 shadow-sm">
+      <div className="sticky top-0 z-20 bg-[var(--color-navy)] text-white px-6 py-4 rounded-t-lg shadow-sm">
+        <p className="text-xs font-semibold uppercase tracking-wide text-white/70">Viewing Race</p>
         <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide">{race.officeTitle}</h2>
       </div>
 
@@ -259,6 +275,15 @@ function RaceSection({ race, districts }: { race: VoterGuideRace; districts: Vot
         </aside>
 
         <div className="px-6 py-6 space-y-6">
+          {orderedDistricts.length === 0 && (
+            <div className="rounded-md border border-[var(--color-border)] bg-[var(--color-blue-light)] px-4 py-3">
+              <p className="text-sm font-semibold text-[var(--color-navy)]">Details coming soon</p>
+              <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                This race is in the voter guide, but candidates or district details have not been added yet.
+              </p>
+            </div>
+          )}
+
           {orderedDistricts.map((district) => (
             <article key={district._key ?? district.districtLabel} className="space-y-3">
               <h3 className="text-xl font-bold text-[var(--color-blue-mid)] uppercase tracking-wide">{district.districtLabel}</h3>
@@ -357,8 +382,11 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
   )
 
   const districtRaces = useMemo(() => {
-    const byTitle = new Map(races.map((race) => [race.officeTitle, race]))
-    return TARGET_RACE_TITLES.map((title) => byTitle.get(title)).filter((race): race is VoterGuideRace => Boolean(race))
+    return [
+      findRaceByTitles(races, DISTRICT_RACE_TITLE_ALIASES.congress),
+      findRaceByTitles(races, DISTRICT_RACE_TITLE_ALIASES.stateSenate),
+      findRaceByTitles(races, DISTRICT_RACE_TITLE_ALIASES.stateHouse),
+    ].filter((race): race is VoterGuideRace => Boolean(race))
   }, [races])
 
   const statewideRaces = useMemo(
@@ -399,7 +427,7 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
   }, [matchResults, zipQuery])
 
   const stateSenateMatchNumbers = useMemo(() => {
-    const senateMatches = matchResults.find((result) => result.race.officeTitle === 'Senator in the General Assembly')?.matches ?? []
+    const senateMatches = matchResults.find((result) => getDistrictRaceKind(result.race) === 'stateSenate')?.matches ?? []
     return new Set(
       senateMatches
         .map((match) => extractDistrictNumber(match.district.districtLabel))
@@ -445,10 +473,11 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
     if (!exactLookup) return []
 
     return districtRaces.flatMap((race) => {
+      const raceKind = getDistrictRaceKind(race)
       const districtNumber =
-        race.officeTitle === 'Representative in Congress'
+        raceKind === 'congress'
           ? exactLookup.congressionalDistrict
-          : race.officeTitle === 'Senator in the General Assembly'
+          : raceKind === 'stateSenate'
             ? exactLookup.stateSenateDistrict
             : exactLookup.stateHouseDistrict
 
