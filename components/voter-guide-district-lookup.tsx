@@ -202,11 +202,30 @@ function matchRace(query: string, race: VoterGuideRace): LookupResult[] {
 
 function sortCandidates(candidates: VoterGuideCandidate[]) {
   return [...candidates].sort((a, b) => {
-    const aOrder = a.displayOrder ?? 999
-    const bOrder = b.displayOrder ?? 999
-    if (aOrder !== bOrder) return aOrder - bOrder
-    return a.name.localeCompare(b.name)
+    if (a.endorsedByAcdc !== b.endorsedByAcdc) return a.endorsedByAcdc ? -1 : 1
+
+    const lastNameCompare = getSortableLastName(a.name).localeCompare(getSortableLastName(b.name), undefined, {
+      sensitivity: 'base',
+    })
+    if (lastNameCompare !== 0) return lastNameCompare
+
+    return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
   })
+}
+
+function getSortableLastName(name: string) {
+  const suffixes = new Set(['jr', 'sr', 'ii', 'iii', 'iv', 'v'])
+  const parts = name
+    .replace(/[.,]/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+
+  while (parts.length > 1 && suffixes.has(parts[parts.length - 1].toLowerCase())) {
+    parts.pop()
+  }
+
+  return parts.at(-1) ?? name
 }
 
 function isStatewideRace(race: VoterGuideRace) {
