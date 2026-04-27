@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Merriweather } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 const inter = Inter({
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${merriweather.variable}`}>
       <body className="min-h-screen flex flex-col antialiased">
         {children}
+        <Analytics />
       </body>
     </html>
   )
