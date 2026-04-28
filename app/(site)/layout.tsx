@@ -1,5 +1,4 @@
 import Nav from '@/components/nav'
-import Footer from '@/components/footer'
 import ActionAlertBanner from '@/components/action-alert-banner'
 import { getSiteSettings, getMunicipalitySettings, getBannerAlert, getActiveMunicipalities } from '@/sanity/lib/queries'
 import type { NavItem, MunicipalityListItem } from '@/sanity/lib/queries'
@@ -64,7 +63,6 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       />
       {bannerAlert && <ActionAlertBanner alert={bannerAlert} />}
       <main className="flex-1">{children}</main>
-      <Footer settings={effectiveSettings} basePath={basePath} />
     </MunicipalityPrefixProvider>
   )
 }
