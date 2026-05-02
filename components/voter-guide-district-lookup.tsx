@@ -69,6 +69,12 @@ function candidateStatusLabel(status?: VoterGuideCandidate['ballotStatus']) {
   return null
 }
 
+function candidateEndorsementLabel(candidate: VoterGuideCandidate) {
+  if (candidate.endorsedByAcdc) return 'Endorsed by ACDC'
+  if (candidate.ballotStatus === 'endorsed') return 'Endorsed by PA Dems'
+  return null
+}
+
 function normalize(value: string) {
   return value
     .toLowerCase()
@@ -272,14 +278,15 @@ function CandidateGrid({ candidates }: { candidates: VoterGuideCandidate[] }) {
     >
       {orderedCandidates.map((candidate) => {
         const status = candidateStatusLabel(candidate.ballotStatus)
+        const endorsement = candidateEndorsementLabel(candidate)
         return (
           <div
             key={candidate._key ?? candidate.name}
             className="rounded-lg border border-[var(--color-border)] p-4 md:p-5 bg-white"
           >
-            {candidate.endorsedByAcdc && (
+            {endorsement && (
               <div className="mb-3 inline-flex items-center rounded-r-sm bg-[var(--color-navy)] text-white px-3 py-1 text-xs font-bold uppercase tracking-wide">
-                Endorsed by ACDC
+                {endorsement}
               </div>
             )}
             <div className="flex gap-3">

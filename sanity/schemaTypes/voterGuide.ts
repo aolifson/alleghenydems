@@ -28,7 +28,7 @@ export const voterGuideCandidateType = defineType({
           { title: 'Listed Candidate', value: 'listed' },
           { title: 'Also Appearing on Ballot', value: 'alsoAppearing' },
           { title: 'Appearing on Ballot', value: 'appearing' },
-          { title: 'Endorsed', value: 'endorsed' },
+          { title: 'Endorsed by PA Dems', value: 'endorsed' },
           { title: 'Unknown', value: 'unknown' },
         ],
         layout: 'radio',
@@ -105,7 +105,7 @@ export const voterGuideCandidateType = defineType({
         listed: 'Listed',
         alsoAppearing: 'Also on ballot',
         appearing: 'On ballot',
-        endorsed: 'Endorsed',
+        endorsed: 'PA Dems endorsed',
         unknown: 'Unknown',
       }
       const parts = [statusLabel[subtitle as string] ?? subtitle, endorsedByAcdc ? '⭐ ACDC Endorsed' : undefined]
