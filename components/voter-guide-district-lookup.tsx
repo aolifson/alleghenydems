@@ -666,7 +666,7 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
 
         {shouldOfferExactLookup && !hasExactLookup && (
           <p className="mt-2 text-sm text-[var(--color-text-muted)] max-w-3xl leading-relaxed">
-            This looks like a street address. Press Enter or click `Check Address` to try an exact ballot lookup first. If you leave off the state, we&apos;ll assume Pennsylvania.
+            This looks like a street address. Press Enter or click `Check Address` to try an exact ballot lookup first. 
           </p>
         )}
 
@@ -683,11 +683,7 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
           </p>
         )}
 
-        {!hasExactLookup && zipQuery && (
-          <p className="mt-2 text-xs text-[var(--color-text-muted)]">
-            ZIP results come from district ZIP mappings in Sanity. If a ZIP returns no district matches, add it under the district&apos;s `ZIP Codes` field.
-          </p>
-        )}
+       
         {!hasExactLookup && zipQuery && hasAnyDistrictMatch && (
           <p className="mt-2 text-xs text-[var(--color-text-muted)]">
             ZIP {zipQuery} matched {zipMatchSummary.length} district race{zipMatchSummary.length === 1 ? '' : 's'}: {zipMatchSummary.join(' · ')}.
@@ -702,13 +698,13 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
 
         {hasExactLookup && (
           <p className="mt-3 text-base text-[var(--color-text)] leading-relaxed">
-            Showing the races attached to this exact address, plus any true statewide races every voter sees.
+            Showing the races attached to this exact address.
           </p>
         )}
 
         {!hasExactLookup && hasQuery && (
           <p className="mt-3 text-base text-[var(--color-text)] leading-relaxed">
-            Showing all races this search can place on your ballot. District-based races appear below, and any true statewide races are listed separately because every voter sees them.
+            Showing all races related to this search. 
           </p>
         )}
       </section>
