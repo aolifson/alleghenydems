@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { PortableText } from '@portabletext/react'
+import PrintButton from '@/components/print-button'
 import VoterGuideDistrictLookup from '@/components/voter-guide-district-lookup'
 import {
   getLatestVoterGuide,
@@ -39,9 +40,9 @@ export default async function VoterGuidePage() {
   const stateCommitteeRace = races.find((race) => race.officeTitle === STATE_COMMITTEE_RACE_TITLE)
 
   return (
-    <main className="bg-[var(--color-blue-mid)] py-10">
-      <div className="max-w-6xl mx-auto px-4 space-y-8">
-        <section className="bg-white/95 border border-white/50 rounded-lg p-6 md:p-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-center">
+    <main className="voter-guide-print-root bg-[var(--color-blue-mid)] py-10">
+      <div className="voter-guide-print-container max-w-6xl mx-auto px-4 space-y-8">
+        <section className="voter-guide-print-card bg-white/95 border border-white/50 rounded-lg p-6 md:p-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-center">
           <div>
             <p className="text-sm font-semibold text-[var(--color-blue-mid)] tracking-wide uppercase">{HERO_EYEBROW}</p>
             <h1 className="font-display text-4xl md:text-5xl font-bold text-[var(--color-navy)] mt-2">
@@ -55,6 +56,9 @@ export default async function VoterGuidePage() {
                 Election date: {guide.electionDate}
               </p>
             )}
+            <div className="mt-5">
+              <PrintButton />
+            </div>
           </div>
           <Image
             src="/acdc-seal.png"
@@ -67,7 +71,7 @@ export default async function VoterGuidePage() {
         </section>
 
         {guide.intro && guide.intro.length > 0 && (
-          <section className="bg-white/95 border border-white/50 rounded-lg p-6 md:p-8 prose-content">
+          <section className="voter-guide-print-card bg-white/95 border border-white/50 rounded-lg p-6 md:p-8 prose-content">
             <PortableText value={guide.intro as Parameters<typeof PortableText>[0]['value']} />
           </section>
         )}

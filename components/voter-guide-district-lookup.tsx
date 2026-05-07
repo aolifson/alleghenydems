@@ -263,6 +263,68 @@ function findDistrictByNumber(race: VoterGuideRace, districtNumber?: string | nu
   )
 }
 
+function CandidateCard({ candidate }: { candidate: VoterGuideCandidate }) {
+  const status = candidateStatusLabel(candidate.ballotStatus)
+  const endorsement = candidateEndorsementLabel(candidate)
+  return (
+    <div className="voter-guide-candidate-card rounded-lg border border-[var(--color-border)] p-4 md:p-5 bg-white">
+      {endorsement && (
+        <div className="mb-3 inline-flex items-center rounded-r-sm bg-[var(--color-navy)] text-white px-3 py-1 text-xs font-bold uppercase tracking-wide">
+          {endorsement}
+        </div>
+      )}
+      <div className="flex gap-3">
+        {candidate.photo ? (
+          <div className="voter-guide-candidate-photo relative h-20 w-20 shrink-0 rounded overflow-hidden border border-[var(--color-border)]">
+            <Image
+              src={urlFor(candidate.photo).width(160).height(160).url()}
+              alt={candidate.photo.alt ?? candidate.name}
+              fill
+              loading="eager"
+              sizes="80px"
+              className="object-cover"
+            />
+          </div>
+        ) : (
+          <div className="h-20 w-20 shrink-0 rounded bg-[var(--color-blue-light)] border border-[var(--color-border)] flex items-center justify-center font-bold text-[var(--color-blue-mid)]">
+            {candidate.name.charAt(0)}
+          </div>
+        )}
+
+        <div className="min-w-0">
+          <h4 className="font-semibold text-[var(--color-navy)]">{candidate.name}</h4>
+          {candidate.campaignWebsite && (
+            <a
+              href={candidate.campaignWebsite}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-[var(--color-blue-mid)] hover:underline break-all"
+            >
+              {candidate.campaignWebsite.replace(/^https?:\/\//, '')}
+            </a>
+          )}
+          {status && (
+            <p className="mt-1 text-xs font-semibold text-[var(--color-red)] uppercase tracking-wide">{status}</p>
+          )}
+        </div>
+      </div>
+
+      {candidate.description && (
+        <p className="mt-3 text-sm text-[var(--color-text)] leading-relaxed whitespace-pre-line">
+          {candidate.description}
+        </p>
+      )}
+
+      <SocialLinks
+        className="justify-start mt-3"
+        facebookUrl={candidate.facebookUrl}
+        instagramUrl={candidate.instagramUrl}
+        xUrl={candidate.xUrl}
+      />
+    </div>
+  )
+}
+
 function CandidateGrid({ candidates }: { candidates: VoterGuideCandidate[] }) {
   const orderedCandidates = sortCandidates(candidates)
 
@@ -272,73 +334,38 @@ function CandidateGrid({ candidates }: { candidates: VoterGuideCandidate[] }) {
     <div
       className={
         orderedCandidates.length <= 1
-          ? 'grid grid-cols-1 gap-4'
-          : 'grid grid-cols-1 md:grid-cols-2 gap-4'
+          ? 'voter-guide-candidate-grid grid grid-cols-1 gap-4'
+          : 'voter-guide-candidate-grid grid grid-cols-1 md:grid-cols-2 gap-4'
       }
     >
-      {orderedCandidates.map((candidate) => {
-        const status = candidateStatusLabel(candidate.ballotStatus)
-        const endorsement = candidateEndorsementLabel(candidate)
-        return (
-          <div
-            key={candidate._key ?? candidate.name}
-            className="rounded-lg border border-[var(--color-border)] p-4 md:p-5 bg-white"
-          >
-            {endorsement && (
-              <div className="mb-3 inline-flex items-center rounded-r-sm bg-[var(--color-navy)] text-white px-3 py-1 text-xs font-bold uppercase tracking-wide">
-                {endorsement}
-              </div>
-            )}
-            <div className="flex gap-3">
-              {candidate.photo ? (
-                <div className="relative h-20 w-20 shrink-0 rounded overflow-hidden border border-[var(--color-border)]">
-                  <Image
-                    src={urlFor(candidate.photo).width(160).height(160).url()}
-                    alt={candidate.photo.alt ?? candidate.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="h-20 w-20 shrink-0 rounded bg-[var(--color-blue-light)] border border-[var(--color-border)] flex items-center justify-center font-bold text-[var(--color-blue-mid)]">
-                  {candidate.name.charAt(0)}
-                </div>
-              )}
-
-              <div className="min-w-0">
-                <h4 className="font-semibold text-[var(--color-navy)]">{candidate.name}</h4>
-                {candidate.campaignWebsite && (
-                  <a
-                    href={candidate.campaignWebsite}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-[var(--color-blue-mid)] hover:underline break-all"
-                  >
-                    {candidate.campaignWebsite.replace(/^https?:\/\//, '')}
-                  </a>
-                )}
-                {status && (
-                  <p className="mt-1 text-xs font-semibold text-[var(--color-red)] uppercase tracking-wide">{status}</p>
-                )}
-              </div>
-            </div>
-
-            {candidate.description && (
-              <p className="mt-3 text-sm text-[var(--color-text)] leading-relaxed whitespace-pre-line">
-                {candidate.description}
-              </p>
-            )}
-
-            <SocialLinks
-              className="justify-start mt-3"
-              facebookUrl={candidate.facebookUrl}
-              instagramUrl={candidate.instagramUrl}
-              xUrl={candidate.xUrl}
-            />
-          </div>
-        )
-      })}
+      {orderedCandidates.map((candidate) => (
+        <CandidateCard key={candidate._key ?? candidate.name} candidate={candidate} />
+      ))}
     </div>
+  )
+}
+
+function DistrictSection({ district }: { district: VoterGuideDistrict }) {
+  const candidates = sortCandidates(district.candidates ?? [])
+  const [firstCandidate, ...remainingCandidates] = candidates
+
+  return (
+    <article className="voter-guide-district-section space-y-3">
+      <div className="voter-guide-district-lead space-y-3">
+        <div className="voter-guide-district-intro space-y-3">
+          <h3 className="text-xl font-bold text-[var(--color-blue-mid)] uppercase tracking-wide">{district.districtLabel}</h3>
+          {district.districtDescription && (
+            <p className="text-base text-[var(--color-text)] leading-relaxed">
+              {district.districtDescription}
+            </p>
+          )}
+        </div>
+
+        {firstCandidate && <CandidateCard candidate={firstCandidate} />}
+      </div>
+
+      {remainingCandidates.length > 0 && <CandidateGrid candidates={remainingCandidates} />}
+    </article>
   )
 }
 
@@ -362,8 +389,8 @@ function RaceSection({
   const shouldRenderDistricts = !shouldRenderRacewide
 
   return (
-    <section key={race._key ?? race.officeTitle} className="bg-white rounded-lg overflow-visible border border-white/40 shadow-sm">
-      <div className="sticky top-0 z-20 bg-[var(--color-navy)] text-white px-6 py-4 rounded-t-lg shadow-sm">
+    <section key={race._key ?? race.officeTitle} className="voter-guide-race-section bg-white rounded-lg overflow-visible border border-white/40 shadow-sm">
+      <div className="voter-guide-race-header sticky top-0 z-20 bg-[var(--color-navy)] text-white px-6 py-4 rounded-t-lg shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-wide text-white/70">Viewing Race</p>
         <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide">{race.officeTitle}</h2>
       </div>
@@ -377,7 +404,7 @@ function RaceSection({
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr]">
-        <aside className="bg-[var(--color-blue-light)] px-6 py-5 border-b lg:border-b-0 lg:border-r border-[var(--color-border)]">
+        <aside className="voter-guide-race-meta bg-[var(--color-blue-light)] px-6 py-5 border-b lg:border-b-0 lg:border-r border-[var(--color-border)]">
           {race.term && (
             <div className="mb-5">
               <p className="text-xs uppercase tracking-wide font-semibold text-[var(--color-text-muted)]">Term</p>
@@ -415,16 +442,7 @@ function RaceSection({
           )}
 
           {shouldRenderDistricts && orderedDistricts.map((district) => (
-            <article key={district._key ?? district.districtLabel} className="space-y-3">
-              <h3 className="text-xl font-bold text-[var(--color-blue-mid)] uppercase tracking-wide">{district.districtLabel}</h3>
-              {district.districtDescription && (
-                <p className="text-base text-[var(--color-text)] leading-relaxed">
-                  {district.districtDescription}
-                </p>
-              )}
-
-              <CandidateGrid candidates={district.candidates ?? []} />
-            </article>
+            <DistrictSection key={district._key ?? district.districtLabel} district={district} />
           ))}
         </div>
       </div>
@@ -629,7 +647,7 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
 
   return (
     <div className="space-y-8">
-      <section className="bg-white/95 border border-white/50 rounded-lg p-6 md:p-8">
+      <section className="voter-guide-print-card bg-white/95 border border-white/50 rounded-lg p-6 md:p-8">
         <h2 className="font-display text-2xl md:text-3xl font-bold text-[var(--color-navy)]">
           Find Your Candidates
         </h2>
@@ -637,7 +655,7 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
           For best results, search by your full street address. You can also search by municipality (Clairton) or neighborhood (e.g. Beltzhoover), but those can include multiple candidates’ districts. 
         </p>
 
-        <form onSubmit={handleSearchSubmit} className="mt-4 flex flex-col sm:flex-row gap-3">
+        <form onSubmit={handleSearchSubmit} className="no-print mt-4 flex flex-col sm:flex-row gap-3">
           <input
             type="search"
             value={query}
@@ -665,13 +683,13 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
         </form>
 
         {shouldOfferExactLookup && !hasExactLookup && (
-          <p className="mt-2 text-sm text-[var(--color-text-muted)] max-w-3xl leading-relaxed">
+          <p className="no-print mt-2 text-sm text-[var(--color-text-muted)] max-w-3xl leading-relaxed">
             This looks like a street address. Press Enter or click `Check Address` to try an exact ballot lookup first. 
           </p>
         )}
 
         {lookupNotice && (
-          <p className={`mt-2 text-sm leading-relaxed ${lookupNotice.tone === 'error' ? 'text-[var(--color-red)]' : 'text-[var(--color-text-muted)]'}`}>
+          <p className={`no-print mt-2 text-sm leading-relaxed ${lookupNotice.tone === 'error' ? 'text-[var(--color-red)]' : 'text-[var(--color-text-muted)]'}`}>
             {lookupNotice.message}
           </p>
         )}
@@ -685,32 +703,32 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
 
        
         {!hasExactLookup && zipQuery && hasAnyDistrictMatch && (
-          <p className="mt-2 text-xs text-[var(--color-text-muted)]">
+          <p className="no-print mt-2 text-xs text-[var(--color-text-muted)]">
             ZIP {zipQuery} matched {zipMatchSummary.length} district race{zipMatchSummary.length === 1 ? '' : 's'}: {zipMatchSummary.join(' · ')}.
           </p>
         )}
 
         {!hasExactLookup && zipQuery && ambiguousZipRaces.length > 0 && (
-          <p className="mt-2 text-xs text-[var(--color-text-muted)]">
+          <p className="no-print mt-2 text-xs text-[var(--color-text-muted)]">
             ZIP codes can cross district lines. For {zipQuery}, we show every possible district match so you do not miss a race you may be able to vote in.
           </p>
         )}
 
         {hasExactLookup && (
-          <p className="mt-3 text-base text-[var(--color-text)] leading-relaxed">
+          <p className="no-print mt-3 text-base text-[var(--color-text)] leading-relaxed">
             Showing the races attached to this exact address.
           </p>
         )}
 
         {!hasExactLookup && hasQuery && (
-          <p className="mt-3 text-base text-[var(--color-text)] leading-relaxed">
+          <p className="no-print mt-3 text-base text-[var(--color-text)] leading-relaxed">
             Showing all races related to this search. 
           </p>
         )}
       </section>
 
       {hasActiveSearch && !hasSearchResults && (
-        <section className="bg-white/95 border border-white/50 rounded-lg p-6">
+        <section className="voter-guide-print-card bg-white/95 border border-white/50 rounded-lg p-6">
           <p className="text-sm text-[var(--color-text-muted)]">
             {hasExactLookup
               ? `No ballot matches from ${exactLookup?.standardizedAddress}.`

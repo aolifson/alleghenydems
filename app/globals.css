@@ -48,3 +48,124 @@ body {
 .prose-content blockquote {
   @apply border-l-4 border-gold pl-4 italic text-text-muted my-4;
 }
+
+@media print {
+  @page {
+    margin: 0.5in;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  body {
+    font-size: 10.5pt;
+  }
+
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  .voter-guide-print-root {
+    background: #fff !important;
+    padding: 0 !important;
+  }
+
+  .voter-guide-print-container {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .voter-guide-print-card,
+  .voter-guide-race-section {
+    background: #fff !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .voter-guide-print-card {
+    padding: 0 0 0.2in !important;
+  }
+
+  .voter-guide-race-section {
+    break-inside: auto;
+    margin-top: 0.18in !important;
+  }
+
+  .voter-guide-race-header {
+    position: static !important;
+    background: #111 !important;
+    color: #fff !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0.12in 0.16in !important;
+  }
+
+  .voter-guide-race-meta {
+    background: #f3f4f6 !important;
+  }
+
+  .voter-guide-district-section {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  .voter-guide-district-lead {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+
+  .voter-guide-district-intro {
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .voter-guide-district-intro h3,
+  .voter-guide-district-intro p {
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .voter-guide-candidate-grid {
+    display: block !important;
+  }
+
+  .voter-guide-candidate-card {
+    break-inside: avoid;
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+    break-before: avoid-page;
+    page-break-before: avoid;
+    border-color: #bbb !important;
+    box-shadow: none !important;
+    margin-bottom: 0.16in !important;
+  }
+
+  .voter-guide-candidate-photo {
+    width: 0.75in !important;
+    height: 0.75in !important;
+  }
+
+  .voter-guide-candidate-photo img {
+    max-width: none !important;
+    max-height: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .voter-guide-print-root img {
+    max-width: 1in !important;
+    max-height: 1in !important;
+  }
+}
