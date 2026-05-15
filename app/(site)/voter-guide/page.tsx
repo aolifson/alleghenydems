@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { PortableText } from '@portabletext/react'
-import PrintButton from '@/components/print-button'
 import VoterGuideDistrictLookup from '@/components/voter-guide-district-lookup'
 import {
   getLatestVoterGuide,
@@ -56,9 +55,6 @@ export default async function VoterGuidePage() {
                 Election date: {guide.electionDate}
               </p>
             )}
-            <div className="mt-5">
-              <PrintButton />
-            </div>
           </div>
           <Image
             src="/acdc-seal.png"

@@ -1,7 +1,9 @@
 'use client'
 
-import { FormEvent, useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import type { FormEvent, KeyboardEvent } from 'react'
 import Image from 'next/image'
+import PrintButton from '@/components/print-button'
 import SocialLinks from '@/components/social-links'
 import VoterGuideStateCommittee from '@/components/voter-guide-state-committee'
 import { urlFor } from '@/sanity/lib/image'
@@ -24,6 +26,13 @@ interface AddressLookupResult {
     latitude?: number | null
   }
   source?: string
+}
+
+interface AddressSuggestion {
+  description: string
+  placeId: string
+  mainText: string
+  secondaryText: string
 }
 
 interface Props {
@@ -61,6 +70,18 @@ function looksLikeAddressQuery(query: string) {
   const wordCount = trimmed.split(/\s+/).length
 
   return startsWithStreetNumber && (hasStreetType || hasZip || hasComma || wordCount >= 3)
+}
+
+function looksLikeAddressAutocompleteQuery(query: string) {
+  const trimmed = query.trim()
+  return trimmed.length >= 3 && /^\d+[a-zA-Z\-]?\s+/.test(trimmed)
+}
+
+function createAutocompleteSessionToken() {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID()
+  }
+  return Math.random().toString(36).slice(2)
 }
 
 function candidateStatusLabel(status?: VoterGuideCandidate['ballotStatus']) {
@@ -454,7 +475,12 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
   const [query, setQuery] = useState(initialQuery)
   const [exactLookup, setExactLookup] = useState<AddressLookupResult | null>(null)
   const [lookupNotice, setLookupNotice] = useState<{ tone: 'error' | 'info'; message: string } | null>(null)
+  const [addressSuggestions, setAddressSuggestions] = useState<AddressSuggestion[]>([])
+  const [isSuggestionOpen, setIsSuggestionOpen] = useState(false)
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1)
+  const [autocompleteSessionToken, setAutocompleteSessionToken] = useState(createAutocompleteSessionToken)
   const [isAddressLookupPending, startAddressLookupTransition] = useTransition()
+  const autocompleteAbortRef = useRef<AbortController | null>(null)
 
   const orderedRaces = useMemo(
     () => [...races].sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999)),
@@ -590,16 +616,102 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
     ].filter((item): item is string => Boolean(item))
   }, [exactLookup])
 
+  useEffect(() => {
+    const trimmedQuery = query.trim()
+    if (!looksLikeAddressAutocompleteQuery(trimmedQuery) || hasExactLookup) {
+      autocompleteAbortRef.current?.abort()
+      setAddressSuggestions([])
+      setIsSuggestionOpen(false)
+      setActiveSuggestionIndex(-1)
+      return
+    }
+
+    const controller = new AbortController()
+    autocompleteAbortRef.current?.abort()
+    autocompleteAbortRef.current = controller
+
+    const timeout = window.setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `/api/voter-guide/address-autocomplete?input=${encodeURIComponent(trimmedQuery)}&sessionToken=${encodeURIComponent(autocompleteSessionToken)}`,
+          { cache: 'no-store', signal: controller.signal }
+        )
+        if (!response.ok) return
+
+        const payload = (await response.json()) as { suggestions?: AddressSuggestion[] }
+        if (controller.signal.aborted) return
+
+        const suggestions = payload.suggestions ?? []
+        setAddressSuggestions(suggestions)
+        setIsSuggestionOpen(suggestions.length > 0)
+        setActiveSuggestionIndex(-1)
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return
+        setAddressSuggestions([])
+        setIsSuggestionOpen(false)
+        setActiveSuggestionIndex(-1)
+      }
+    }, 250)
+
+    return () => {
+      window.clearTimeout(timeout)
+      controller.abort()
+    }
+  }, [autocompleteSessionToken, hasExactLookup, query])
+
   function clearAllSearch() {
     setQuery('')
     setExactLookup(null)
     setLookupNotice(null)
+    setAddressSuggestions([])
+    setIsSuggestionOpen(false)
+    setActiveSuggestionIndex(-1)
+    setAutocompleteSessionToken(createAutocompleteSessionToken())
   }
 
   function handleTextQueryChange(nextValue: string) {
     setQuery(nextValue)
     if (exactLookup) setExactLookup(null)
     if (lookupNotice) setLookupNotice(null)
+    setIsSuggestionOpen(addressSuggestions.length > 0)
+  }
+
+  function selectAddressSuggestion(suggestion: AddressSuggestion) {
+    setQuery(suggestion.description)
+    setExactLookup(null)
+    setLookupNotice(null)
+    setAddressSuggestions([])
+    setIsSuggestionOpen(false)
+    setActiveSuggestionIndex(-1)
+  }
+
+  function handleAddressInputKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (!isSuggestionOpen || addressSuggestions.length === 0) return
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      setActiveSuggestionIndex((current) => (current + 1) % addressSuggestions.length)
+      return
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      setActiveSuggestionIndex((current) =>
+        current <= 0 ? addressSuggestions.length - 1 : current - 1
+      )
+      return
+    }
+
+    if (event.key === 'Enter' && activeSuggestionIndex >= 0) {
+      event.preventDefault()
+      selectAddressSuggestion(addressSuggestions[activeSuggestionIndex])
+      return
+    }
+
+    if (event.key === 'Escape') {
+      setIsSuggestionOpen(false)
+      setActiveSuggestionIndex(-1)
+    }
   }
 
   async function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
@@ -632,6 +744,10 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
 
         setExactLookup(payload)
         setLookupNotice(null)
+        setAddressSuggestions([])
+        setIsSuggestionOpen(false)
+        setActiveSuggestionIndex(-1)
+        setAutocompleteSessionToken(createAutocompleteSessionToken())
       } catch (err) {
         setExactLookup(null)
         setLookupNotice({
@@ -656,14 +772,50 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
         </p>
 
         <form onSubmit={handleSearchSubmit} className="no-print mt-4 flex flex-col sm:flex-row gap-3">
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => handleTextQueryChange(event.target.value)}
-            placeholder="e.g. Mt Lebanon, Summer Lee, District 42, 15217, 5843 Hobart St"
-            className="w-full rounded-md border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-mid)]"
-            aria-label="Search district by location, candidate name, ZIP code, or street address"
-          />
+          <div className="relative min-w-0 flex-1">
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => handleTextQueryChange(event.target.value)}
+              onFocus={() => setIsSuggestionOpen(addressSuggestions.length > 0)}
+              onBlur={() => window.setTimeout(() => setIsSuggestionOpen(false), 120)}
+              onKeyDown={handleAddressInputKeyDown}
+              placeholder="e.g. Mt Lebanon, Summer Lee, District 42, 15217, 5843 Hobart St"
+              className="w-full rounded-md border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-blue-mid)]"
+              aria-label="Search district by location, candidate name, ZIP code, or street address"
+              aria-autocomplete="list"
+              aria-expanded={isSuggestionOpen}
+              aria-controls="voter-guide-address-suggestions"
+            />
+            {isSuggestionOpen && addressSuggestions.length > 0 && (
+              <div
+                id="voter-guide-address-suggestions"
+                role="listbox"
+                className="absolute left-0 right-0 top-full z-30 mt-1 overflow-hidden rounded-md border border-[var(--color-border)] bg-white shadow-lg"
+              >
+                {addressSuggestions.map((suggestion, index) => (
+                  <button
+                    key={suggestion.placeId}
+                    type="button"
+                    role="option"
+                    aria-selected={index === activeSuggestionIndex}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => selectAddressSuggestion(suggestion)}
+                    className={`block w-full px-3 py-2 text-left text-sm transition-colors ${
+                      index === activeSuggestionIndex
+                        ? 'bg-[var(--color-blue-light)] text-[var(--color-navy)]'
+                        : 'text-[var(--color-text)] hover:bg-[var(--color-blue-light)]'
+                    }`}
+                  >
+                    <span className="block font-semibold">{suggestion.mainText}</span>
+                    {suggestion.secondaryText && (
+                      <span className="block text-xs text-[var(--color-text-muted)]">{suggestion.secondaryText}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <button
             type="submit"
             disabled={isAddressLookupPending || !shouldOfferExactLookup}
@@ -725,7 +877,17 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
             Showing all races related to this search. 
           </p>
         )}
+
       </section>
+
+      {hasActiveSearch && hasSearchResults && (
+        <section className="no-print bg-white/95 border border-white/50 rounded-lg p-4 md:p-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-[var(--color-text-muted)]">
+            Print only the races currently shown for this search.
+          </p>
+          <PrintButton label="Print These Results" />
+        </section>
+      )}
 
       {hasActiveSearch && !hasSearchResults && (
         <section className="voter-guide-print-card bg-white/95 border border-white/50 rounded-lg p-6">
