@@ -616,6 +616,38 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
     ].filter((item): item is string => Boolean(item))
   }, [exactLookup])
 
+  const exactLookupSourceLabel = useMemo(() => {
+    if (!exactLookup?.source) return 'address geocoder'
+    if (/Google Maps/i.test(exactLookup.source)) return 'Google Maps, then Census district boundaries'
+    if (/Census/i.test(exactLookup.source)) return 'U.S. Census Geocoder'
+    return exactLookup.source
+  }, [exactLookup])
+
+  const textMatchSummary = useMemo(() => {
+    if (!hasQuery || hasExactLookup || !hasSearchResults) return null
+
+    const trimmedQuery = query.trim()
+    if (!trimmedQuery) return null
+
+    if (zipQuery && hasAnyDistrictMatch) {
+      return `Matched ZIP ${zipQuery} against ZIP.`
+    }
+
+    if (/^(district\s*)?\d+$/i.test(trimmedQuery)) {
+      return `Matched "${trimmedQuery}" against district.`
+    }
+
+    const candidateMatchCount = matchResults.reduce((count, result) => {
+      return count + result.matches.filter((match) => scoreDistrictByCandidate(trimmedQuery, match.district) > 0).length
+    }, 0)
+
+    if (candidateMatchCount > 0) {
+      return `Matched "${trimmedQuery}" against candidate names in the voter guide.`
+    }
+
+    return `Matched "${trimmedQuery}" against  district, municipality, neighborhood, and search.`
+  }, [hasAnyDistrictMatch, hasExactLookup, hasQuery, hasSearchResults, matchResults, query, zipQuery])
+
   useEffect(() => {
     const trimmedQuery = query.trim()
     if (!looksLikeAddressAutocompleteQuery(trimmedQuery) || hasExactLookup) {
@@ -848,7 +880,7 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
 
         {exactLookup && (
           <p className="mt-2 text-base text-[var(--color-text)] leading-relaxed">
-            Using exact address lookup for {exactLookup.standardizedAddress}
+            Exact address match from {exactLookupSourceLabel}: {exactLookup.standardizedAddress}
             {exactLookupSummary.length > 0 ? ` (${exactLookupSummary.join(' · ')})` : ''}.
           </p>
         )}
@@ -872,9 +904,9 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
           </p>
         )}
 
-        {!hasExactLookup && hasQuery && (
+        {!hasExactLookup && hasQuery && textMatchSummary && (
           <p className="no-print mt-3 text-base text-[var(--color-text)] leading-relaxed">
-            Showing all races related to this search. 
+            {textMatchSummary} Showing all races related to this search.
           </p>
         )}
 
