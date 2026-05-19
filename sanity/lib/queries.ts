@@ -183,12 +183,14 @@ export interface VoterGuideDistrict {
   searchTerms?: string[]
   zipCodes?: string[]
   candidates: VoterGuideCandidate[]
+  numberToElect?: number
   displayOrder?: number
 }
 
 export interface VoterGuideRace {
   _key?: string
   officeTitle: string
+  numberToElect?: number
   term?: string
   annualSalary?: string
   powersAndDuties?: string[]

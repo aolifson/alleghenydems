@@ -167,6 +167,12 @@ export const voterGuideDistrictType = defineType({
       validation: (rule) => rule.min(1).error('Add at least one candidate.'),
     }),
     defineField({
+      name: 'numberToElect',
+      title: 'Number to Elect',
+      type: 'number',
+      description: 'How many candidates the voter selects in this district. Leave blank if same as the race-level setting.',
+    }),
+    defineField({
       name: 'displayOrder',
       title: 'Display Order',
       type: 'number',
@@ -218,6 +224,12 @@ export const voterGuideRaceType = defineType({
       type: 'array',
       of: [{ type: 'string' }],
       description: 'Bullet-point list of what this office does. Add one item per line.',
+    }),
+    defineField({
+      name: 'numberToElect',
+      title: 'Number to Elect',
+      type: 'number',
+      description: 'How many candidates the voter selects for this race (e.g. 1 for most races). Can be overridden per district. Leave blank if it varies by district.',
     }),
     defineField({
       name: 'candidates',

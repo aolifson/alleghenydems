@@ -38,6 +38,11 @@ body {
   font-family: var(--font-display), Georgia, serif;
 }
 
+/* ─── Voter Guide Quick Reference (print only) ──────────────── */
+.voter-guide-quick-ref {
+  display: none;
+}
+
 /* ─── Portable Text (article body) ──────────────────────────── */
 .prose-content h2 { @apply text-2xl font-bold text-blue mt-8 mb-3; }
 .prose-content h3 { @apply text-xl font-bold text-blue mt-6 mb-2; }
@@ -167,5 +172,67 @@ body {
   .voter-guide-print-root img {
     max-width: 1in !important;
     max-height: 1in !important;
+  }
+
+  /* Hide detailed race sections — replaced by quick reference */
+  .voter-guide-race-section,
+  .voter-guide-state-committee-section {
+    display: none !important;
+  }
+
+  /* Show compact quick reference */
+  .voter-guide-quick-ref {
+    display: block !important;
+    margin-top: 0.2in;
+  }
+
+  .voter-guide-quick-ref-notice {
+    font-size: 9pt;
+    color: #555;
+    font-style: italic;
+    margin-bottom: 0.12in;
+  }
+
+  .voter-guide-quick-ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+  }
+
+  .voter-guide-quick-ref-table th {
+    background: #111 !important;
+    color: #fff !important;
+    text-align: left;
+    padding: 3pt 6pt;
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid #333;
+  }
+
+  .voter-guide-quick-ref-table td {
+    padding: 4pt 6pt;
+    border: 1px solid #ccc;
+    vertical-align: top;
+  }
+
+  .voter-guide-quick-ref-table tr:nth-child(even) td {
+    background: #f5f5f5 !important;
+  }
+
+  .voter-guide-quick-ref-table th:nth-child(1),
+  .voter-guide-quick-ref-table td:nth-child(1) {
+    width: 26%;
+  }
+
+  .voter-guide-quick-ref-table th:nth-child(2),
+  .voter-guide-quick-ref-table td:nth-child(2) {
+    width: 16%;
+  }
+
+  .voter-guide-quick-ref-table th:last-child,
+  .voter-guide-quick-ref-table td:last-child {
+    width: 10%;
+    text-align: center;
   }
 }

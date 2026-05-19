@@ -68,7 +68,7 @@ export default function VoterGuideStateCommittee({ race, districts }: Props) {
   if (orderedDistricts.length === 0) return null
 
   return (
-    <div>
+    <div className="voter-guide-state-committee-section">
       <section className="bg-white rounded-lg overflow-visible border border-white/40 shadow-sm">
         <div className="sticky top-0 z-20 bg-[var(--color-navy)] text-white px-6 py-4 rounded-t-lg shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-wide text-white/70">Viewing Race</p>

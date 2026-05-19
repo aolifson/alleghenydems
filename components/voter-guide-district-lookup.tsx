@@ -284,6 +284,98 @@ function findDistrictByNumber(race: VoterGuideRace, districtNumber?: string | nu
   )
 }
 
+function PrintQuickRef({
+  racesToRender,
+  stateCommitteeRace,
+  stateCommitteeDistricts,
+  statewideRaces,
+  hasActiveSearch,
+}: {
+  racesToRender: { race: VoterGuideRace; districts: VoterGuideDistrict[] }[]
+  stateCommitteeRace?: VoterGuideRace
+  stateCommitteeDistricts: VoterGuideDistrict[]
+  statewideRaces: VoterGuideRace[]
+  hasActiveSearch: boolean
+}) {
+  type Row = { key: string; position: string; district: string; candidates: string[]; numberToElect?: number }
+  const rows: Row[] = []
+
+  if (hasActiveSearch) {
+    for (const { race, districts } of racesToRender) {
+      const ordered = [...districts].sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
+      for (const district of ordered) {
+        rows.push({
+          key: `${race._key ?? race.officeTitle}-${district._key ?? district.districtLabel}`,
+          position: race.officeTitle,
+          district: district.districtLabel,
+          candidates: sortCandidates(district.candidates ?? []).map((c) => c.name),
+          numberToElect: district.numberToElect ?? race.numberToElect,
+        })
+      }
+    }
+    if (stateCommitteeRace) {
+      for (const district of stateCommitteeDistricts) {
+        rows.push({
+          key: `sc-${district._key ?? district.districtLabel}`,
+          position: stateCommitteeRace.officeTitle,
+          district: district.districtLabel,
+          candidates: sortCandidates(district.candidates ?? []).map((c) => c.name),
+          numberToElect: district.numberToElect ?? stateCommitteeRace.numberToElect,
+        })
+      }
+    }
+  }
+
+  for (const race of statewideRaces) {
+    const statewideDistrictCandidates =
+      (race.districts ?? []).length === 1 && normalize((race.districts ?? [])[0].districtLabel) === 'statewide'
+        ? (race.districts ?? [])[0].candidates ?? []
+        : []
+    const candidates = race.candidates && race.candidates.length > 0 ? race.candidates : statewideDistrictCandidates
+    rows.push({
+      key: race._key ?? race.officeTitle,
+      position: race.officeTitle,
+      district: '',
+      candidates: sortCandidates(candidates).map((c) => c.name),
+      numberToElect: race.numberToElect,
+    })
+  }
+
+  if (rows.length === 0) return null
+
+  const hasAnyVoteFor = rows.some((row) => row.numberToElect != null)
+
+  return (
+    <div className="voter-guide-quick-ref">
+      {!hasActiveSearch && (
+        <p className="voter-guide-quick-ref-notice">
+          District races (Congress, State Senate, State House) vary by location — search your address above, then print to see only your races.
+        </p>
+      )}
+      <table className="voter-guide-quick-ref-table">
+        <thead>
+          <tr>
+            <th>Position</th>
+            <th>District</th>
+            <th>Candidate(s)</th>
+            {hasAnyVoteFor && <th>Vote For</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.key}>
+              <td>{row.position}</td>
+              <td>{row.district}</td>
+              <td>{row.candidates.join(' · ')}</td>
+              {hasAnyVoteFor && <td>{row.numberToElect ?? ''}</td>}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 function CandidateCard({ candidate }: { candidate: VoterGuideCandidate }) {
   const status = candidateStatusLabel(candidate.ballotStatus)
   const endorsement = candidateEndorsementLabel(candidate)
@@ -920,6 +1012,14 @@ export default function VoterGuideDistrictLookup({ races, initialQuery = '', sta
           <PrintButton label="Print These Results" />
         </section>
       )}
+
+      <PrintQuickRef
+        racesToRender={racesToRender}
+        stateCommitteeRace={stateCommitteeRace}
+        stateCommitteeDistricts={activeStateCommitteeMatches}
+        statewideRaces={statewideRaces}
+        hasActiveSearch={hasActiveSearch}
+      />
 
       {hasActiveSearch && !hasSearchResults && (
         <section className="voter-guide-print-card bg-white/95 border border-white/50 rounded-lg p-6">
