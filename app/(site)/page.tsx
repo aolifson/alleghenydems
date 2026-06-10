@@ -7,6 +7,7 @@ import { fetchFacebookPosts } from '@/lib/facebook'
 import FacebookLiveFeed from '@/components/facebook-live-feed'
 import EventCard from '@/components/event-card'
 import NewsCard from '@/components/news-card'
+import ExternalLink, { isExternalHref } from '@/components/external-link'
 import { getMunicipalitySlug, getMunicipalityPrefix } from '@/lib/tenant'
 import { prefixHref } from '@/lib/prefix-href'
 
@@ -64,13 +65,9 @@ export default async function HomePage() {
                 className="px-5 py-2.5 bg-[var(--color-red)] hover:bg-[var(--color-red-dark)] text-white font-semibold rounded transition-colors">
                 Get Involved
               </Link>
-              <Link href="https://secure.actblue.com" target="_blank" rel="noopener noreferrer"
-                className="px-5 py-2.5 border-2 border-white hover:bg-white hover:text-[var(--color-navy)] text-white font-semibold rounded transition-colors">
-                Donate
-              </Link>
-              <Link href={prefixHref('/vote', basePath)}
+              <Link href={prefixHref('/voter-guide', basePath)}
                 className="px-5 py-2.5 bg-[var(--color-gold)] hover:opacity-90 text-[var(--color-navy)] font-semibold rounded transition-colors">
-                Voter Resources
+                2026 Voter Guide
               </Link>
             </div>
           </div>
@@ -88,47 +85,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Facebook Feed ────────────────────────────────────── */}
-      <section className="bg-[var(--color-navy)] border-t border-white/10 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-10 flex justify-center">
-          <div className="w-full max-w-6xl">
-            <h2 className="font-display text-3xl font-bold text-white mb-5 text-center">Follow Us on Facebook</h2>
-            <FacebookLiveFeed
-              pageUrl={facebookPageUrl}
-              initialPosts={facebook?.posts ?? []}
-              initialCursor={facebook?.nextCursor}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ── Quick Action Boxes ──────────────────────────────────── */}
-      <section className="bg-[var(--color-navy)] border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: 'Register to Vote', href: 'https://www.pavoterservices.pa.gov/pages/VoterRegistrationApplication.aspx', icon: '🗳️', external: true },
-            { label: 'Find Your Polling Place', href: 'https://www.pavoterservices.pa.gov/pages/pollingplaceinfo.aspx', icon: '📍', external: true },
-            { label: 'Upcoming Events', href: prefixHref('/events', basePath), icon: '📅', external: false },
-            { label: 'Volunteer', href: prefixHref('/get-involved#volunteer', basePath), icon: '🤝', external: false },
-          ].map(({ label, href, icon, external }) => (
-            <a
-              key={href}
-              href={href}
-              target={external ? '_blank' : undefined}
-              rel={external ? 'noopener noreferrer' : undefined}
-              className="flex flex-col items-center gap-2 p-4 bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-[var(--color-blue)] hover:text-white transition-all text-center"
-            >
-              <span className="text-2xl">{icon}</span>
-              <span className="text-sm font-semibold">{label}</span>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Take Action ──────────────────────────────────────────── */}
-      {activeAlerts.length > 0 && (
+      {/* ── What's Needed Now ────────────────────────────────────── */}
+      {activeAlerts.length > 0 ? (
         <section className="max-w-7xl mx-auto px-4 py-12">
-          <h2 className="font-display text-2xl font-bold text-[var(--color-blue)] mb-6">Take Action</h2>
+          <h2 className="font-display text-2xl font-bold text-[var(--color-blue)] mb-6">What&rsquo;s Needed Now</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activeAlerts.map((alert) => {
               const borderColor =
@@ -151,6 +111,7 @@ export default async function HomePage() {
                   : alert.urgency === 'action'
                   ? 'bg-[var(--color-gold)] hover:opacity-90 text-[var(--color-navy)]'
                   : 'bg-[var(--color-blue)] hover:opacity-90 text-white'
+              const ctaClassName = `mt-auto self-start px-4 py-2 text-sm font-semibold rounded transition-colors ${ctaColor}`
 
               return (
                 <div
@@ -162,28 +123,38 @@ export default async function HomePage() {
                   </span>
                   <p className="font-semibold text-[var(--color-blue)] leading-snug">{alert.headline}</p>
                   {alert.ctaLabel && alert.ctaUrl && (
-                    <a
-                      href={alert.ctaUrl}
-                      target={alert.ctaUrl.startsWith('/') ? undefined : '_blank'}
-                      rel={alert.ctaUrl.startsWith('/') ? undefined : 'noopener noreferrer'}
-                      className={`mt-auto self-start px-4 py-2 text-sm font-semibold rounded transition-colors ${ctaColor}`}
-                    >
-                      {alert.ctaLabel}
-                    </a>
+                    isExternalHref(alert.ctaUrl) ? (
+                      <ExternalLink href={alert.ctaUrl} className={ctaClassName}>
+                        {alert.ctaLabel}
+                      </ExternalLink>
+                    ) : (
+                      <a href={alert.ctaUrl} className={ctaClassName}>
+                        {alert.ctaLabel}
+                      </a>
+                    )
                   )}
                 </div>
               )
             })}
           </div>
         </section>
+      ) : (
+        <section className="bg-[var(--color-surface)] border-b border-[var(--color-border)]">
+          <div className="max-w-7xl mx-auto px-4 py-4 text-sm text-[var(--color-text-muted)]">
+            No urgent calls to action right now —{' '}
+            <Link href={prefixHref('/get-involved', basePath)} className="font-semibold text-[var(--color-blue-mid)] hover:underline">
+              see ways to get involved →
+            </Link>
+          </div>
+        </section>
       )}
 
-      {/* ── Featured Events ──────────────────────────────────────── */}
+      {/* ── Upcoming Events ──────────────────────────────────────── */}
       {featuredEvents.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 py-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="font-display text-2xl font-bold text-[var(--color-blue)]">Upcoming Events</h2>
-            <Link href={prefixHref('/events', basePath)} className="text-sm text-[var(--color-blue-mid)] hover:underline">View all →</Link>
+            <Link href={prefixHref('/events', basePath)} className="text-sm text-[var(--color-blue-mid)] hover:underline">View all events →</Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {featuredEvents.map((event) => (
@@ -193,23 +164,75 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* ── What the Committee Does ──────────────────────────────── */}
+      <section className="bg-[var(--color-surface)] border-y border-[var(--color-border)]">
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <h2 className="font-display text-2xl font-bold text-[var(--color-blue)] mb-6">What the Committee Does</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: '🗳️',
+                title: 'Electing Democrats locally',
+                description: 'We organize in every ward and municipality to elect Democrats up and down the ballot — from school board to U.S. Senate.',
+                linkLabel: 'About the committee →',
+                href: '/about',
+              },
+              {
+                icon: '📋',
+                title: 'Civic resources for voters',
+                description: 'Our voter guide and legislative tracker help neighbors make informed choices and hold elected officials accountable.',
+                linkLabel: 'See the 2026 Voter Guide →',
+                href: '/voter-guide',
+              },
+              {
+                icon: '🏘️',
+                title: 'Supporting local committees',
+                description: 'We back Democratic committees across Allegheny County with tools, training, and a shared platform.',
+                linkLabel: 'Find your local committee →',
+                href: '/committee-members#local-committees',
+              },
+            ].map(({ icon, title, description, linkLabel, href }) => (
+              <div key={href} className="bg-white rounded-lg border border-[var(--color-border)] p-6 flex flex-col gap-3">
+                <span className="text-3xl">{icon}</span>
+                <h3 className="font-semibold text-[var(--color-navy)]">{title}</h3>
+                <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">{description}</p>
+                <Link href={prefixHref(href, basePath)} className="mt-auto text-sm font-semibold text-[var(--color-blue-mid)] hover:underline">
+                  {linkLabel}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Latest News ──────────────────────────────────────────── */}
       {displayNews.length > 0 && (
-        <section className="bg-[var(--color-surface)] border-y border-[var(--color-border)]">
-          <div className="max-w-7xl mx-auto px-4 py-12">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-2xl font-bold text-[var(--color-blue)]">News & Updates</h2>
-              <Link href={prefixHref('/news', basePath)} className="text-sm text-[var(--color-blue-mid)] hover:underline">View all →</Link>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {displayNews.map((post) => (
-                <NewsCard key={post._id} post={post} basePath={basePath} />
-              ))}
-            </div>
+        <section className="max-w-7xl mx-auto px-4 py-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="font-display text-2xl font-bold text-[var(--color-blue)]">News & Updates</h2>
+            <Link href={prefixHref('/news', basePath)} className="text-sm text-[var(--color-blue-mid)] hover:underline">View all →</Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {displayNews.map((post) => (
+              <NewsCard key={post._id} post={post} basePath={basePath} />
+            ))}
           </div>
         </section>
       )}
 
+      {/* ── Facebook Feed ────────────────────────────────────── */}
+      <section className="bg-[var(--color-navy)] border-t border-white/10 border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 py-10 flex justify-center">
+          <div className="w-full max-w-6xl">
+            <h2 className="font-display text-3xl font-bold text-white mb-5 text-center">Follow Us on Facebook</h2>
+            <FacebookLiveFeed
+              pageUrl={facebookPageUrl}
+              initialPosts={facebook?.posts ?? []}
+              initialCursor={facebook?.nextCursor}
+            />
+          </div>
+        </div>
+      </section>
     </>
   )
 }
