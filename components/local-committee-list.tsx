@@ -41,6 +41,15 @@ function FacebookIcon() {
   )
 }
 
+function HouseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m3 11 9-7.5L21 11" />
+      <path d="M5.5 9.5V20h13V9.5" />
+    </svg>
+  )
+}
+
 export default function LocalCommitteeList({ committees }: { committees: MunicipalityListItem[] }) {
   const [query, setQuery] = useState('')
 
@@ -99,7 +108,19 @@ export default function LocalCommitteeList({ committees }: { committees: Municip
                   </span>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-[var(--color-navy)] leading-snug">{m.name}</p>
+                  <p className="font-semibold text-[var(--color-navy)] leading-snug">
+                    {m.name}
+                    {/* Team-facing marker: white-labeled sites we manage vs. committees with their own site */}
+                    {!link.external && (
+                      <span
+                        title="White-labeled site managed on the ACDC platform"
+                        className="inline-flex ml-1.5 align-baseline text-[var(--color-text-muted)]/60"
+                      >
+                        <HouseIcon />
+                        <span className="sr-only"> (site managed on the ACDC platform)</span>
+                      </span>
+                    )}
+                  </p>
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                     {link.external ? (
                       <ExternalLink
