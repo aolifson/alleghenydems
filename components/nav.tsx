@@ -13,15 +13,17 @@ function getMunicipalityUrl(m: MunicipalityListItem): string {
   return `/municipalities/${m.slug.current}`
 }
 
+// One visitor intent per top-level item; every destination appears exactly once.
 const DEFAULT_NAV_ITEMS: NavItem[] = [
   {
     label: 'About',
     href: '/about',
     children: [
       { label: 'Who We Are', href: '/about/who-we-are' },
+      { label: 'What We Do', href: '/about' },
       { label: 'Elected Officials', href: '/elected-officials' },
       { label: 'Legislative Tracker', href: '/legislative-tracker' },
-      { label: 'Democratic Organizations', href: '/links#party' },
+      { label: 'News', href: '/news' },
     ],
   },
   {
@@ -29,19 +31,11 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
     href: '/get-involved',
     children: [
       { label: 'Volunteer', href: '/get-involved#volunteer' },
+      { label: 'Become a Committee Member', href: '/become-a-committee-member' },
+      { label: 'Events', href: '/events' },
       { label: 'Donate', href: 'https://secure.actblue.com', external: true },
     ],
   },
-  {
-    label: 'Committee Members',
-    href: '/committee-members',
-    children: [
-      { label: 'Become a Committee Member', href: '/become-a-committee-member' },
-      { label: 'Find Members & Positions', href: '/find-committee-members-and-positions' },
-    ],
-  },
-  { label: 'Events', href: '/events' },
-  { label: 'News', href: '/news' },
   {
     label: 'Vote',
     href: '/vote',
@@ -49,9 +43,11 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
       { label: '2026 Voter Guide', href: '/voter-guide' },
       { label: 'Register to Vote', href: 'https://www.pavoterservices.pa.gov/pages/VoterRegistrationApplication.aspx', external: true },
       { label: 'Vote by Mail', href: 'https://www.vote.pa.gov/Voting-in-PA/Pages/Mail-and-Absentee-Ballot.aspx', external: true },
+      { label: 'Find Your Polling Place', href: 'https://www.pavoterservices.pa.gov/pages/pollingplaceinfo.aspx', external: true },
       { label: 'Election Calendar', href: 'https://www.vote.pa.gov/About-Elections/Pages/Election-Calendar.aspx', external: true },
     ],
   },
+  { label: 'Committee Directory', href: '/committee-members' },
   { label: 'Contact', href: '/contact' },
 ]
 
@@ -62,6 +58,14 @@ function FacebookIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4" fill="currentColor">
       <path d="M13.5 8.5V6.8c0-.6.4-1 1-1H16V3h-2c-2.5 0-3.5 1.3-3.5 3.7v1.8H8V12h2.5v9h3V12H16l.5-3.5h-3Z" />
+    </svg>
+  )
+}
+
+function PersonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5" fill="currentColor">
+      <path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Zm0 2c-4 0-7.5 2-7.5 4.5V20h15v-1.5c0-2.5-3.5-4.5-7.5-4.5Z" />
     </svg>
   )
 }
@@ -286,6 +290,15 @@ export default function Nav({
 
         {/* Desktop right controls */}
         <div className="hidden md:flex items-center gap-2 ml-4">
+          {/* Member Login is deliberately un-prefixed: auth is county-level,
+              so municipality demo paths still land on the county /members. */}
+          <Link
+            href="/members"
+            className="inline-flex items-center gap-1 px-2 py-2 text-xs font-medium text-[var(--color-navy)]/70 hover:text-[var(--color-navy)] transition-colors"
+          >
+            <PersonIcon />
+            Member Login
+          </Link>
           <Link
             href={FACEBOOK_URL}
             target="_blank"
@@ -442,6 +455,14 @@ export default function Nav({
               ))}
             </div>
           )}
+          <Link
+            href="/members"
+            className="inline-flex items-center gap-1.5 py-2 text-sm text-white/70 hover:text-white"
+            onClick={() => setOpen(false)}
+          >
+            <PersonIcon />
+            Member Login
+          </Link>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <Link
               href="https://store.alleghenydems.com/"

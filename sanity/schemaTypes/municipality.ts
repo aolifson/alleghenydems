@@ -170,7 +170,7 @@ export const municipalityType = defineType({
               name: 'href',
               title: 'Link',
               type: 'string',
-              description: 'Internal: /about, /events. External: https://example.com',
+              description: 'Internal: /about, /events. External: https://example.com — links to outside websites automatically open in a new tab and show a small ↗ icon.',
               validation: (r) => r.required(),
             }),
             defineField({
@@ -184,7 +184,7 @@ export const municipalityType = defineType({
                   title: 'Dropdown Link',
                   fields: [
                     defineField({ name: 'label', title: 'Label', type: 'string', validation: (r) => r.required() }),
-                    defineField({ name: 'href', title: 'Link', type: 'string', validation: (r) => r.required() }),
+                    defineField({ name: 'href', title: 'Link', type: 'string', description: 'Internal path (/about) or full external URL — links to outside websites automatically open in a new tab and show a small ↗ icon.', validation: (r) => r.required() }),
                     defineField({ name: 'external', title: 'Opens in new tab', type: 'boolean', initialValue: false }),
                   ],
                   preview: { select: { title: 'label', subtitle: 'href' } },

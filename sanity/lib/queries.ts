@@ -111,6 +111,7 @@ export interface NavItem {
   _key?: string
   label: string
   href: string
+  external?: boolean
   children?: NavChild[]
 }
 
