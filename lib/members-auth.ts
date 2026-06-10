@@ -21,6 +21,21 @@ export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase()
 }
 
+/**
+ * Site admins who can sign in to the members area without being a
+ * committeeMember in Sanity — from MEMBERS_ADMIN_EMAILS (comma-separated).
+ */
+export function isAdminEmail(email: string): boolean {
+  const list = process.env.MEMBERS_ADMIN_EMAILS
+  if (!list) return false
+  const normalized = normalizeEmail(email)
+  return list
+    .split(',')
+    .map((entry) => normalizeEmail(entry))
+    .filter(Boolean)
+    .includes(normalized)
+}
+
 export async function signMemberToken(email: string, purpose: TokenPurpose): Promise<string> {
   const key = secretKey()
   if (!key) throw new Error('AUTH_SECRET is not set')

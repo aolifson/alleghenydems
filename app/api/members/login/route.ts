@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { Resend } from 'resend'
 import { client } from '@/sanity/lib/client'
-import { signMemberToken, normalizeEmail } from '@/lib/members-auth'
+import { signMemberToken, normalizeEmail, isAdminEmail } from '@/lib/members-auth'
 
 const GENERIC_RESPONSE = {
   ok: true,
@@ -73,7 +73,8 @@ export async function POST(request: NextRequest) {
   )
 
   // Same response whether or not the email matched — no account enumeration.
-  if (!member) {
+  // Site admins from MEMBERS_ADMIN_EMAILS get in without a Sanity record.
+  if (!member && !isAdminEmail(email)) {
     return NextResponse.json(GENERIC_RESPONSE)
   }
 
