@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { SESSION_COOKIE, verifyMemberToken } from '@/lib/members-auth'
 
 // Hard-coded map for custom domains (added as municipalities onboard).
 // Subdomains of alleghenydems.com are resolved automatically below —
@@ -72,7 +73,19 @@ function isAuthorizedStudioRequest(request: NextRequest) {
   }
 }
 
-export function middleware(request: NextRequest) {
+// ── Members-only area gating ────────────────────────────────────────────────
+// Cookie-signature check only — no Sanity round-trip per request. The
+// sensitive node routes (roster CSV, internal docs) re-verify isActive.
+async function hasValidMemberSession(request: NextRequest): Promise<boolean> {
+  const token = request.cookies.get(SESSION_COOKIE)?.value
+  if (!token) return false
+  return (await verifyMemberToken(token, 'session')) !== null
+}
+
+// /api/members routes that must stay reachable without a session
+const MEMBERS_PUBLIC_API = /^\/api\/members\/(login|verify)(\/|$)/
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   if (pathname.startsWith(STUDIO_PREFIX)) {
@@ -87,6 +100,23 @@ export function middleware(request: NextRequest) {
     }
 
     return NextResponse.next()
+  }
+
+  // Strip the municipality demo prefix so /municipalities/<slug>/members
+  // is gated the same as /members (the rewrite below never re-enters here).
+  const tenantPath = pathname.replace(/^\/municipalities\/[^/]+/, '') || '/'
+  const isMembersPage =
+    /^\/members(\/|$)/.test(tenantPath) && !/^\/members\/login(\/|$)/.test(tenantPath)
+  const isMembersApi = pathname.startsWith('/api/members/') && !MEMBERS_PUBLIC_API.test(pathname)
+
+  if ((isMembersPage || isMembersApi) && !(await hasValidMemberSession(request))) {
+    if (isMembersApi) {
+      return new NextResponse('Unauthorized', { status: 401, headers: { 'Cache-Control': 'no-store' } })
+    }
+    const loginUrl = request.nextUrl.clone()
+    loginUrl.pathname = '/members/login'
+    loginUrl.search = ''
+    return NextResponse.redirect(loginUrl)
   }
 
   if (BYPASS_PREFIXES.some((p) => pathname.startsWith(p))) {
