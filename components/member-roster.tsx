@@ -1,23 +1,38 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import type { CommitteeMember } from '@/sanity/lib/queries'
+import { useEffect, useMemo, useState } from 'react'
+import type { RosterRow } from '@/sanity/lib/queries'
 
-function rowSearchText(member: CommitteeMember) {
-  return [member.name, member.title, member.district, member.email, member.phone]
+function rowSearchText(row: RosterRow) {
+  return [row.name, row.role, row.seat, row.email, row.phone]
     .filter(Boolean)
     .join(' ')
     .toLowerCase()
 }
 
-export default function MemberRoster({ members }: { members: CommitteeMember[] }) {
+export default function MemberRoster({ members }: { members: RosterRow[] }) {
   const [query, setQuery] = useState('')
+  const [page, setPage] = useState(1)
+  const pageSize = 50
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return members
     return members.filter((member) => rowSearchText(member).includes(q))
   }, [members, query])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+
+  useEffect(() => {
+    setPage(1)
+  }, [query])
+
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages)
+  }, [page, totalPages])
+
+  const start = (page - 1) * pageSize
+  const pagedRows = filtered.slice(start, start + pageSize)
 
   return (
     <div className="space-y-4">
@@ -29,7 +44,7 @@ export default function MemberRoster({ members }: { members: CommitteeMember[] }
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by name, ward, role, email, or phone"
+            placeholder="Search by name, committee, ward, role, email, or phone"
             className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)]"
           />
         </div>
@@ -52,24 +67,24 @@ export default function MemberRoster({ members }: { members: CommitteeMember[] }
             <tr>
               <th className="px-3 py-2 font-semibold">Name</th>
               <th className="px-3 py-2 font-semibold">Role</th>
-              <th className="px-3 py-2 font-semibold">Ward / Municipality</th>
+              <th className="px-3 py-2 font-semibold">Committee / Ward</th>
               <th className="px-3 py-2 font-semibold">Email</th>
               <th className="px-3 py-2 font-semibold">Phone</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {pagedRows.length === 0 ? (
               <tr>
                 <td className="px-3 py-6 text-center text-[var(--color-text-muted)]" colSpan={5}>
                   No members found.
                 </td>
               </tr>
             ) : (
-              filtered.map((member) => (
+              pagedRows.map((member) => (
                 <tr key={member._id} className="border-t border-[var(--color-border)]">
                   <td className="px-3 py-2 font-medium">{member.name}</td>
-                  <td className="px-3 py-2">{member.title || ''}</td>
-                  <td className="px-3 py-2">{member.district || ''}</td>
+                  <td className="px-3 py-2">{member.role || ''}</td>
+                  <td className="px-3 py-2">{member.seat || ''}</td>
                   <td className="px-3 py-2">
                     {member.email ? (
                       <a href={`mailto:${member.email}`} className="text-[var(--color-blue-mid)] hover:underline">{member.email}</a>
@@ -85,6 +100,35 @@ export default function MemberRoster({ members }: { members: CommitteeMember[] }
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex items-center justify-between text-sm text-[var(--color-text-muted)]">
+        <span>
+          {filtered.length === 0
+            ? '0 to 0 of 0'
+            : `${start + 1} to ${Math.min(start + pageSize, filtered.length)} of ${filtered.length.toLocaleString()}`}
+        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 disabled:opacity-50 hover:bg-[var(--color-surface)] transition-colors"
+          >
+            Previous
+          </button>
+          <span>
+            Page {page} of {totalPages}
+          </span>
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+            className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 disabled:opacity-50 hover:bg-[var(--color-surface)] transition-colors"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   )

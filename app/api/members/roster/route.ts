@@ -14,9 +14,9 @@ export async function GET() {
   }
 
   const members = await getMemberRoster()
-  const header = 'Name,Role,Ward/Municipality,Email,Phone'
+  const header = 'Name,Role,Committee/Ward,Email,Phone'
   const rows = members.map((m) =>
-    [m.name, m.title, m.district, m.email, m.phone].map(csvField).join(',')
+    [m.name, m.role, m.seat, m.email, m.phone].map(csvField).join(',')
   )
   const csv = [header, ...rows].join('\n')
 

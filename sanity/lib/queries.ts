@@ -506,22 +506,63 @@ export async function getActiveActionAlerts(municipalitySlug = 'allegheny-county
 // Only call these from members-area pages and /api/members routes that
 // have already verified the session — they expose private contact info.
 
-export async function getMemberRoster(): Promise<CommitteeMember[]> {
-  const members = await client.withConfig({ useCdn: false }).fetch<CommitteeMember[]>(
-    `*[
-      _type == "committeeMember" &&
-      isActive == true &&
-      !(
-        defined(district) &&
-        lower(district) in ["elected-official", "elected officials", "who-we-are"]
-      )
-    ] | order(district asc, displayOrder asc, name asc) {
-      _id, _type, name, title, district, email, phone
-    }`,
-    {},
-    { cache: 'no-store' }
-  )
-  return dedupeMembersByName(members)
+export interface RosterRow {
+  _id: string
+  name: string
+  role?: string
+  seat?: string
+  email?: string
+  phone?: string
+}
+
+// The roster merges two sources: county leadership profiles (committeeMember,
+// which carry email/phone) and the seat-level directory entries imported from
+// the old site (committeeDirectoryEntry, names + seats only for now).
+export async function getMemberRoster(): Promise<RosterRow[]> {
+  const noCdn = client.withConfig({ useCdn: false })
+  const [leadership, members, seats] = await Promise.all([
+    noCdn.fetch<Array<{ _id: string; name: string; role?: string; email?: string; phone?: string }>>(
+      `*[_type == "committeeMember" && isActive == true && lower(district) == "who-we-are"]
+        | order(displayOrder asc, name asc) { _id, name, "role": title, email, phone }`,
+      {},
+      { cache: 'no-store' }
+    ),
+    noCdn.fetch<Array<{ _id: string; name: string; role?: string; seat?: string; email?: string; phone?: string }>>(
+      `*[
+        _type == "committeeMember" &&
+        isActive == true &&
+        !(defined(district) && lower(district) in ["elected-official", "elected officials", "who-we-are"])
+      ] | order(district asc, name asc) { _id, name, "role": title, "seat": district, email, phone }`,
+      {},
+      { cache: 'no-store' }
+    ),
+    noCdn.fetch<Array<{ _id: string; firstName?: string; lastName?: string; committeeOffice?: string; committee?: string; ward?: string; district?: string }>>(
+      `*[
+        _type == "committeeDirectoryEntry" &&
+        isActive != false &&
+        (coalesce(firstName, '') + coalesce(lastName, '')) != ''
+      ] | order(committee asc, ward asc, district asc, lastName asc, firstName asc) {
+        _id, firstName, lastName, committeeOffice, committee, ward, district
+      }`,
+      {},
+      { cache: 'no-store' }
+    ),
+  ])
+
+  const leadershipRows: RosterRow[] = leadership.map((m) => ({ ...m, seat: 'County Leadership' }))
+  const seatRows: RosterRow[] = seats.map((s) => ({
+    _id: s._id,
+    name: [s.firstName, s.lastName].filter(Boolean).join(' '),
+    role: s.committeeOffice || undefined,
+    seat: [
+      s.committee,
+      s.ward && s.ward !== '0' ? `Ward ${s.ward}` : null,
+      s.district ? `District ${s.district}` : null,
+    ]
+      .filter(Boolean)
+      .join(' · '),
+  }))
+  return [...leadershipRows, ...members, ...seatRows]
 }
 
 export interface InternalDoc extends SanityDocument {

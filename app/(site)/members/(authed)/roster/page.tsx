@@ -18,7 +18,8 @@ export default async function MemberRosterPage() {
     <div>
       <h1 className="font-display text-3xl font-bold text-[var(--color-blue)] mb-2">Member Roster</h1>
       <p className="text-[var(--color-text-muted)] mb-6">
-        Full contact information for active committee members. For committee business only — please don&rsquo;t share outside the committee.
+        County leadership and every seated committee member. Emails and phone numbers appear as they&rsquo;re added to member records.
+        For committee business only — please don&rsquo;t share outside the committee.
       </p>
       <MemberRoster members={members} />
     </div>
