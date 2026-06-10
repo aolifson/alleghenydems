@@ -5,6 +5,7 @@ import { useState, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import type { NavItem, MunicipalityListItem } from '@/sanity/lib/queries'
 import { useMunicipalityPrefix, prefixHref } from '@/lib/municipality-prefix-context'
+import { ExternalLinkIcon, isExternalHref } from '@/components/external-link'
 
 function getMunicipalityUrl(m: MunicipalityListItem): string {
   if (m.customDomain) return `https://${m.customDomain}`
@@ -181,6 +182,7 @@ export default function Nav({
         <nav className="hidden md:flex items-center gap-1 ml-5 flex-1">
           {items.map((item) => {
             const itemIsExternal = item.href.startsWith('http')
+            const isItemExt = ('external' in item && item.external) || isExternalHref(item.href)
             const NavLinkTag = itemIsExternal ? 'a' : Link
             const parentIsActive = isActive(item.href) || itemHasActiveChild(item)
             return (
@@ -192,6 +194,8 @@ export default function Nav({
               >
                 <NavLinkTag
                   href={item.href}
+                  target={isItemExt ? '_blank' : undefined}
+                  rel={isItemExt ? 'noopener noreferrer' : undefined}
                   className={
                     parentIsActive
                       ? "px-3 py-2 rounded text-sm font-semibold bg-[var(--color-navy)]/15 border-b-2 border-white/80 transition-colors flex items-center gap-1"
@@ -199,6 +203,12 @@ export default function Nav({
                   }
                 >
                   {item.label}
+                  {isItemExt && (
+                    <>
+                      <ExternalLinkIcon className="h-3 w-3 opacity-60" />
+                      <span className="sr-only"> (opens in new tab)</span>
+                    </>
+                  )}
                   {item.children && <span className="text-xs opacity-60">▾</span>}
                 </NavLinkTag>
                 {item.children && activeDropdown === item.label && (
@@ -209,7 +219,7 @@ export default function Nav({
                   >
                     {item.children.map((child) => {
                       const childIsExternal = child.href.startsWith('http')
-                      const isChildExt = 'external' in child && child.external
+                      const isChildExt = ('external' in child && child.external) || isExternalHref(child.href)
                       const ChildTag = childIsExternal ? 'a' : Link
                       return (
                         <ChildTag
@@ -225,7 +235,12 @@ export default function Nav({
                           onClick={() => setActiveDropdown(null)}
                         >
                           {child.label}
-                          {isChildExt && <span className="ml-1 opacity-50 text-xs">↗</span>}
+                          {isChildExt && (
+                            <>
+                              <ExternalLinkIcon className="inline-block ml-1 h-3 w-3 opacity-50" />
+                              <span className="sr-only"> (opens in new tab)</span>
+                            </>
+                          )}
                         </ChildTag>
                       )
                     })}
@@ -301,9 +316,11 @@ export default function Nav({
             href="https://secure.actblue.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 py-2 bg-[var(--color-red)] hover:bg-[var(--color-red-dark)] text-white text-sm font-semibold rounded transition-colors"
+            className="px-4 py-2 bg-[var(--color-red)] hover:bg-[var(--color-red-dark)] text-white text-sm font-semibold rounded transition-colors inline-flex items-center gap-1"
           >
             Donate
+            <ExternalLinkIcon className="h-3 w-3 opacity-80" />
+            <span className="sr-only"> (opens in new tab)</span>
           </Link>
         </div>
 
@@ -356,12 +373,15 @@ export default function Nav({
         <div className="md:hidden bg-[var(--color-navy)] border-t border-white/10 px-4 pb-4 text-white">
           {items.map((item) => {
             const itemIsExternal = item.href.startsWith('http')
+            const isItemExt = ('external' in item && item.external) || isExternalHref(item.href)
             const MobileNavTag = itemIsExternal ? 'a' : Link
             const parentIsActive = isActive(item.href) || itemHasActiveChild(item)
             return (
               <div key={item.href}>
                 <MobileNavTag
                   href={item.href}
+                  target={isItemExt ? '_blank' : undefined}
+                  rel={isItemExt ? 'noopener noreferrer' : undefined}
                   className={
                     parentIsActive
                       ? "block py-2 pl-2 text-sm font-semibold border-b border-white/10 text-white border-l-2 border-l-white"
@@ -370,10 +390,16 @@ export default function Nav({
                   onClick={() => setOpen(false)}
                 >
                   {item.label}
+                  {isItemExt && (
+                    <>
+                      <ExternalLinkIcon className="inline-block ml-1 h-3 w-3 opacity-60" />
+                      <span className="sr-only"> (opens in new tab)</span>
+                    </>
+                  )}
                 </MobileNavTag>
                 {item.children?.map((child) => {
                   const childIsExternal = child.href.startsWith('http')
-                  const isChildExt = 'external' in child && child.external
+                  const isChildExt = ('external' in child && child.external) || isExternalHref(child.href)
                   const MobileChildTag = childIsExternal ? 'a' : Link
                   return (
                     <MobileChildTag
@@ -389,6 +415,12 @@ export default function Nav({
                       onClick={() => setOpen(false)}
                     >
                       {child.label}
+                      {isChildExt && (
+                        <>
+                          <ExternalLinkIcon className="inline-block ml-1 h-3 w-3 opacity-60" />
+                          <span className="sr-only"> (opens in new tab)</span>
+                        </>
+                      )}
                     </MobileChildTag>
                   )
                 })}
@@ -423,9 +455,11 @@ export default function Nav({
               href="https://secure.actblue.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-center px-4 py-2 bg-[var(--color-red)] text-white text-sm font-semibold rounded"
+              className="text-center px-4 py-2 bg-[var(--color-red)] text-white text-sm font-semibold rounded inline-flex items-center justify-center gap-1"
             >
               Donate
+              <ExternalLinkIcon className="h-3 w-3 opacity-80" />
+              <span className="sr-only"> (opens in new tab)</span>
             </Link>
           </div>
         </div>

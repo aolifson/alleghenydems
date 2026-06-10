@@ -76,10 +76,12 @@ export default function Footer({
           <h3 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-gold)] mb-3">Quick Links</h3>
           <ul className="space-y-1.5 text-sm text-white/70">
             {[
+              { label: 'About', href: '/about' },
+              { label: 'Get Involved', href: '/get-involved' },
               { label: 'Events', href: '/events' },
-              { label: 'News & Updates', href: '/news' },
-              { label: 'Committee Members', href: '/committee-members' },
-              { label: 'Voter Resources', href: '/vote' },
+              { label: 'News', href: '/news' },
+              { label: 'Committee Directory', href: '/committee-members' },
+              { label: 'Vote', href: '/vote' },
               { label: 'Run for Office', href: '/run-for-office' },
               { label: 'Contact', href: '/contact' },
             ].map(({ label, href }) => (
