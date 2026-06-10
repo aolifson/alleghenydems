@@ -6,6 +6,7 @@ import { committeeMemberType } from './committeeMember'
 import { committeeDirectoryEntryType } from './committeeDirectoryEntry'
 import { committeeContactEntryType } from './committeeContactEntry'
 import { externalLinkType } from './externalLink'
+import { internalDocType } from './internalDoc'
 import { pageType } from './page'
 import { siteSettingsType } from './siteSettings'
 import {
@@ -32,6 +33,7 @@ export const schemaTypes = [
   committeeDirectoryEntryType,
   committeeContactEntryType,
   externalLinkType,
+  internalDocType,
   pageType,
   voterGuideCandidateType,
   voterGuideDistrictType,

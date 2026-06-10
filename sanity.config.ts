@@ -164,6 +164,7 @@ export default defineConfig({
                     S.documentTypeListItem('committeeMember').title('Committee Members').icon(UsersIcon),
                     S.documentTypeListItem('committeeDirectoryEntry').title('Committee Directory').icon(DocumentsIcon),
                     S.documentTypeListItem('committeeContactEntry').title('Committee Contacts').icon(EnvelopeIcon),
+                    S.documentTypeListItem('internalDoc').title('🔒 Internal Documents — members only').icon(DocumentIcon),
                   ])
               ),
 

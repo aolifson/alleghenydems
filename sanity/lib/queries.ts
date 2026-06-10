@@ -499,6 +499,51 @@ export async function getActiveActionAlerts(municipalitySlug = 'allegheny-county
   )
 }
 
+// ─── Members-only queries ─────────────────────────────────────────────
+// Only call these from members-area pages and /api/members routes that
+// have already verified the session — they expose private contact info.
+
+export async function getMemberRoster(): Promise<CommitteeMember[]> {
+  const members = await client.withConfig({ useCdn: false }).fetch<CommitteeMember[]>(
+    `*[
+      _type == "committeeMember" &&
+      isActive == true &&
+      !(
+        defined(district) &&
+        lower(district) in ["elected-official", "elected officials", "who-we-are"]
+      )
+    ] | order(district asc, displayOrder asc, name asc) {
+      _id, _type, name, title, district, email, phone
+    }`,
+    {},
+    { cache: 'no-store' }
+  )
+  return dedupeMembersByName(members)
+}
+
+export interface InternalDoc extends SanityDocument {
+  title: string
+  category?: string
+  description?: string
+  publishedAt?: string
+  fileName?: string
+  fileExtension?: string
+}
+
+// Deliberately never projects the file asset URL — Sanity CDN URLs are
+// unauthenticated, so downloads go through /api/members/doc/[id] instead.
+export async function getInternalDocs(): Promise<InternalDoc[]> {
+  return client.withConfig({ useCdn: false }).fetch(
+    `*[_type == "internalDoc" && isActive == true && defined(file.asset)] | order(category asc, publishedAt desc, title asc) {
+      _id, _type, title, category, description, publishedAt,
+      "fileName": file.asset->originalFilename,
+      "fileExtension": file.asset->extension
+    }`,
+    {},
+    { cache: 'no-store' }
+  )
+}
+
 export async function getBannerAlert(municipalitySlug = 'allegheny-county'): Promise<ActionAlert | null> {
   return client.withConfig({ useCdn: false }).fetch(
     `*[_type == "actionAlert" && isActive == true && showInBanner == true && startDate <= $now && (endDate == null || endDate >= $now) && ${municipalityFilter(municipalitySlug)}] | order(startDate desc)[0]`,
