@@ -32,6 +32,13 @@ export const committeeMemberType = defineType({
       description: 'Member headshot. Use the focal-point handles to control cropping.',
     }),
     defineField({
+      name: 'bio',
+      title: 'Short Bio',
+      type: 'text',
+      rows: 3,
+      description: 'A sentence or two about the member, shown when their card is expanded.',
+    }),
+    defineField({
       name: 'email',
       title: 'Email',
       type: 'string',
@@ -41,7 +48,14 @@ export const committeeMemberType = defineType({
       name: 'phone',
       title: 'Phone',
       type: 'string',
-      description: 'Public contact phone number.',
+      description: 'Contact phone number. Only shown to the public if "Show Phone Publicly" is turned on; always visible in the members-only roster.',
+    }),
+    defineField({
+      name: 'showPhonePublicly',
+      title: 'Show Phone Publicly',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Turn on to display this member\'s phone number in the public directory. Off by default for privacy.',
     }),
     defineField({
       name: 'facebookUrl',
@@ -62,6 +76,20 @@ export const committeeMemberType = defineType({
       title: 'X (Twitter) URL',
       type: 'url',
       description: 'Full X/Twitter profile URL.',
+      validation: (r) => r.uri({ scheme: ['http', 'https'] }),
+    }),
+    defineField({
+      name: 'blueskyUrl',
+      title: 'Bluesky URL',
+      type: 'url',
+      description: 'Full Bluesky profile URL.',
+      validation: (r) => r.uri({ scheme: ['http', 'https'] }),
+    }),
+    defineField({
+      name: 'websiteUrl',
+      title: 'Website URL',
+      type: 'url',
+      description: 'Personal or campaign website URL.',
       validation: (r) => r.uri({ scheme: ['http', 'https'] }),
     }),
     defineField({

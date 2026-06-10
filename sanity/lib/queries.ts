@@ -59,11 +59,15 @@ export interface CommitteeMember extends SanityDocument {
   name: string
   title?: string
   district?: string
+  bio?: string
   email?: string
   phone?: string
+  showPhonePublicly?: boolean
   facebookUrl?: string
   instagramUrl?: string
   xUrl?: string
+  blueskyUrl?: string
+  websiteUrl?: string
   photo?: SanityImage
   isActive?: boolean
   displayOrder?: number
@@ -374,16 +378,24 @@ export async function getNewsPost(slug: string, municipalitySlug = 'allegheny-co
 }
 
 export async function getCommitteeMembers(municipalitySlug = 'allegheny-county'): Promise<CommitteeMember[]> {
+  // Phone is projected only when the member opted into showing it publicly,
+  // so private numbers never reach the public payload.
   const members = await client.fetch<CommitteeMember[]>(
     `*[
       _type == "committeeMember" &&
-      isActive != false &&
+      isActive == true &&
       !(
         defined(district) &&
         lower(district) in ["elected-official", "elected officials", "who-we-are"]
       ) &&
       ${municipalityFilter(municipalitySlug)}
-    ] | order(district asc, displayOrder asc, name asc)`,
+    ] | order(district asc, displayOrder asc, name asc) {
+      _id, _type, name, title, district, bio, photo, email,
+      "phone": select(showPhonePublicly == true => phone),
+      "showPhonePublicly": showPhonePublicly == true,
+      facebookUrl, instagramUrl, xUrl, blueskyUrl, websiteUrl,
+      isActive, displayOrder
+    }`,
     { municipalitySlug }
   )
   return dedupeMembersByName(members)
