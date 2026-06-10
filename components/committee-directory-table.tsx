@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 import type { CommitteeDirectoryEntry } from '@/sanity/lib/queries'
+import { useMunicipalityPrefix, prefixHref } from '@/lib/municipality-prefix-context'
 
 interface CommitteeDirectoryTableProps {
   rows: CommitteeDirectoryEntry[]
@@ -21,7 +23,18 @@ function rowSearchText(row: CommitteeDirectoryEntry) {
     .toLowerCase()
 }
 
+function isVacant(row: CommitteeDirectoryEntry) {
+  return !`${row.firstName ?? ''}${row.lastName ?? ''}`.trim()
+}
+
+function seatLabel(row: CommitteeDirectoryEntry) {
+  return [row.ward && `Ward ${row.ward}`, row.district && `District ${row.district}`]
+    .filter(Boolean)
+    .join(' · ')
+}
+
 export default function CommitteeDirectoryTable({ rows }: CommitteeDirectoryTableProps) {
+  const basePath = useMunicipalityPrefix()
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
@@ -45,28 +58,39 @@ export default function CommitteeDirectoryTable({ rows }: CommitteeDirectoryTabl
   const start = (page - 1) * pageSize
   const pagedRows = filtered.slice(start, start + pageSize)
 
+  // Group the current page's rows by committee for scannable list headers.
+  const groups = useMemo(() => {
+    const map = new Map<string, CommitteeDirectoryEntry[]>()
+    for (const row of pagedRows) {
+      const key = row.committee || 'Other'
+      if (!map.has(key)) map.set(key, [])
+      map.get(key)!.push(row)
+    }
+    return Array.from(map.entries())
+  }, [pagedRows])
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex-1 max-w-md">
-          <label className="sr-only" htmlFor="committee-directory-search">Search committee members</label>
+          <label className="sr-only" htmlFor="committee-directory-search">Search committee seats</label>
           <input
             id="committee-directory-search"
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search committee, ward, district, name, office"
-            className="w-full rounded border border-[var(--color-border)] px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-blue)]"
           />
         </div>
         <div className="flex items-center gap-3 text-sm text-[var(--color-text-muted)]">
-          <span>{filtered.length.toLocaleString()} results</span>
+          <span>{filtered.length.toLocaleString()} seats</span>
           <label className="flex items-center gap-2">
-            <span>Rows</span>
+            <span>Per page</span>
             <select
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
-              className="rounded border border-[var(--color-border)] px-2 py-1"
+              className="rounded-lg border border-[var(--color-border)] px-2 py-1 bg-white"
             >
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -76,40 +100,51 @@ export default function CommitteeDirectoryTable({ rows }: CommitteeDirectoryTabl
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded border border-[var(--color-border)] bg-white">
-        <table className="min-w-full text-sm">
-          <thead className="bg-[var(--color-surface)] text-left">
-            <tr>
-              <th className="px-3 py-2 font-semibold">Committee</th>
-              <th className="px-3 py-2 font-semibold">Ward</th>
-              <th className="px-3 py-2 font-semibold">District</th>
-              <th className="px-3 py-2 font-semibold">First</th>
-              <th className="px-3 py-2 font-semibold">Last</th>
-              <th className="px-3 py-2 font-semibold">Committee Office</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagedRows.length === 0 ? (
-              <tr>
-                <td className="px-3 py-6 text-center text-[var(--color-text-muted)]" colSpan={6}>
-                  No rows found.
-                </td>
-              </tr>
-            ) : (
-              pagedRows.map((row) => (
-                <tr key={row._id} className="border-t border-[var(--color-border)]">
-                  <td className="px-3 py-2">{row.committee || ''}</td>
-                  <td className="px-3 py-2">{row.ward || ''}</td>
-                  <td className="px-3 py-2">{row.district || ''}</td>
-                  <td className="px-3 py-2">{row.firstName || ''}</td>
-                  <td className="px-3 py-2">{row.lastName || ''}</td>
-                  <td className="px-3 py-2">{row.committeeOffice || ''}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {groups.length === 0 ? (
+        <p className="py-10 text-center text-[var(--color-text-muted)] bg-white rounded-xl border border-[var(--color-border)]">
+          No seats found.
+        </p>
+      ) : (
+        <div className="space-y-6">
+          {groups.map(([committee, committeeRows]) => (
+            <section key={committee} className="bg-white rounded-xl border border-[var(--color-border)] overflow-hidden">
+              <h3 className="px-4 py-2.5 bg-[var(--color-surface)] border-b border-[var(--color-border)] font-semibold text-sm text-[var(--color-navy)] uppercase tracking-wide">
+                {committee}
+              </h3>
+              <ul className="divide-y divide-[var(--color-border)]">
+                {committeeRows.map((row) => {
+                  const vacant = isVacant(row)
+                  const seat = seatLabel(row)
+                  return (
+                    <li key={row._id} className="px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                      {seat && (
+                        <span className="w-44 shrink-0 text-[var(--color-text-muted)]">{seat}</span>
+                      )}
+                      {vacant ? (
+                        <Link
+                          href={prefixHref('/become-a-committee-member', basePath)}
+                          className="font-semibold text-[var(--color-gold)] hover:underline"
+                        >
+                          Seat open — become a committee member →
+                        </Link>
+                      ) : (
+                        <span className="font-medium text-[var(--color-text)]">
+                          {[row.firstName, row.lastName].filter(Boolean).join(' ')}
+                        </span>
+                      )}
+                      {row.committeeOffice && !vacant && (
+                        <span className="text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-[var(--color-blue-light)] text-[var(--color-blue-mid)]">
+                          {row.committeeOffice}
+                        </span>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
+      )}
 
       <div className="flex items-center justify-between text-sm text-[var(--color-text-muted)]">
         <span>
@@ -122,7 +157,7 @@ export default function CommitteeDirectoryTable({ rows }: CommitteeDirectoryTabl
             type="button"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="rounded border border-[var(--color-border)] px-3 py-1.5 disabled:opacity-50"
+            className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 disabled:opacity-50 hover:bg-[var(--color-surface)] transition-colors"
           >
             Previous
           </button>
@@ -133,7 +168,7 @@ export default function CommitteeDirectoryTable({ rows }: CommitteeDirectoryTabl
             type="button"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            className="rounded border border-[var(--color-border)] px-3 py-1.5 disabled:opacity-50"
+            className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 disabled:opacity-50 hover:bg-[var(--color-surface)] transition-colors"
           >
             Next
           </button>
