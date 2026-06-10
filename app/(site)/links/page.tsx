@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import ExternalLink from '@/components/external-link'
 import { getExternalLinks } from '@/sanity/lib/queries'
 
 export const metadata: Metadata = { title: 'Resources & Links' }
@@ -39,11 +40,10 @@ export default async function LinksPage() {
           <ul className="space-y-2">
             {byCategory[category].map((link) => (
               <li key={link._id}>
-                <a
+                <ExternalLink
                   href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="flex items-start gap-3 p-3 bg-white rounded-lg border border-[var(--color-border)] hover:border-[var(--color-blue-mid)] hover:shadow-sm transition-all group"
+                  iconClassName="h-3.5 w-3.5 mt-1 text-[var(--color-text-muted)] flex-shrink-0"
                 >
                   <div className="flex-1">
                     <span className="font-semibold text-[var(--color-blue-mid)] group-hover:underline">{link.label}</span>
@@ -51,8 +51,7 @@ export default async function LinksPage() {
                       <p className="text-sm text-[var(--color-text-muted)] mt-0.5">{link.description}</p>
                     )}
                   </div>
-                  <span className="text-[var(--color-text-muted)] flex-shrink-0 mt-0.5">↗</span>
-                </a>
+                </ExternalLink>
               </li>
             ))}
           </ul>

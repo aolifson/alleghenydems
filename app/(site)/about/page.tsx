@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { PortableText } from '@portabletext/react'
 import PageHero from '@/components/page-hero'
 import { getPageBySlug } from '@/sanity/lib/queries'
@@ -36,9 +37,11 @@ export default async function AboutPage() {
           <p>
             To build and sustain a strong, inclusive Democratic Party that reflects the diversity of Allegheny County — and to elect candidates who fight for working families, quality education, affordable healthcare, and a clean environment.
           </p>
-          <h2>Get Involved</h2>
           <p>
-            There are many ways to participate — volunteer for campaigns, become a committee person in your ward, attend party events, or donate to support our work.
+            Ready to participate?{' '}
+            <Link href="/get-involved" className="font-semibold text-[var(--color-blue-mid)] hover:underline">
+              Get Involved →
+            </Link>
           </p>
         </div>
       )}

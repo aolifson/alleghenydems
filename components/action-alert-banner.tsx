@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import type { ActionAlert } from '@/sanity/lib/queries'
+import { ExternalLinkIcon, isExternalHref } from '@/components/external-link'
 
 const URGENCY_STYLES: Record<ActionAlert['urgency'], string> = {
   urgent: 'bg-[var(--color-red)] text-white',
@@ -52,11 +53,17 @@ export default function ActionAlertBanner({ alert }: { alert: ActionAlert }) {
           {alert.ctaLabel && alert.ctaUrl && (
             <a
               href={alert.ctaUrl}
-              target={alert.ctaUrl.startsWith('/') ? undefined : '_blank'}
-              rel={alert.ctaUrl.startsWith('/') ? undefined : 'noopener noreferrer'}
-              className={`px-3 py-1 text-xs font-semibold border rounded transition-colors whitespace-nowrap ${ctaStyle}`}
+              target={isExternalHref(alert.ctaUrl) ? '_blank' : undefined}
+              rel={isExternalHref(alert.ctaUrl) ? 'noopener noreferrer' : undefined}
+              className={`px-3 py-1 text-xs font-semibold border rounded transition-colors whitespace-nowrap inline-flex items-center gap-1 ${ctaStyle}`}
             >
               {alert.ctaLabel}
+              {isExternalHref(alert.ctaUrl) && (
+                <>
+                  <ExternalLinkIcon className="h-2.5 w-2.5 opacity-80" />
+                  <span className="sr-only"> (opens in new tab)</span>
+                </>
+              )}
             </a>
           )}
           <button
