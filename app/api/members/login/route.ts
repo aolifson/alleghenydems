@@ -83,13 +83,21 @@ export async function POST(request: NextRequest) {
 
   try {
     const resend = new Resend(process.env.RESEND_API_KEY)
-    await resend.emails.send({
-      from: process.env.MEMBERS_AREA_FROM_EMAIL ?? 'Allegheny Dems Members <noreply@alleghenydems.com>',
+    const payload = {
       to: email,
       subject: 'Your members area sign-in link',
       html: loginEmailHtml(verifyUrl),
       text: `Sign in to the ACDC members area (link expires in 15 minutes): ${verifyUrl}`,
-    })
+    }
+    // Preferred sender requires the domain to be verified in Resend; until
+    // then, fall back to Resend's test sender so login links still go out.
+    const preferredFrom = process.env.MEMBERS_AREA_FROM_EMAIL ?? 'Allegheny Dems Members <noreply@alleghenydems.com>'
+    const { error } = await resend.emails.send({ from: preferredFrom, ...payload })
+    if (error) {
+      console.error('Members login email failed from preferred sender, retrying with test sender:', error)
+      const retry = await resend.emails.send({ from: 'ACDC Members <onboarding@resend.dev>', ...payload })
+      if (retry.error) console.error('Members login email failed:', retry.error)
+    }
   } catch (error) {
     console.error('Members login email failed:', error)
   }
