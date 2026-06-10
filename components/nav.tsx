@@ -7,12 +7,6 @@ import type { NavItem, MunicipalityListItem } from '@/sanity/lib/queries'
 import { useMunicipalityPrefix, prefixHref } from '@/lib/municipality-prefix-context'
 import { ExternalLinkIcon, isExternalHref } from '@/components/external-link'
 
-function getMunicipalityUrl(m: MunicipalityListItem): string {
-  if (m.customDomain) return `https://${m.customDomain}`
-  if (m.subdomain) return `https://${m.subdomain}.alleghenydems.com`
-  return `/municipalities/${m.slug.current}`
-}
-
 // One visitor intent per top-level item; every destination appears exactly once.
 const DEFAULT_NAV_ITEMS: NavItem[] = [
   {
@@ -217,7 +211,7 @@ export default function Nav({
                 </NavLinkTag>
                 {item.children && activeDropdown === item.label && (
                   <div
-                    className="absolute top-full left-0 mt-1 bg-white text-[var(--color-text)] shadow-lg rounded-md py-1 min-w-[200px]"
+                    className="absolute top-full left-0 mt-1 z-50 bg-white text-[var(--color-text)] shadow-lg rounded-md py-1 min-w-[200px]"
                     onMouseEnter={() => { if (closeTimer.current) clearTimeout(closeTimer.current) }}
                     onMouseLeave={scheduleClose}
                   >
@@ -254,37 +248,18 @@ export default function Nav({
             )
           })}
 
-          {/* Local Committees dropdown — county site only, hidden when empty */}
+          {/* Local Committees — county site only, hidden when none exist */}
           {municipalities.length > 0 && (
-            <div
-              className="relative"
-              onMouseEnter={() => openDropdown('__local_committees__')}
-              onMouseLeave={scheduleClose}
+            <Link
+              href={prefixHref('/local-committees', basePath)}
+              className={
+                isActive('/local-committees')
+                  ? "px-3 py-2 rounded text-sm font-semibold bg-[var(--color-navy)]/15 border-b-2 border-white/80 transition-colors"
+                  : "px-3 py-2 rounded text-sm font-medium hover:bg-[var(--color-navy)]/10 transition-colors"
+              }
             >
-              <button
-                className="px-3 py-2 rounded text-sm font-medium hover:bg-[var(--color-navy)]/10 transition-colors flex items-center gap-1"
-              >
-                Local Committees <span className="text-xs opacity-60">▾</span>
-              </button>
-              {activeDropdown === '__local_committees__' && (
-                <div
-                  className="absolute top-full right-0 mt-1 bg-white text-[var(--color-text)] shadow-lg rounded-md py-1 min-w-[220px]"
-                  onMouseEnter={() => { if (closeTimer.current) clearTimeout(closeTimer.current) }}
-                  onMouseLeave={scheduleClose}
-                >
-                  {municipalities.map((m) => (
-                    <a
-                      key={m._id}
-                      href={getMunicipalityUrl(m)}
-                      className="block px-4 py-2 text-sm hover:bg-[var(--color-blue-light)] hover:text-[var(--color-blue)] transition-colors"
-                      onClick={() => setActiveDropdown(null)}
-                    >
-                      {m.name}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
+              Local Committees
+            </Link>
           )}
         </nav>
 
@@ -441,19 +416,13 @@ export default function Nav({
             )
           })}
           {municipalities.length > 0 && (
-            <div className="border-b border-white/10 pb-2 mb-2">
-              <p className="py-2 text-xs font-semibold text-white/50 uppercase tracking-wide">Local Committees</p>
-              {municipalities.map((m) => (
-                <a
-                  key={m._id}
-                  href={getMunicipalityUrl(m)}
-                  className="block py-1.5 pl-4 text-sm text-white/70 hover:text-white"
-                  onClick={() => setOpen(false)}
-                >
-                  {m.name}
-                </a>
-              ))}
-            </div>
+            <Link
+              href={prefixHref('/local-committees', basePath)}
+              className="block py-2 text-sm font-medium border-b border-white/10 text-white"
+              onClick={() => setOpen(false)}
+            >
+              Local Committees
+            </Link>
           )}
           <Link
             href="/members"

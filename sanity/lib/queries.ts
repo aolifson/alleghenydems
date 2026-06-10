@@ -308,12 +308,15 @@ export interface MunicipalityListItem {
   logo?: SanityImage
   customDomain?: string
   subdomain?: string
+  externalSiteUrl?: string
+  contactEmail?: string
+  facebookPageUrl?: string
 }
 
 export async function getActiveMunicipalities(): Promise<MunicipalityListItem[]> {
   return client.fetch(
     `*[_type == "municipality" && isActive == true] | order(name asc) {
-      _id, name, slug, logo, customDomain, subdomain
+      _id, name, slug, logo, customDomain, subdomain, externalSiteUrl, contactEmail, facebookPageUrl
     }`
   )
 }

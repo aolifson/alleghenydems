@@ -189,7 +189,7 @@ export default async function HomePage() {
                 title: 'Supporting local committees',
                 description: 'We back Democratic committees across Allegheny County with tools, training, and a shared platform.',
                 linkLabel: 'Find your local committee →',
-                href: '/committee-members#local-committees',
+                href: '/local-committees',
               },
             ].map(({ icon, title, description, linkLabel, href }) => (
               <div key={href} className="bg-white rounded-lg border border-[var(--color-border)] p-6 flex flex-col gap-3">

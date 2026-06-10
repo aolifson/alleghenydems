@@ -57,6 +57,14 @@ export const municipalityType = defineType({
       group: 'identity',
       description: 'e.g. "northside" → northside.alleghenydems.com (auto-resolved via wildcard DNS)',
     }),
+    defineField({
+      name: 'externalSiteUrl',
+      title: 'External Website URL',
+      type: 'url',
+      group: 'identity',
+      description: 'Only for committees that run their own website outside alleghenydems.com (e.g. https://example-dems.org). The Local Committees page will link there with the ↗ indicator instead of a white-labeled site. Leave blank for committees hosted here.',
+      validation: (r) => r.uri({ scheme: ['http', 'https'] }),
+    }),
 
     // ── Branding ──────────────────────────────────────────────
     defineField({
