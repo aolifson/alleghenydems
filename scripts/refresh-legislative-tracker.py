@@ -223,30 +223,31 @@ def fetch_legiscan(api_key: str, roster: list, since: dt.date) -> list:
     log(f"  legiscan: PA session {session.get('session_name', session_id)}")
 
     # ── Resolve each roster legislator's LegiScan people_id automatically ──
-    # (by chamber + district, falling back to last name) so editors never hand-enter IDs.
+    # Primary key is chamber + district (uniquely identifies a seat, so it survives
+    # name changes/marriages); last name is only a tie-breaker. Editors never enter IDs.
     session_people = call("getSessionPeople", id=session_id).get("sessionpeople", {}).get("people", [])
     people: dict = {}  # people_id -> roster official
     for o in state_roster:
         pid = o.get("legiscanPeopleId")  # explicit override wins
         if not pid:
-            want_chamber = o.get("chamber")  # pa-house / pa-senate
-            want_role = "Sen" if want_chamber == "pa-senate" else "Rep"
+            want_role = "sen" if o.get("chamber") == "pa-senate" else "rep"
             want_dist = district_num(o.get("district"))
             want_last = norm_name(o.get("lastName") or o["name"].split()[-1])
+            # All sitting members in this chamber + district (usually exactly one).
+            seat = [p for p in session_people
+                    if want_role in str(p.get("role", "")).lower()
+                    and district_num(p.get("district")) == want_dist]
             match = None
-            for p in session_people:
-                if p.get("role") not in (want_role, want_role + ".",):
-                    # LegiScan role is "Rep" or "Sen"; be lenient.
-                    if want_role.lower() not in str(p.get("role", "")).lower():
-                        continue
-                if district_num(p.get("district")) == want_dist and norm_name(p.get("last_name", "")) == want_last:
-                    match = p
-                    break
-            if not match:  # last-ditch: name only
+            if len(seat) == 1:
+                match = seat[0]
+            elif len(seat) > 1:  # e.g. mid-term replacement: prefer the name match
+                match = next((p for p in seat if norm_name(p.get("last_name", "")) == want_last), seat[-1])
+            if not match:  # district lookup failed: fall back to last name
                 match = next((p for p in session_people if norm_name(p.get("last_name", "")) == want_last), None)
             if match:
                 pid = match.get("people_id")
-                log(f"  legiscan: matched {o['name']} -> people_id {pid} ({match.get('district')})")
+                log(f"  legiscan: matched {o['name']} -> people_id {pid} "
+                    f"({match.get('role')} {match.get('district')}, {match.get('name', '')})")
             else:
                 log(f"  legiscan: NO MATCH for {o['name']} (district {o.get('district')}) — set legiscanPeopleId manually.")
                 continue
@@ -255,7 +256,8 @@ def fetch_legiscan(api_key: str, roster: list, since: dt.date) -> list:
         log("  legiscan: no state officials could be resolved — skipping.")
         return []
 
-    master = call("getMasterListRaw", id=session_id).get("masterlist", {})
+    # getMasterList (full) includes last_action_date; getMasterListRaw does NOT (hashes only).
+    master = call("getMasterList", id=session_id).get("masterlist", {})
     bill_ids = []
     for k, v in master.items():
         if k == "session" or not isinstance(v, dict):
@@ -263,7 +265,7 @@ def fetch_legiscan(api_key: str, roster: list, since: dt.date) -> list:
         d = parse_date(v.get("last_action_date", "") or v.get("status_date", ""))
         if d and d >= since:
             bill_ids.append(v["bill_id"])
-    log(f"  legiscan: {len(bill_ids)} bills changed since {since}")
+    log(f"  legiscan: {len(bill_ids)} bills with action since {since}")
 
     events: list = []
     for bid in bill_ids:
@@ -325,11 +327,11 @@ def fetch_congress_house(api_key: str, roster: list, since: dt.date, today: dt.d
     congress = current_congress(today)
     session = congress_session(today)
     base = "https://api.congress.gov/v3"
-    hdr = {"X-Api-Key": api_key}
+    # Congress.gov authenticates via the ?api_key= query param ONLY. Sending an
+    # additional X-Api-Key header trips their gateway and returns 403 Forbidden.
 
     listing = http_json(
         f"{base}/house-vote/{congress}/{session}?format=json&limit=250&api_key={api_key}",
-        headers=hdr,
     )
     votes = listing.get("houseRollCallVotes") or listing.get("votes") or []
     log(f"  congress(house): {len(votes)} roll calls listed for congress {congress} session {session}")
@@ -344,7 +346,6 @@ def fetch_congress_house(api_key: str, roster: list, since: dt.date, today: dt.d
             continue
         members = http_json(
             f"{base}/house-vote/{congress}/{session}/{rollnum}/members?format=json&api_key={api_key}",
-            headers=hdr,
         )
         recs = (members.get("houseRollCallVoteMemberVotes", {}) or {}).get("results") \
             or members.get("members") or []
