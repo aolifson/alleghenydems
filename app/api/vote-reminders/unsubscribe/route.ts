@@ -13,9 +13,15 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const doc = await writeClient.fetch<{ _id: string } | null>(
+    // The typed client can't infer the $token param type without typegen, so
+    // call fetch through a plain signature for this lookup.
+    const fetchByToken = writeClient.fetch as (
+      query: string,
+      params: Record<string, string>,
+    ) => Promise<{ _id: string } | null>
+    const doc = await fetchByToken(
       `*[_type == "voteReminder" && unsubscribeToken == $token][0]{ _id }`,
-      { token }
+      { token },
     )
 
     if (!doc) {
