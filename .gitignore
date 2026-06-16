@@ -26,3 +26,7 @@ yarn-error.log*
 
 # Vercel
 .vercel
+
+# Python cache (import scripts)
+scripts/__pycache__/
+__pycache__/

@@ -40,17 +40,69 @@ export const legislativeActionType = defineType({
       validation: (r) => r.min(1),
     }),
     defineField({ name: 'displayOrder', title: 'Display Order', type: 'number' }),
+    // ─── Auto-import fields (populated by scripts/refresh-legislative-tracker.py) ───
+    defineField({
+      name: 'needsReview',
+      title: 'Needs Review',
+      type: 'boolean',
+      initialValue: false,
+      description:
+        'TRUE for items pulled automatically that have not yet been checked by an editor. Set the Action Type, confirm the framing, verify the source, then uncheck. The public page only shows published items, so review happens here in drafts.',
+    }),
+    defineField({
+      name: 'autoImported',
+      title: 'Auto-Imported',
+      type: 'boolean',
+      initialValue: false,
+      readOnly: true,
+      description: 'Set automatically when this item came from LegiScan or Congress.gov rather than being entered by hand.',
+    }),
+    defineField({
+      name: 'externalId',
+      title: 'External ID',
+      type: 'string',
+      readOnly: true,
+      description: 'Stable de-duplication key (source + chamber + roll-call + official). Do not edit — the importer uses it to avoid duplicates.',
+    }),
+    defineField({ name: 'billId', title: 'Bill / Roll Call', type: 'string', description: 'e.g. "PA HB 1234" or "US HR 567".' }),
+    defineField({
+      name: 'chamber',
+      title: 'Chamber',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'PA House', value: 'pa-house' },
+          { title: 'PA Senate', value: 'pa-senate' },
+          { title: 'U.S. House', value: 'us-house' },
+          { title: 'U.S. Senate', value: 'us-senate' },
+        ],
+      },
+    }),
+    defineField({
+      name: 'voteValue',
+      title: 'How They Voted',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Yea', value: 'Yea' },
+          { title: 'Nay', value: 'Nay' },
+          { title: 'Present', value: 'Present' },
+          { title: 'Not Voting', value: 'Not Voting' },
+        ],
+      },
+    }),
   ],
   preview: {
-    select: { title: 'official', subtitle: 'category', type: 'type' },
-    prepare({ title, subtitle, type }) {
+    select: { title: 'official', subtitle: 'category', type: 'type', needsReview: 'needsReview' },
+    prepare({ title, subtitle, type, needsReview }) {
       const labels: Record<string, string> = {
         accomplishment: 'Delivered',
         blocked: 'Blocked',
         harmful: 'Harmful',
       }
+      const prefix = needsReview ? '🆕 REVIEW · ' : ''
       return {
-        title,
+        title: `${prefix}${title}`,
         subtitle: [subtitle, labels[String(type)]].filter(Boolean).join(' · '),
       }
     },

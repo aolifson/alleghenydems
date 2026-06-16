@@ -1,0 +1,34 @@
+[
+  {
+    "externalId": "ushouse-119-2-rc152-L000601",
+    "official": "Rep. Summer Lee", "party": "D", "office": "U.S. House — District 12",
+    "chamber": "us-house", "billId": "US HR 22", "billTitle": "SAVE Act",
+    "voteValue": "Nay", "date": "2026-03-10",
+    "sourceLabel": "U.S. House roll call 152", "sourceUrl": "https://clerk.house.gov/Votes/2026152",
+    "municipalities": ["Pittsburgh (all wards)", "Braddock"]
+  },
+  {
+    "externalId": "ussenate-119-2-rc88-S424",
+    "official": "Sen. John Fetterman", "party": "D", "office": "U.S. Senate — Pennsylvania",
+    "chamber": "us-senate", "billId": "US S 5", "billTitle": "Laken Riley Act",
+    "voteValue": "Yea", "date": "2026-04-02",
+    "sourceLabel": "U.S. Senate roll call 88", "sourceUrl": "https://www.senate.gov/x.xml",
+    "municipalities": ["All Allegheny County municipalities"]
+  },
+  {
+    "externalId": "legiscan-rc99001-p9999",
+    "official": "PA State Rep — TEST", "party": "R", "office": "PA House — District 44",
+    "chamber": "pa-house", "billId": "PA HB 1234", "billTitle": "School Voucher Expansion",
+    "voteValue": "Yea", "date": "2026-05-15",
+    "sourceLabel": "LegiScan roll call — PA HB 1234", "sourceUrl": "https://legiscan.com/PA/rollcall/HB1234",
+    "municipalities": ["Upper St. Clair", "Mt. Lebanon"]
+  },
+  {
+    "externalId": "ushouse-119-2-rc152-L000601",
+    "official": "Rep. Summer Lee", "party": "D", "office": "U.S. House — District 12",
+    "chamber": "us-house", "billId": "US HR 22", "billTitle": "SAVE Act (DUPLICATE — should be skipped)",
+    "voteValue": "Nay", "date": "2026-03-10",
+    "sourceLabel": "dup", "sourceUrl": "https://example.com",
+    "municipalities": ["Pittsburgh (all wards)"]
+  }
+]

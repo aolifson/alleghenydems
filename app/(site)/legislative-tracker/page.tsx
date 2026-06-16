@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import PageHero from '@/components/page-hero'
 import LegislativeTrackerFilter from '@/components/legislative-tracker-filter'
 import {
@@ -8,7 +9,8 @@ import {
   type LegislativeExternalLink,
   type LegislativeOfficialRow,
 } from '@/sanity/lib/queries'
-import { getMunicipalitySlug } from '@/lib/tenant'
+import { getMunicipalitySlug, getMunicipalityPrefix } from '@/lib/tenant'
+import { prefixHref } from '@/lib/prefix-href'
 
 export const metadata: Metadata = {
   title: 'Legislative Tracker — What They Did & What They Blocked',
@@ -44,9 +46,10 @@ function uniqueCategories(actions: LegislativeAction[], configured: string[] | u
 export default async function LegislativeTrackerPage() {
   const municipalitySlug = await getMunicipalitySlug()
   const isCounty = municipalitySlug === 'allegheny-county'
-  const [tracker, municipalitySettings] = await Promise.all([
+  const [tracker, municipalitySettings, basePath] = await Promise.all([
     getLegislativeTrackerBySlug('legislative-tracker'),
     isCounty ? Promise.resolve(null) : getMunicipalitySettings(municipalitySlug),
+    getMunicipalityPrefix(),
   ])
   const initialQuery = municipalitySettings?.voterGuideSearchTerms?.[0] ?? ''
 
@@ -61,7 +64,9 @@ export default async function LegislativeTrackerPage() {
     )
   }
 
-  const actions = sortByOrder(tracker.actions)
+  // Defensive guard: never surface auto-imported items still awaiting editor review,
+  // even if a draft is accidentally published. The real gate is Sanity's draft/publish flow.
+  const actions = sortByOrder((tracker.actions ?? []).filter((a) => !a.needsReview))
   const localEntries = sortByOrder(tracker.localEntries)
   const links = sortByOrder(tracker.districtLookupLinks)
   const republicanOfficials = sortByOrder(tracker.republicanOfficials)
@@ -77,6 +82,16 @@ export default async function LegislativeTrackerPage() {
         subhead={tracker.heroSubhead}
         image={tracker.heroImage}
       />
+
+      <Link
+        href={prefixHref('/legislative-tracker/scorecards', basePath)}
+        className="flex flex-wrap items-center justify-between gap-3 mb-8 rounded-lg bg-[var(--color-navy)] text-white px-5 py-4 hover:opacity-95 transition-opacity"
+      >
+        <span className="font-semibold">
+          📊 See each official&rsquo;s record at a glance — view the per-official scorecards
+        </span>
+        <span className="text-sm font-semibold whitespace-nowrap">Open scorecards →</span>
+      </Link>
 
       <LegislativeTrackerFilter
         accomplishments={accomplishments}

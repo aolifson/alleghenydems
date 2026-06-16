@@ -1,0 +1,641 @@
+#!/usr/bin/env python3
+"""
+Refresh the Legislative Tracker from live sources (LegiScan + Congress.gov / official feeds).
+
+What it does
+------------
+1. Pulls recent roll-call votes for the officials listed in scripts/data/tracked-officials.json
+   - PA state House/Senate via the LegiScan API
+   - U.S. House via the Congress.gov API, U.S. Senate via the official senate.gov vote XML
+2. Turns each vote into a draft `legislativeAction` item (description, source link,
+   bill id, chamber, how-they-voted, the official's municipalities).
+3. MERGES those items into the *draft* of the `legislative-tracker` Sanity document,
+   without touching your hand-curated items, and flags each new one `needsReview: true`.
+   Nothing reaches the public page until an editor classifies it and publishes in Studio.
+
+Backfill / no-gap behavior
+--------------------------
+The window pulled is controlled by --since:
+  * If --since is passed, that date is used.
+  * Else, the date of the last successful run is used (scripts/data/legislative-import-state.json).
+  * Else (very first run), it falls back to BACKFILL_START below.
+So the FIRST run backfills the entire gap since your last content update (Feb 2026) and every
+later run only fetches what is new. There is no gap and no double-import — a per-item
+externalId plus a "seen" ledger prevent duplicates and stop rejected items from coming back.
+
+Usage
+-----
+  # Safe preview, no writes, real network:
+  python3 scripts/refresh-legislative-tracker.py --dry-run
+
+  # First-time backfill from your last update through today, write drafts:
+  python3 scripts/refresh-legislative-tracker.py --since 2026-02-01
+
+  # Normal weekly incremental run (used by the scheduled task):
+  python3 scripts/refresh-legislative-tracker.py
+
+  # Offline test of the transform + merge using a fixture of normalized events:
+  python3 scripts/refresh-legislative-tracker.py --mock scripts/data/_mock-vote-events.json --dry-run
+
+Flags
+-----
+  --since YYYY-MM-DD   Override the start of the fetch window.
+  --source            legiscan | congress | senate | all   (default: all)
+  --mock FILE         Load normalized vote events from FILE instead of the network (for testing).
+  --dry-run           Do everything except write to Sanity; prints what would change.
+  --emit FILE         Write the normalized vote events fetched this run to FILE (debugging).
+"""
+
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import json
+import os
+import pathlib
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+import uuid
+import xml.etree.ElementTree as ET
+
+# If no prior run and no --since, backfill from here (your last manual content update).
+BACKFILL_START = "2026-02-01"
+
+REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
+DATA_DIR = REPO_ROOT / "scripts" / "data"
+ROSTER_PATH = DATA_DIR / "tracked-officials.json"
+STATE_PATH = DATA_DIR / "legislative-import-state.json"
+
+DOC_ID = "legislative-tracker"
+DRAFT_ID = f"drafts.{DOC_ID}"
+SANITY_API_VERSION = "v2021-10-21"
+
+# LegiScan vote_id -> normalized value
+LEGISCAN_VOTE = {1: "Yea", 2: "Nay", 3: "Not Voting", 4: "Not Voting"}
+
+
+# ─────────────────────────── small helpers ───────────────────────────
+
+def log(msg: str) -> None:
+    print(msg, flush=True)
+
+
+def make_key() -> str:
+    return uuid.uuid4().hex[:12]
+
+
+def load_env(path: pathlib.Path) -> dict:
+    env: dict = {}
+    if not path.exists():
+        return env
+    for raw in path.read_text().splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        env[key.strip()] = value.strip().strip('"').strip("'")
+    return env
+
+
+def http_json(url: str, headers: dict | None = None, timeout: int = 60) -> dict:
+    req = urllib.request.Request(url, headers=headers or {})
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return json.loads(resp.read() or b"{}")
+
+
+def http_text(url: str, timeout: int = 60) -> str:
+    req = urllib.request.Request(url, headers={"User-Agent": "alleghenydems-tracker/1.0"})
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return resp.read().decode("utf-8", errors="ignore")
+
+
+def parse_date(value: str) -> dt.date | None:
+    if not value:
+        return None
+    value = value.strip()[:10]
+    for fmt in ("%Y-%m-%d", "%m/%d/%Y", "%B %d, %Y"):
+        try:
+            return dt.datetime.strptime(value, fmt).date()
+        except ValueError:
+            continue
+    return None
+
+
+def current_congress(today: dt.date) -> int:
+    # 119th Congress runs 2025-2026; each Congress is 2 years starting odd years.
+    return (today.year - 1789) // 2 + 1
+
+
+def congress_session(today: dt.date) -> int:
+    return 1 if today.year % 2 == 1 else 2
+
+
+def norm_name(value: str) -> str:
+    """Lowercase a (last) name for fuzzy matching: strip accents, punctuation, spaces."""
+    import unicodedata
+    s = unicodedata.normalize("NFKD", value or "")
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    return "".join(ch for ch in s.lower() if ch.isalnum())
+
+
+def district_num(value) -> int | None:
+    """Pull the integer district out of values like 'HD-036', 'SD-43', 12, '12'."""
+    if value is None:
+        return None
+    digits = "".join(ch for ch in str(value) if ch.isdigit())
+    return int(digits) if digits else None
+
+
+# ─────────────────────── normalized vote event ───────────────────────
+# Every source produces a list of these dicts; the transform + merge code
+# below is source-agnostic and is what the offline tests exercise.
+#   {
+#     "externalId": str,   # stable de-dup key
+#     "official": str, "party": "D"|"R", "office": str,
+#     "chamber": "pa-house"|"pa-senate"|"us-house"|"us-senate",
+#     "billId": str, "billTitle": str,
+#     "voteValue": "Yea"|"Nay"|"Present"|"Not Voting",
+#     "date": "YYYY-MM-DD",
+#     "sourceLabel": str, "sourceUrl": str,
+#     "municipalities": [str, ...],
+#   }
+
+
+def event_to_action(ev: dict) -> dict:
+    """Turn a normalized vote event into a draft legislativeAction item."""
+    vote = ev.get("voteValue", "")
+    bill = ev.get("billId", "").strip()
+    title = (ev.get("billTitle") or "").strip()
+    desc = f"Voted {vote} on {bill}".strip()
+    if title:
+        desc += f": {title}"
+    desc += (
+        "\n\n[AUTO-IMPORTED — needs editor review. Set the Action Type "
+        "(accomplishment / blocked / harmful), choose a real Category, rewrite this "
+        "description in plain language for voters, and confirm the source before publishing.]"
+    )
+    return {
+        "_type": "legislativeAction",
+        "_key": make_key(),
+        "official": ev["official"],
+        "party": ev.get("party", "R"),
+        "office": ev.get("office", ""),
+        "description": desc,
+        "date": ev.get("date", ""),
+        # `type` deliberately omitted -> Studio requires it before publish (the review gate).
+        "category": "Needs Review",
+        "sourceLabel": ev.get("sourceLabel", "Official roll-call record"),
+        "sourceUrl": ev.get("sourceUrl", ""),
+        "municipalities": ev.get("municipalities") or ["Allegheny County"],
+        "displayOrder": 9000,
+        "autoImported": True,
+        "needsReview": True,
+        "externalId": ev["externalId"],
+        "billId": bill,
+        "chamber": ev.get("chamber"),
+        "voteValue": vote if vote in ("Yea", "Nay", "Present", "Not Voting") else None,
+    }
+
+
+# ─────────────────────────── source: LegiScan (PA state) ───────────────────────────
+
+def fetch_legiscan(api_key: str, roster: list, since: dt.date) -> list:
+    """PA House/Senate roll-call votes for tracked state legislators."""
+    state_roster = [o for o in roster if o.get("level") == "state"]
+    if not state_roster:
+        log("  legiscan: no state officials in roster — skipping.")
+        return []
+    base = "https://api.legiscan.com/"
+
+    def call(op: str, **params) -> dict:
+        q = urllib.parse.urlencode({"key": api_key, "op": op, **params})
+        return http_json(f"{base}?{q}")
+
+    # Find the current PA session.
+    sessions = call("getSessionList", state="PA").get("sessions", [])
+    if not sessions:
+        log("  legiscan: no PA sessions returned.")
+        return []
+    session = sorted(sessions, key=lambda s: s.get("year_end", 0), reverse=True)[0]
+    session_id = session["session_id"]
+    log(f"  legiscan: PA session {session.get('session_name', session_id)}")
+
+    # ── Resolve each roster legislator's LegiScan people_id automatically ──
+    # (by chamber + district, falling back to last name) so editors never hand-enter IDs.
+    session_people = call("getSessionPeople", id=session_id).get("sessionpeople", {}).get("people", [])
+    people: dict = {}  # people_id -> roster official
+    for o in state_roster:
+        pid = o.get("legiscanPeopleId")  # explicit override wins
+        if not pid:
+            want_chamber = o.get("chamber")  # pa-house / pa-senate
+            want_role = "Sen" if want_chamber == "pa-senate" else "Rep"
+            want_dist = district_num(o.get("district"))
+            want_last = norm_name(o.get("lastName") or o["name"].split()[-1])
+            match = None
+            for p in session_people:
+                if p.get("role") not in (want_role, want_role + ".",):
+                    # LegiScan role is "Rep" or "Sen"; be lenient.
+                    if want_role.lower() not in str(p.get("role", "")).lower():
+                        continue
+                if district_num(p.get("district")) == want_dist and norm_name(p.get("last_name", "")) == want_last:
+                    match = p
+                    break
+            if not match:  # last-ditch: name only
+                match = next((p for p in session_people if norm_name(p.get("last_name", "")) == want_last), None)
+            if match:
+                pid = match.get("people_id")
+                log(f"  legiscan: matched {o['name']} -> people_id {pid} ({match.get('district')})")
+            else:
+                log(f"  legiscan: NO MATCH for {o['name']} (district {o.get('district')}) — set legiscanPeopleId manually.")
+                continue
+        people[pid] = o
+    if not people:
+        log("  legiscan: no state officials could be resolved — skipping.")
+        return []
+
+    master = call("getMasterListRaw", id=session_id).get("masterlist", {})
+    bill_ids = []
+    for k, v in master.items():
+        if k == "session" or not isinstance(v, dict):
+            continue
+        d = parse_date(v.get("last_action_date", "") or v.get("status_date", ""))
+        if d and d >= since:
+            bill_ids.append(v["bill_id"])
+    log(f"  legiscan: {len(bill_ids)} bills changed since {since}")
+
+    events: list = []
+    for bid in bill_ids:
+        bill = call("getBill", id=bid).get("bill", {})
+        bnum = bill.get("bill_number", str(bid))
+        btitle = bill.get("title", "")
+        for v in bill.get("votes", []):
+            vdate = parse_date(v.get("date", ""))
+            if not vdate or vdate < since:
+                continue
+            rc = call("getRollCall", id=v["roll_call_id"]).get("roll_call", {})
+            for pv in rc.get("votes", []):
+                pid = pv.get("people_id")
+                if pid not in people:
+                    continue
+                o = people[pid]
+                events.append({
+                    "externalId": f"legiscan-rc{rc.get('roll_call_id')}-p{pid}",
+                    "official": o["name"], "party": o.get("party", "R"),
+                    "office": o.get("office", ""), "chamber": o.get("chamber"),
+                    "billId": f"PA {bnum}", "billTitle": btitle,
+                    "voteValue": LEGISCAN_VOTE.get(pv.get("vote_id"), pv.get("vote_text", "")),
+                    "date": vdate.isoformat(),
+                    "sourceLabel": f"LegiScan roll call — PA {bnum}",
+                    "sourceUrl": rc.get("url") or bill.get("url", ""),
+                    "municipalities": o.get("municipalities", []),
+                })
+    return events
+
+
+# ─────────────────────── source: Congress.gov (U.S. House) ───────────────────────
+
+def fetch_congress_house(api_key: str, roster: list, since: dt.date, today: dt.date) -> list:
+    """U.S. House roll-call votes for tracked representatives via the Congress.gov API.
+
+    NOTE: the House vote endpoints are newer in the Congress.gov v3 API. The call shape
+    here follows their documented `house-vote` group. Smoke-test once with your key; if the
+    response shape differs, only this function needs adjusting — the rest of the pipeline is
+    driven by the normalized event dict it returns.
+    """
+    house_roster = [o for o in roster if o.get("chamber") == "us-house"]
+    if not house_roster:
+        log("  congress(house): no US House officials in roster — skipping.")
+        return []
+    reps_by_bioguide = {o["bioguideId"]: o for o in house_roster if o.get("bioguideId")}
+    reps_by_name = {norm_name(o.get("lastName") or o["name"].split()[-1]): o for o in house_roster}
+
+    def match_rep(rec: dict):
+        bg = rec.get("bioguideId") or rec.get("bioguideID")
+        if bg and bg in reps_by_bioguide:
+            return reps_by_bioguide[bg]
+        # Fall back to PA + last name (handles a missing/changed bioguide id).
+        state = (rec.get("voteState") or rec.get("state") or "").upper()
+        if state and state not in ("PA", "PENNSYLVANIA"):
+            return None
+        last = norm_name(rec.get("lastName") or rec.get("last_name") or "")
+        return reps_by_name.get(last)
+
+    congress = current_congress(today)
+    session = congress_session(today)
+    base = "https://api.congress.gov/v3"
+    hdr = {"X-Api-Key": api_key}
+
+    listing = http_json(
+        f"{base}/house-vote/{congress}/{session}?format=json&limit=250&api_key={api_key}",
+        headers=hdr,
+    )
+    votes = listing.get("houseRollCallVotes") or listing.get("votes") or []
+    log(f"  congress(house): {len(votes)} roll calls listed for congress {congress} session {session}")
+
+    events: list = []
+    for v in votes:
+        vdate = parse_date(str(v.get("startDate") or v.get("date") or ""))
+        if not vdate or vdate < since:
+            continue
+        rollnum = v.get("rollCallNumber") or v.get("voteNumber")
+        if rollnum is None:
+            continue
+        members = http_json(
+            f"{base}/house-vote/{congress}/{session}/{rollnum}/members?format=json&api_key={api_key}",
+            headers=hdr,
+        )
+        recs = (members.get("houseRollCallVoteMemberVotes", {}) or {}).get("results") \
+            or members.get("members") or []
+        bill_id = v.get("legislationNumber") or v.get("bill", {}).get("number") or f"Roll {rollnum}"
+        title = v.get("voteQuestion") or v.get("question") or ""
+        url = v.get("url") or f"https://clerk.house.gov/Votes/{vdate.year}{rollnum}"
+        for rec in recs:
+            o = match_rep(rec)
+            if not o:
+                continue
+            slug = norm_name(o.get("lastName") or o["name"])
+            events.append({
+                "externalId": f"ushouse-{congress}-{session}-rc{rollnum}-{slug}",
+                "official": o["name"], "party": o.get("party", "D"),
+                "office": o.get("office", ""), "chamber": "us-house",
+                "billId": f"US {bill_id}", "billTitle": title,
+                "voteValue": _norm_vote(rec.get("voteCast") or rec.get("vote") or ""),
+                "date": vdate.isoformat(),
+                "sourceLabel": f"U.S. House roll call {rollnum}",
+                "sourceUrl": url,
+                "municipalities": o.get("municipalities", []),
+            })
+    return events
+
+
+# ─────────────────────── source: senate.gov XML (U.S. Senate) ───────────────────────
+
+def fetch_senate(roster: list, since: dt.date, today: dt.date) -> list:
+    """U.S. Senate roll-call votes for tracked senators via the official senate.gov XML.
+
+    No API key needed. Senate member-level votes are not yet in the Congress.gov API, so
+    we read the official vote menu + per-vote XML and match senators by last name
+    (LIS id is auto-resolved; the lisMemberId override is rarely needed).
+    """
+    senate_roster = [o for o in roster if o.get("chamber") == "us-senate"]
+    if not senate_roster:
+        log("  senate: no US Senate officials in roster — skipping.")
+        return []
+    sens_by_lis = {o["lisMemberId"]: o for o in senate_roster if o.get("lisMemberId")}
+    sens_by_name = {norm_name(o.get("lastName") or o["name"].split()[-1]): o for o in senate_roster}
+    congress = current_congress(today)
+    session = congress_session(today)
+    menu_url = (
+        f"https://www.senate.gov/legislative/LIS/roll_call_lists/"
+        f"vote_menu_{congress}_{session}.xml"
+    )
+    try:
+        menu = ET.fromstring(http_text(menu_url))
+    except Exception as e:  # noqa: BLE001
+        log(f"  senate: could not read vote menu ({e}).")
+        return []
+
+    events: list = []
+    for vote in menu.findall(".//vote"):
+        num = (vote.findtext("vote_number") or "").strip()
+        vdate = parse_date(vote.findtext("vote_date") or "")
+        if not num or not vdate or vdate < since:
+            continue
+        vurl = (
+            f"https://www.senate.gov/legislative/LIS/roll_call_votes/"
+            f"vote{congress}{session}/vote_{congress}_{session}_{int(num):05d}.xml"
+        )
+        try:
+            detail = ET.fromstring(http_text(vurl))
+        except Exception:  # noqa: BLE001
+            continue
+        question = detail.findtext("vote_question_text") or detail.findtext("question") or ""
+        doc = (detail.findtext("document/document_name") or "").strip()
+        for member in detail.findall(".//member"):
+            lis = (member.findtext("lis_member_id") or "").strip()
+            last = norm_name(member.findtext("last_name") or "")
+            o = sens_by_lis.get(lis) or sens_by_name.get(last)
+            if not o:
+                continue
+            key = lis or last
+            events.append({
+                "externalId": f"ussenate-{congress}-{session}-rc{num}-{key}",
+                "official": o["name"], "party": o.get("party", "D"),
+                "office": o.get("office", ""), "chamber": "us-senate",
+                "billId": f"US {doc}" if doc else f"Senate Vote {num}",
+                "billTitle": question,
+                "voteValue": _norm_vote(member.findtext("vote_cast") or ""),
+                "date": vdate.isoformat(),
+                "sourceLabel": f"U.S. Senate roll call {num}",
+                "sourceUrl": vurl,
+                "municipalities": o.get("municipalities", []),
+            })
+    return events
+
+
+def _norm_vote(raw: str) -> str:
+    r = (raw or "").strip().lower()
+    if r in ("yea", "yes", "aye", "guilty"):
+        return "Yea"
+    if r in ("nay", "no", "not guilty"):
+        return "Nay"
+    if r == "present":
+        return "Present"
+    return "Not Voting"
+
+
+# ─────────────────────────── Sanity I/O ───────────────────────────
+
+def sanity_fetch_existing(project_id: str, dataset: str, token: str) -> dict:
+    """Return {'published': doc|None, 'draft': doc|None}."""
+    groq = f'*[_id in ["{DOC_ID}", "{DRAFT_ID}"]]'
+    url = (f"https://{project_id}.api.sanity.io/{SANITY_API_VERSION}/data/query/{dataset}"
+           f"?query={urllib.parse.quote(groq)}")
+    data = http_json(url, headers={"Authorization": f"Bearer {token}"})
+    out = {"published": None, "draft": None}
+    for d in data.get("result", []):
+        if d.get("_id") == DRAFT_ID:
+            out["draft"] = d
+        elif d.get("_id") == DOC_ID:
+            out["published"] = d
+    return out
+
+
+def sanity_write_draft(project_id: str, dataset: str, token: str, doc: dict) -> dict:
+    url = f"https://{project_id}.api.sanity.io/{SANITY_API_VERSION}/data/mutate/{dataset}"
+    body = json.dumps({"mutations": [{"createOrReplace": doc}], "returnIds": True}).encode()
+    req = urllib.request.Request(
+        url, data=body, method="POST",
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        return json.loads(resp.read() or b"{}")
+
+
+# ─────────────────────────── merge core (tested offline) ───────────────────────────
+
+def existing_external_ids(existing: dict, seen_ledger: list) -> set:
+    ids = set(seen_ledger or [])
+    for which in ("published", "draft"):
+        doc = existing.get(which) or {}
+        for a in doc.get("actions", []) or []:
+            if a.get("externalId"):
+                ids.add(a["externalId"])
+    return ids
+
+
+def build_merged_draft(existing: dict, new_actions: list) -> dict:
+    """Copy the current draft (or published) doc and append new review items to its actions."""
+    base = dict(existing.get("draft") or existing.get("published") or {})
+    base = {k: v for k, v in base.items()
+            if k not in ("_id", "_rev", "_createdAt", "_updatedAt")}
+    base["_id"] = DRAFT_ID
+    base["_type"] = "legislativeTracker"
+    base.setdefault("title", "Legislative Tracker")
+    base.setdefault("slug", {"_type": "slug", "current": DOC_ID})
+    base["actions"] = list(base.get("actions") or []) + new_actions
+    return base
+
+
+# ─────────────────────────── state ledger ───────────────────────────
+
+def load_state() -> dict:
+    if STATE_PATH.exists():
+        try:
+            return json.loads(STATE_PATH.read_text())
+        except json.JSONDecodeError:
+            pass
+    return {"lastRun": None, "seenExternalIds": []}
+
+
+def save_state(state: dict) -> None:
+    STATE_PATH.write_text(json.dumps(state, indent=2))
+
+
+# ─────────────────────────── main ───────────────────────────
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--since")
+    ap.add_argument("--source", choices=["legiscan", "congress", "senate", "all"], default="all")
+    ap.add_argument("--mock")
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--emit")
+    args = ap.parse_args()
+
+    today = dt.date.today()
+    env = load_env(REPO_ROOT / ".env.local")
+
+    def cfg(name: str) -> str | None:
+        return env.get(name) or os.environ.get(name)
+
+    state = load_state()
+    if args.since:
+        since = parse_date(args.since)
+    elif state.get("lastRun"):
+        since = parse_date(state["lastRun"])
+    else:
+        since = parse_date(BACKFILL_START)
+    if not since:
+        sys.exit("ERROR: could not determine --since date.")
+    log(f"Fetch window: votes on or after {since} (today {today})")
+
+    roster = json.loads(ROSTER_PATH.read_text()).get("officials", [])
+    roster = [o for o in roster if not str(o.get("name", "")).endswith("EXAMPLE")]
+
+    # ── gather normalized vote events ──
+    events: list = []
+    if args.mock:
+        events = json.loads(pathlib.Path(args.mock).read_text())
+        log(f"Loaded {len(events)} mock events from {args.mock}")
+    else:
+        if args.source in ("legiscan", "all"):
+            key = cfg("LEGISCAN_API_KEY")
+            if not key:
+                log("  legiscan: LEGISCAN_API_KEY not set — skipping.")
+            else:
+                try:
+                    events += fetch_legiscan(key, roster, since)
+                except Exception as e:  # noqa: BLE001
+                    log(f"  legiscan: ERROR {e}")
+        if args.source in ("congress", "all"):
+            key = cfg("CONGRESS_GOV_API_KEY")
+            if not key:
+                log("  congress(house): CONGRESS_GOV_API_KEY not set — skipping.")
+            else:
+                try:
+                    events += fetch_congress_house(key, roster, since, today)
+                except Exception as e:  # noqa: BLE001
+                    log(f"  congress(house): ERROR {e}")
+        if args.source in ("senate", "all"):
+            try:
+                events += fetch_senate(roster, since, today)
+            except Exception as e:  # noqa: BLE001
+                log(f"  senate: ERROR {e}")
+
+    log(f"Fetched {len(events)} raw vote events.")
+    if args.emit:
+        pathlib.Path(args.emit).write_text(json.dumps(events, indent=2))
+        log(f"Wrote raw events to {args.emit}")
+
+    # ── connect to Sanity (unless purely offline dry-run with mock) ──
+    project_id = cfg("NEXT_PUBLIC_SANITY_PROJECT_ID")
+    dataset = cfg("NEXT_PUBLIC_SANITY_DATASET") or "production"
+    token = cfg("SANITY_API_TOKEN")
+
+    existing = {"published": None, "draft": None}
+    if project_id and token:
+        try:
+            existing = sanity_fetch_existing(project_id, dataset, token)
+        except Exception as e:  # noqa: BLE001
+            log(f"  sanity: could not read existing doc ({e}); proceeding as if empty.")
+    else:
+        log("  sanity: project id / token not set — running in offline merge-preview mode.")
+
+    # ── de-dup + transform ──
+    known = existing_external_ids(existing, state.get("seenExternalIds", []))
+    fresh, fresh_ids = [], set()
+    for ev in events:
+        eid = ev.get("externalId")
+        if not eid or eid in known or eid in fresh_ids:
+            continue
+        fresh.append(event_to_action(ev))
+        fresh_ids.add(eid)
+
+    log(f"New items after de-dup: {len(fresh)} (skipped {len(events) - len(fresh)} already seen)")
+    if fresh:
+        by_person: dict = {}
+        for a in fresh:
+            by_person[a["official"]] = by_person.get(a["official"], 0) + 1
+        for name, n in sorted(by_person.items()):
+            log(f"    + {n:>3}  {name}")
+
+    merged = build_merged_draft(existing, fresh)
+    total_actions = len(merged.get("actions", []))
+    log(f"Draft would contain {total_actions} total actions "
+        f"({total_actions - len(fresh)} existing + {len(fresh)} new for review).")
+
+    if args.dry_run:
+        log("DRY RUN — no Sanity write, state not advanced.")
+        return
+    if not (project_id and token):
+        sys.exit("ERROR: SANITY_API_TOKEN / project id required for a real write. Use --dry-run to preview.")
+    if not fresh:
+        log("Nothing new to write. Advancing run timestamp only.")
+    else:
+        res = sanity_write_draft(project_id, dataset, token, merged)
+        log(f"Wrote draft {DRAFT_ID}: {res.get('results', [])}")
+
+    # ── advance state ──
+    state["lastRun"] = today.isoformat()
+    state["seenExternalIds"] = sorted(set(state.get("seenExternalIds", [])) | fresh_ids)
+    save_state(state)
+    log(f"State saved. lastRun={state['lastRun']}, tracked ids={len(state['seenExternalIds'])}")
+    log("Done. Open Sanity Studio → Legislative Tracker (draft) to review 🆕 items, "
+        "set Action Type + Category, then publish.")
+
+
+if __name__ == "__main__":
+    main()

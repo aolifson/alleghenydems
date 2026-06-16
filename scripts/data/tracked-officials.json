@@ -1,0 +1,89 @@
+{
+  "_comment": "Officials whose roll-call votes the refresh importer pulls. You only need human-readable info here — name, chamber, and district. The importer resolves the internal LegiScan / Congress / Senate IDs automatically by matching last name + district at runtime, so NON-TECHNICAL EDITORS can add or remove people safely. (Optional override IDs can be added if a match ever fails — see _howToOverride.)",
+  "_districtFormat": {
+    "chamber": "one of: pa-house, pa-senate, us-house, us-senate",
+    "district": "just the number, e.g. 36 or 12. Leave blank/null for U.S. Senate (statewide).",
+    "note": "Group entries like 'PA Senate Republicans' are NOT listed here because they aren't individual voters. Only named individuals can be vote-tracked."
+  },
+  "_howToOverride": {
+    "legiscanPeopleId": "Optional. Only set if name/district matching fails for a PA legislator. Find via op=getSessionPeople in the LegiScan API.",
+    "bioguideId": "Optional. U.S. House/Senate. From https://bioguide.congress.gov (e.g. Summer Lee = L000601).",
+    "lisMemberId": "Optional. U.S. Senators only. The importer auto-matches senators by last name, so this is rarely needed."
+  },
+  "officials": [
+    {
+      "name": "Rep. Summer Lee", "party": "D", "office": "U.S. House — District 12",
+      "level": "federal", "chamber": "us-house", "district": 12,
+      "lastName": "Lee", "bioguideId": "L000601",
+      "municipalities": [
+        "Pittsburgh (all wards)", "Turtle Creek", "Braddock", "Homestead",
+        "McKeesport", "Duquesne", "Clairton", "Monroeville", "Plum",
+        "Munhall", "West Mifflin", "Whitehall", "Bethel Park",
+        "Jefferson Hills", "Pleasant Hills"
+      ]
+    },
+    {
+      "name": "Rep. Chris Deluzio", "party": "D", "office": "U.S. House — District 17",
+      "level": "federal", "chamber": "us-house", "district": 17,
+      "lastName": "Deluzio", "bioguideId": "D000130",
+      "municipalities": [
+        "Sewickley", "Moon", "Coraopolis", "Ross", "McCandless", "Hampton",
+        "Shaler", "Pine", "Marshall", "Robinson", "Kennedy", "Stowe"
+      ]
+    },
+    {
+      "name": "Sen. John Fetterman", "party": "D", "office": "U.S. Senate — Pennsylvania",
+      "level": "federal", "chamber": "us-senate", "district": null,
+      "lastName": "Fetterman", "bioguideId": "F000479",
+      "municipalities": ["All Allegheny County municipalities"]
+    },
+    {
+      "name": "Sen. Dave McCormick", "party": "R", "office": "U.S. Senate — Pennsylvania",
+      "level": "federal", "chamber": "us-senate", "district": null,
+      "lastName": "McCormick", "bioguideId": null,
+      "municipalities": ["All Allegheny County municipalities"]
+    },
+    {
+      "name": "State Rep. Jessica Benham", "party": "D", "office": "PA House — District 36",
+      "level": "state", "chamber": "pa-house", "district": 36,
+      "lastName": "Benham", "legiscanPeopleId": null,
+      "municipalities": ["South Side", "Carrick", "Mt. Oliver", "Brentwood", "Baldwin"]
+    },
+    {
+      "name": "State Sen. Jay Costa", "party": "D", "office": "PA Senate — District 43",
+      "level": "state", "chamber": "pa-senate", "district": 43,
+      "lastName": "Costa", "legiscanPeopleId": null,
+      "municipalities": ["Forest Hills", "Edgewood", "Swissvale", "Wilkinsburg", "Penn Hills", "Pittsburgh (eastern)"]
+    },
+    {
+      "name": "Sen. Devlin Robinson", "party": "R", "office": "PA Senate — District 37",
+      "level": "state", "chamber": "pa-senate", "district": 37,
+      "lastName": "Robinson", "legiscanPeopleId": null,
+      "municipalities": ["Bethel Park", "Upper St. Clair", "Moon", "Sewickley", "Franklin Park"]
+    },
+    {
+      "name": "Rep. Jeremy Shaffer", "party": "R", "office": "PA House — District 28",
+      "level": "state", "chamber": "pa-house", "district": 28,
+      "lastName": "Shaffer", "legiscanPeopleId": null,
+      "municipalities": ["Pine", "Marshall", "Hampton", "Bradford Woods", "West Deer", "Richland"]
+    },
+    {
+      "name": "Rep. Natalie Mihalek", "party": "R", "office": "PA House — District 40",
+      "level": "state", "chamber": "pa-house", "district": 40,
+      "lastName": "Mihalek", "legiscanPeopleId": null,
+      "municipalities": ["Bethel Park", "Upper St. Clair (part)", "South Park"]
+    },
+    {
+      "name": "Rep. Valerie Gaydos", "party": "R", "office": "PA House — District 44",
+      "level": "state", "chamber": "pa-house", "district": 44,
+      "lastName": "Gaydos", "legiscanPeopleId": null,
+      "municipalities": ["Moon", "Sewickley", "North Fayette", "Crescent", "Findlay"]
+    },
+    {
+      "name": "Rep. Jason Ortitay", "party": "R", "office": "PA House — District 46",
+      "level": "state", "chamber": "pa-house", "district": 46,
+      "lastName": "Ortitay", "legiscanPeopleId": null,
+      "municipalities": ["South Fayette", "Oakdale", "McDonald (Allegheny County portion)"]
+    }
+  ]
+}

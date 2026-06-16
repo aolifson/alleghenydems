@@ -229,6 +229,13 @@ export interface LegislativeAction {
   sourceUrl: string
   municipalities?: string[]
   displayOrder?: number
+  // Auto-import metadata (populated by scripts/refresh-legislative-tracker.py)
+  needsReview?: boolean
+  autoImported?: boolean
+  externalId?: string
+  billId?: string
+  chamber?: 'pa-house' | 'pa-senate' | 'us-house' | 'us-senate'
+  voteValue?: 'Yea' | 'Nay' | 'Present' | 'Not Voting'
 }
 
 export interface LegislativeLocalEntry {

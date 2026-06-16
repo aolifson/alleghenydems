@@ -1,0 +1,67 @@
+name: Legislative Tracker Refresh
+
+# Pulls recent roll-call votes for tracked officials and stages them as DRAFT items
+# in Sanity for editor review. Nothing reaches the public page automatically — an
+# editor classifies and publishes each item in Studio.
+#
+# Runs weekly. Use the manual "Run workflow" button (workflow_dispatch) with a
+# `since` date the first time, to backfill the whole gap since your last update.
+
+on:
+  schedule:
+    # Mondays 13:00 UTC (~9am ET). Adjust as you like.
+    - cron: "0 13 * * 1"
+  workflow_dispatch:
+    inputs:
+      since:
+        description: "Backfill start date YYYY-MM-DD (leave blank for normal incremental run)"
+        required: false
+        default: ""
+      dry_run:
+        description: "Dry run (no writes) — true/false"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write   # allows committing the updated import-state ledger back to the repo
+
+concurrency:
+  group: legislative-tracker-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run refresh (stdlib only, no pip install needed)
+        env:
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+          NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
+          SANITY_API_TOKEN: ${{ secrets.SANITY_API_TOKEN }}
+          LEGISCAN_API_KEY: ${{ secrets.LEGISCAN_API_KEY }}
+          CONGRESS_GOV_API_KEY: ${{ secrets.CONGRESS_GOV_API_KEY }}
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.since }}" ]; then ARGS="$ARGS --since ${{ github.event.inputs.since }}"; fi
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          echo "Running: python3 scripts/refresh-legislative-tracker.py $ARGS"
+          python3 scripts/refresh-legislative-tracker.py $ARGS
+
+      - name: Persist import-state ledger
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          if ! git diff --quiet -- scripts/data/legislative-import-state.json; then
+            git config user.name "tracker-bot"
+            git config user.email "actions@github.com"
+            git add scripts/data/legislative-import-state.json
+            git commit -m "chore: advance legislative tracker import state [skip ci]"
+            git push
+          else
+            echo "No state change to commit."
+          fi
