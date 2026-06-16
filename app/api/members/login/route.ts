@@ -79,7 +79,10 @@ export async function POST(request: NextRequest) {
   }
 
   const token = await signMemberToken(email, 'login')
-  const verifyUrl = `${request.nextUrl.origin}/api/members/verify?token=${encodeURIComponent(token)}`
+  // Pin links to the canonical public site so they're correct regardless of
+  // which deployment (preview/production/vercel.app) handled the request.
+  const baseUrl = (process.env.MEMBERS_BASE_URL ?? request.nextUrl.origin).replace(/\/$/, '')
+  const verifyUrl = `${baseUrl}/api/members/verify?token=${encodeURIComponent(token)}`
 
   try {
     const resend = new Resend(process.env.RESEND_API_KEY)
