@@ -75,6 +75,42 @@ SANITY_API_VERSION = "v2021-10-21"
 # LegiScan vote_id -> normalized value
 LEGISCAN_VOTE = {1: "Yea", 2: "Nay", 3: "Not Voting", 4: "Not Voting"}
 
+# ── Vote significance filter ──
+# We only want votes worth an editor's time and a voter's attention: final passage /
+# concurrence / veto overrides — NOT amendments, motions, adjournments, procedural votes.
+# And we skip near-unanimous (ceremonial) votes. Tune via --all-votes / MIN_MINORITY.
+PASSAGE_KEYWORDS = (
+    "final passage", "third consideration", "concur", "veto", "passed over veto",
+    "on passage", "override", "and pass", "pass the bill",
+    "on the nomination", "nomination",  # Senate confirmations are high-salience
+)
+PROCEDURAL_KEYWORDS = (
+    "amendment", "motion to", "adjourn", "recommit", "table", "previous question",
+    "first consideration", "second consideration", "quorum", "recess", "germane",
+    "reconsider", "rule", "suspend",
+)
+MIN_MINORITY = 8  # skip votes where the losing side had fewer than this many votes (ceremonial)
+
+
+def is_significant_vote(desc: str, yea, nay, keep_all: bool = False) -> bool:
+    """True if a roll call is a substantive, contested vote worth importing."""
+    d = (desc or "").lower()
+    if keep_all:
+        passage = True
+    else:
+        if any(k in d for k in PROCEDURAL_KEYWORDS) and not any(k in d for k in PASSAGE_KEYWORDS):
+            return False
+        passage = any(k in d for k in PASSAGE_KEYWORDS)
+        if not passage:
+            return False
+    try:
+        y, n = int(yea or 0), int(nay or 0)
+    except (TypeError, ValueError):
+        y, n = 0, 0
+    if not keep_all and min(y, n) < MIN_MINORITY:
+        return False  # near-unanimous / ceremonial
+    return True
+
 
 # ─────────────────────────── small helpers ───────────────────────────
 
@@ -99,14 +135,21 @@ def load_env(path: pathlib.Path) -> dict:
     return env
 
 
+USER_AGENT = "alleghenydems-tracker/1.0 (+https://alleghenydems.com)"
+
+
 def http_json(url: str, headers: dict | None = None, timeout: int = 60) -> dict:
-    req = urllib.request.Request(url, headers=headers or {})
+    # A real User-Agent is REQUIRED: api.congress.gov sits behind a CDN that returns
+    # 403 Forbidden for the default "Python-urllib" agent.
+    h = {"User-Agent": USER_AGENT, "Accept": "application/json"}
+    h.update(headers or {})
+    req = urllib.request.Request(url, headers=h)
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return json.loads(resp.read() or b"{}")
 
 
 def http_text(url: str, timeout: int = 60) -> str:
-    req = urllib.request.Request(url, headers={"User-Agent": "alleghenydems-tracker/1.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return resp.read().decode("utf-8", errors="ignore")
 
@@ -201,7 +244,7 @@ def event_to_action(ev: dict) -> dict:
 
 # ─────────────────────────── source: LegiScan (PA state) ───────────────────────────
 
-def fetch_legiscan(api_key: str, roster: list, since: dt.date) -> list:
+def fetch_legiscan(api_key: str, roster: list, since: dt.date, keep_all: bool = False) -> list:
     """PA House/Senate roll-call votes for tracked state legislators."""
     state_roster = [o for o in roster if o.get("level") == "state"]
     if not state_roster:
@@ -276,6 +319,9 @@ def fetch_legiscan(api_key: str, roster: list, since: dt.date) -> list:
             vdate = parse_date(v.get("date", ""))
             if not vdate or vdate < since:
                 continue
+            # Skip procedural / near-unanimous votes (also saves an API call each).
+            if not is_significant_vote(v.get("desc", ""), v.get("yea"), v.get("nay"), keep_all):
+                continue
             rc = call("getRollCall", id=v["roll_call_id"]).get("roll_call", {})
             for pv in rc.get("votes", []):
                 pid = pv.get("people_id")
@@ -298,7 +344,8 @@ def fetch_legiscan(api_key: str, roster: list, since: dt.date) -> list:
 
 # ─────────────────────── source: Congress.gov (U.S. House) ───────────────────────
 
-def fetch_congress_house(api_key: str, roster: list, since: dt.date, today: dt.date) -> list:
+def fetch_congress_house(api_key: str, roster: list, since: dt.date, today: dt.date,
+                         keep_all: bool = False) -> list:
     """U.S. House roll-call votes for tracked representatives via the Congress.gov API.
 
     NOTE: the House vote endpoints are newer in the Congress.gov v3 API. The call shape
@@ -344,13 +391,22 @@ def fetch_congress_house(api_key: str, roster: list, since: dt.date, today: dt.d
         rollnum = v.get("rollCallNumber") or v.get("voteNumber")
         if rollnum is None:
             continue
+        title = v.get("voteQuestion") or v.get("question") or ""
+        # Cheap keyword screen before spending an API call on the member list
+        # (dummy counts isolate the keyword test; contestedness is checked after the fetch).
+        if not is_significant_vote(title, 999, 999, keep_all):
+            continue
         members = http_json(
             f"{base}/house-vote/{congress}/{session}/{rollnum}/members?format=json&api_key={api_key}",
         )
         recs = (members.get("houseRollCallVoteMemberVotes", {}) or {}).get("results") \
             or members.get("members") or []
+        # Contestedness: skip near-unanimous votes.
+        yea = sum(1 for r in recs if _norm_vote(r.get("voteCast") or r.get("vote") or "") == "Yea")
+        nay = sum(1 for r in recs if _norm_vote(r.get("voteCast") or r.get("vote") or "") == "Nay")
+        if not is_significant_vote(title, yea, nay, keep_all):
+            continue
         bill_id = v.get("legislationNumber") or v.get("bill", {}).get("number") or f"Roll {rollnum}"
-        title = v.get("voteQuestion") or v.get("question") or ""
         url = v.get("url") or f"https://clerk.house.gov/Votes/{vdate.year}{rollnum}"
         for rec in recs:
             o = match_rep(rec)
@@ -373,7 +429,7 @@ def fetch_congress_house(api_key: str, roster: list, since: dt.date, today: dt.d
 
 # ─────────────────────── source: senate.gov XML (U.S. Senate) ───────────────────────
 
-def fetch_senate(roster: list, since: dt.date, today: dt.date) -> list:
+def fetch_senate(roster: list, since: dt.date, today: dt.date, keep_all: bool = False) -> list:
     """U.S. Senate roll-call votes for tracked senators via the official senate.gov XML.
 
     No API key needed. Senate member-level votes are not yet in the Congress.gov API, so
@@ -414,6 +470,10 @@ def fetch_senate(roster: list, since: dt.date, today: dt.date) -> list:
             continue
         question = detail.findtext("vote_question_text") or detail.findtext("question") or ""
         doc = (detail.findtext("document/document_name") or "").strip()
+        yeas = detail.findtext("count/yeas") or detail.findtext(".//yeas") or 0
+        nays = detail.findtext("count/nays") or detail.findtext(".//nays") or 0
+        if not is_significant_vote(question, yeas, nays, keep_all):
+            continue
         for member in detail.findall(".//member"):
             lis = (member.findtext("lis_member_id") or "").strip()
             last = norm_name(member.findtext("last_name") or "")
@@ -524,6 +584,9 @@ def main() -> None:
     ap.add_argument("--mock")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--emit")
+    ap.add_argument("--all-votes", action="store_true",
+                    help="Import every roll call (incl. procedural & near-unanimous). "
+                         "Default: only substantive, contested votes.")
     args = ap.parse_args()
 
     today = dt.date.today()
@@ -558,7 +621,7 @@ def main() -> None:
                 log("  legiscan: LEGISCAN_API_KEY not set — skipping.")
             else:
                 try:
-                    events += fetch_legiscan(key, roster, since)
+                    events += fetch_legiscan(key, roster, since, args.all_votes)
                 except Exception as e:  # noqa: BLE001
                     log(f"  legiscan: ERROR {e}")
         if args.source in ("congress", "all"):
@@ -567,12 +630,12 @@ def main() -> None:
                 log("  congress(house): CONGRESS_GOV_API_KEY not set — skipping.")
             else:
                 try:
-                    events += fetch_congress_house(key, roster, since, today)
+                    events += fetch_congress_house(key, roster, since, today, args.all_votes)
                 except Exception as e:  # noqa: BLE001
                     log(f"  congress(house): ERROR {e}")
         if args.source in ("senate", "all"):
             try:
-                events += fetch_senate(roster, since, today)
+                events += fetch_senate(roster, since, today, args.all_votes)
             except Exception as e:  # noqa: BLE001
                 log(f"  senate: ERROR {e}")
 
