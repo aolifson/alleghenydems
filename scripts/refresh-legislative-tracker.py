@@ -89,7 +89,8 @@ PROCEDURAL_KEYWORDS = (
     "first consideration", "second consideration", "quorum", "recess", "germane",
     "reconsider", "rule", "suspend",
 )
-MIN_MINORITY = 8  # skip votes where the losing side had fewer than this many votes (ceremonial)
+MIN_MINORITY = 8          # absolute floor: losing side must have at least this many votes
+MIN_MINORITY_FRACTION = 0.10  # and be at least this share of votes cast (filters routine bills)
 
 
 def is_significant_vote(desc: str, yea, nay, keep_all: bool = False) -> bool:
@@ -107,8 +108,14 @@ def is_significant_vote(desc: str, yea, nay, keep_all: bool = False) -> bool:
         y, n = int(yea or 0), int(nay or 0)
     except (TypeError, ValueError):
         y, n = 0, 0
-    if not keep_all and min(y, n) < MIN_MINORITY:
+    if keep_all:
+        return True
+    total = y + n
+    minority = min(y, n)
+    if minority < MIN_MINORITY:
         return False  # near-unanimous / ceremonial
+    if total and (minority / total) < MIN_MINORITY_FRACTION:
+        return False  # lopsided: a routine bill with scattered opposition
     return True
 
 
@@ -138,14 +145,24 @@ def load_env(path: pathlib.Path) -> dict:
 USER_AGENT = "alleghenydems-tracker/1.0 (+https://alleghenydems.com)"
 
 
-def http_json(url: str, headers: dict | None = None, timeout: int = 60) -> dict:
+def http_json(url: str, headers: dict | None = None, timeout: int = 90, retries: int = 3) -> dict:
     # A real User-Agent is REQUIRED: api.congress.gov sits behind a CDN that returns
-    # 403 Forbidden for the default "Python-urllib" agent.
+    # 403 Forbidden for the default "Python-urllib" agent. Congress.gov can also be slow,
+    # so we retry on timeouts/transient errors with a longer timeout each attempt.
+    import time
     h = {"User-Agent": USER_AGENT, "Accept": "application/json"}
     h.update(headers or {})
-    req = urllib.request.Request(url, headers=h)
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return json.loads(resp.read() or b"{}")
+    last_err: Exception | None = None
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(url, headers=h)
+            with urllib.request.urlopen(req, timeout=timeout + attempt * 60) as resp:
+                return json.loads(resp.read() or b"{}")
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as e:  # noqa: PERF203
+            last_err = e
+            if attempt < retries - 1:
+                time.sleep(2 + attempt * 3)
+    raise last_err if last_err else RuntimeError("request failed")
 
 
 def http_text(url: str, timeout: int = 60) -> str:
