@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { PortableText } from '@portabletext/react'
 import PageHero from '@/components/page-hero'
 import { getPageBySlug } from '@/sanity/lib/queries'
+import { getMunicipalityPrefix } from '@/lib/tenant'
+import { prefixHref } from '@/lib/prefix-href'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 
 export const metadata: Metadata = { title: 'Voter Resources' }
@@ -60,6 +62,7 @@ const VOTER_LINKS = [
 
 export default async function VotePage() {
   const page = await getPageBySlug('vote')
+  const basePath = await getMunicipalityPrefix()
   const headline = page?.heroHeadline ?? 'Voter Resources'
   const subhead = page?.heroSubhead ?? 'Everything you need to register and vote in Allegheny County, Pennsylvania.'
   const body = stripDuplicatedHeroBlocks(page?.body, headline, subhead)
@@ -74,6 +77,17 @@ export default async function VotePage() {
         framedText
         minHeightClassName="min-h-[340px]"
       />
+
+      <Link
+        href={prefixHref('/plan-to-vote', basePath)}
+        className="flex items-center justify-between gap-4 mb-8 rounded-xl bg-[var(--color-navy)] text-white px-6 py-5 hover:opacity-95 transition-opacity"
+      >
+        <div>
+          <p className="font-display text-xl font-bold">New: Make a Plan to Vote</p>
+          <p className="text-sm text-white/80">Four quick steps to make sure your vote counts this November.</p>
+        </div>
+        <span className="shrink-0 text-[var(--color-gold)] font-semibold">Start →</span>
+      </Link>
 
       {body ? (
         <div className="prose-content max-w-4xl">

@@ -34,6 +34,7 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
     label: 'Vote',
     href: '/vote',
     children: [
+      { label: 'Make a Plan to Vote', href: '/plan-to-vote' },
       { label: '2026 Voter Guide', href: '/voter-guide' },
       { label: 'Register to Vote', href: 'https://www.pavoterservices.pa.gov/pages/VoterRegistrationApplication.aspx', external: true },
       { label: 'Vote by Mail', href: 'https://www.vote.pa.gov/Voting-in-PA/Pages/Mail-and-Absentee-Ballot.aspx', external: true },
