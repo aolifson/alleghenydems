@@ -92,9 +92,14 @@ export default async function ScorecardDetailPage({ params }: Props) {
   if (!card) notFound()
 
   const isDem = card.party === 'D'
-  const shareText = isDem
-    ? `${card.name} delivered ${card.delivered} win${card.delivered === 1 ? '' : 's'} for Allegheny County. See the record:`
-    : `${card.name}'s record: ${card.blocked} blocked, ${card.harmful} harmful to working families. See for yourself:`
+  // Record-driven, not party-driven: an official with more blocked/harmful votes than
+  // wins is presented on their record — including Democrats. Editors control the per-item
+  // classification in Sanity; this just makes the summary honest to whatever they set.
+  const negatives = card.blocked + card.harmful
+  const netNegative = negatives > card.delivered
+  const shareText = netNegative
+    ? `${card.name}'s record: ${card.blocked} blocked, ${card.harmful} harmful to working families. See for yourself:`
+    : `${card.name} delivered ${card.delivered} win${card.delivered === 1 ? '' : 's'} for Allegheny County. See the record:`
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -145,10 +150,12 @@ export default async function ScorecardDetailPage({ params }: Props) {
       {/* GOTV CTA */}
       <section className="mt-12 rounded-lg bg-[var(--color-navy)] text-white p-6">
         <h2 className="font-display text-xl font-bold mb-2">
-          {isDem ? 'Records like this are on the ballot.' : 'You can hold them accountable in November.'}
+          {isDem && !netNegative
+            ? 'Records like this are on the ballot.'
+            : 'You can hold them accountable in November.'}
         </h2>
         <p className="text-sm text-white/85 mb-4">
-          {isDem
+          {isDem && !netNegative
             ? 'Re-elect the people delivering for working families. Make your plan to vote now.'
             : 'This record is on the ballot this November. The most powerful response is your vote.'}
         </p>

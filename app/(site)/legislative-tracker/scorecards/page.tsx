@@ -31,8 +31,12 @@ function StatPill({ n, label, tone }: { n: number; label: string; tone: 'green' 
 function ScorecardTile({ card, basePath }: { card: OfficialScorecard; basePath: string }) {
   const isDem = card.party === 'D'
   const accent = isDem ? 'border-l-[var(--color-blue)]' : 'border-l-red-600'
-  const headline = isDem ? card.delivered : card.blocked + card.harmful
-  const headlineLabel = isDem ? 'delivered' : 'blocked / harmful'
+  // Headline the record, not the party: if an official (of either party) has more
+  // blocked/harmful votes than wins, lead with that instead of burying it.
+  const negatives = card.blocked + card.harmful
+  const leadNegative = negatives > card.delivered
+  const headline = leadNegative ? negatives : card.delivered
+  const headlineLabel = leadNegative ? 'blocked / harmful' : 'delivered'
   return (
     <Link
       href={prefixHref(`/legislative-tracker/scorecards/${card.slug}`, basePath)}
