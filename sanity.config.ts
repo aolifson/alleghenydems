@@ -153,6 +153,22 @@ export default defineConfig({
 
             S.divider(),
 
+            // ── Outreach (county scope only) ──
+            S.listItem()
+              .title('Outreach')
+              .icon(EnvelopeIcon)
+              .child(
+                S.list()
+                  .title('Outreach')
+                  .items([
+                    S.documentTypeListItem('voteReminder')
+                      .title('🗳️ Vote Reminder Signups')
+                      .icon(BellIcon),
+                  ])
+              ),
+
+            S.divider(),
+
             // ── Committee & People ──
             S.listItem()
               .title('Committee & People')

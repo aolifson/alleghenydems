@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import ExternalLink from '@/components/external-link'
 import ElectionCountdown from '@/components/election-countdown'
+import VoteReminderForm from '@/components/vote-reminder-form'
 import { ELECTION, VOTE_LINKS } from '@/lib/election'
 import { getMunicipalityPrefix } from '@/lib/tenant'
 import { prefixHref } from '@/lib/prefix-href'
@@ -143,6 +144,32 @@ export default async function PlanToVotePage() {
             <ActionButton href={VOTE_LINKS.electionCalendar}>Full election calendar</ActionButton>
           </div>
         </StepCard>
+
+        {/* Email-capture: get reminded before each key deadline */}
+        <section className="bg-white rounded-xl border border-[var(--color-border)] shadow-sm overflow-hidden">
+          <div className="flex items-center gap-3 bg-[var(--color-navy)] px-5 py-3">
+            <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--color-gold)] text-[var(--color-navy)] font-bold text-sm">
+              🔔
+            </span>
+            <h2 className="font-display text-lg md:text-xl font-bold text-white">Remind me to vote</h2>
+          </div>
+          <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <p className="text-sm text-[var(--color-text)]">
+                Life gets busy. Sign up and we&rsquo;ll send you a quick heads-up before each key deadline so
+                you never miss your chance to vote.
+              </p>
+              <ul className="text-sm space-y-1.5">
+                <li><Deadline label="Register by" value={ELECTION.registrationDeadlineLabel} /></li>
+                <li><Deadline label="Mail ballot application by" value={ELECTION.mailBallotApplicationDeadlineLabel} /></li>
+                <li><Deadline label="Election Day" value={ELECTION.dateLabel} /></li>
+              </ul>
+            </div>
+            <div className="md:border-l md:border-[var(--color-border)] md:pl-6">
+              <VoteReminderForm source="plan-to-vote" />
+            </div>
+          </div>
+        </section>
 
         <div className="bg-[var(--color-blue-light)] rounded-xl p-5 border border-[var(--color-border)]">
           <h2 className="font-bold text-[var(--color-blue)] mb-1">Questions about voting?</h2>
