@@ -17,6 +17,10 @@ on:
         description: "Backfill start date YYYY-MM-DD (leave blank for normal incremental run)"
         required: false
         default: ""
+      until:
+        description: "Backfill end date YYYY-MM-DD (leave blank = today). Use with 'since' to load a few weeks at a time."
+        required: false
+        default: ""
       dry_run:
         description: "Dry run (no writes) — true/false"
         required: false
@@ -49,6 +53,7 @@ jobs:
         run: |
           ARGS=""
           if [ -n "${{ github.event.inputs.since }}" ]; then ARGS="$ARGS --since ${{ github.event.inputs.since }}"; fi
+          if [ -n "${{ github.event.inputs.until }}" ]; then ARGS="$ARGS --until ${{ github.event.inputs.until }}"; fi
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
           echo "Running: python3 scripts/refresh-legislative-tracker.py $ARGS"
           python3 scripts/refresh-legislative-tracker.py $ARGS

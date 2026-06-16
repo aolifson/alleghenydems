@@ -59,6 +59,20 @@ After that, every run records the date in `scripts/data/legislative-import-state
 later runs only fetch what's new. A per-item `externalId` plus a "seen" ledger mean items
 are never imported twice — and items you reject (delete) won't come back.
 
+### Back-load a few weeks at a time (keeps each review batch small)
+
+Use `--until` with `--since` to import one window, review it in Studio, then advance:
+
+```bash
+python3 scripts/refresh-legislative-tracker.py --since 2026-02-01 --until 2026-02-21
+# review the drafts in Studio, then:
+python3 scripts/refresh-legislative-tracker.py --since 2026-02-21 --until 2026-03-14
+# …continue until you reach today; weekly runs then take over automatically.
+```
+
+`lastRun` only ever moves forward, so the chunks compose cleanly and the weekly job resumes
+from wherever you stopped. (`--until` defaults to today when omitted.)
+
 ## Ongoing — weekly automation
 
 **GitHub Actions (recommended):** `.github/workflows/legislative-tracker-refresh.yml` runs

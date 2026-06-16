@@ -261,7 +261,8 @@ def event_to_action(ev: dict) -> dict:
 
 # ─────────────────────────── source: LegiScan (PA state) ───────────────────────────
 
-def fetch_legiscan(api_key: str, roster: list, since: dt.date, keep_all: bool = False) -> list:
+def fetch_legiscan(api_key: str, roster: list, since: dt.date, until: dt.date,
+                   keep_all: bool = False) -> list:
     """PA House/Senate roll-call votes for tracked state legislators."""
     state_roster = [o for o in roster if o.get("level") == "state"]
     if not state_roster:
@@ -334,7 +335,7 @@ def fetch_legiscan(api_key: str, roster: list, since: dt.date, keep_all: bool = 
         btitle = bill.get("title", "")
         for v in bill.get("votes", []):
             vdate = parse_date(v.get("date", ""))
-            if not vdate or vdate < since:
+            if not vdate or vdate < since or vdate > until:
                 continue
             # Skip procedural / near-unanimous votes (also saves an API call each).
             if not is_significant_vote(v.get("desc", ""), v.get("yea"), v.get("nay"), keep_all):
@@ -361,8 +362,8 @@ def fetch_legiscan(api_key: str, roster: list, since: dt.date, keep_all: bool = 
 
 # ─────────────────────── source: Congress.gov (U.S. House) ───────────────────────
 
-def fetch_congress_house(api_key: str, roster: list, since: dt.date, today: dt.date,
-                         keep_all: bool = False) -> list:
+def fetch_congress_house(api_key: str, roster: list, since: dt.date, until: dt.date,
+                         today: dt.date, keep_all: bool = False) -> list:
     """U.S. House roll-call votes for tracked representatives via the Congress.gov API.
 
     NOTE: the House vote endpoints are newer in the Congress.gov v3 API. The call shape
@@ -403,7 +404,7 @@ def fetch_congress_house(api_key: str, roster: list, since: dt.date, today: dt.d
     events: list = []
     for v in votes:
         vdate = parse_date(str(v.get("startDate") or v.get("date") or ""))
-        if not vdate or vdate < since:
+        if not vdate or vdate < since or vdate > until:
             continue
         rollnum = v.get("rollCallNumber") or v.get("voteNumber")
         if rollnum is None:
@@ -446,7 +447,8 @@ def fetch_congress_house(api_key: str, roster: list, since: dt.date, today: dt.d
 
 # ─────────────────────── source: senate.gov XML (U.S. Senate) ───────────────────────
 
-def fetch_senate(roster: list, since: dt.date, today: dt.date, keep_all: bool = False) -> list:
+def fetch_senate(roster: list, since: dt.date, until: dt.date, today: dt.date,
+                 keep_all: bool = False) -> list:
     """U.S. Senate roll-call votes for tracked senators via the official senate.gov XML.
 
     No API key needed. Senate member-level votes are not yet in the Congress.gov API, so
@@ -475,7 +477,7 @@ def fetch_senate(roster: list, since: dt.date, today: dt.date, keep_all: bool = 
     for vote in menu.findall(".//vote"):
         num = (vote.findtext("vote_number") or "").strip()
         vdate = parse_date(vote.findtext("vote_date") or "")
-        if not num or not vdate or vdate < since:
+        if not num or not vdate or vdate < since or vdate > until:
             continue
         vurl = (
             f"https://www.senate.gov/legislative/LIS/roll_call_votes/"
@@ -596,7 +598,9 @@ def save_state(state: dict) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--since")
+    ap.add_argument("--since", help="Window start (YYYY-MM-DD). Default: last run, else backfill start.")
+    ap.add_argument("--until", help="Window end (YYYY-MM-DD), inclusive. Default: today. "
+                                    "Use with --since to back-load a few weeks at a time.")
     ap.add_argument("--source", choices=["legiscan", "congress", "senate", "all"], default="all")
     ap.add_argument("--mock")
     ap.add_argument("--dry-run", action="store_true")
@@ -621,7 +625,12 @@ def main() -> None:
         since = parse_date(BACKFILL_START)
     if not since:
         sys.exit("ERROR: could not determine --since date.")
-    log(f"Fetch window: votes on or after {since} (today {today})")
+    until = parse_date(args.until) if args.until else today
+    if not until:
+        sys.exit("ERROR: could not parse --until date.")
+    if until < since:
+        sys.exit(f"ERROR: --until ({until}) is before --since ({since}).")
+    log(f"Fetch window: votes {since} … {until} (today {today})")
 
     roster = json.loads(ROSTER_PATH.read_text()).get("officials", [])
     roster = [o for o in roster if not str(o.get("name", "")).endswith("EXAMPLE")]
@@ -638,7 +647,7 @@ def main() -> None:
                 log("  legiscan: LEGISCAN_API_KEY not set — skipping.")
             else:
                 try:
-                    events += fetch_legiscan(key, roster, since, args.all_votes)
+                    events += fetch_legiscan(key, roster, since, until, args.all_votes)
                 except Exception as e:  # noqa: BLE001
                     log(f"  legiscan: ERROR {e}")
         if args.source in ("congress", "all"):
@@ -647,12 +656,12 @@ def main() -> None:
                 log("  congress(house): CONGRESS_GOV_API_KEY not set — skipping.")
             else:
                 try:
-                    events += fetch_congress_house(key, roster, since, today, args.all_votes)
+                    events += fetch_congress_house(key, roster, since, until, today, args.all_votes)
                 except Exception as e:  # noqa: BLE001
                     log(f"  congress(house): ERROR {e}")
         if args.source in ("senate", "all"):
             try:
-                events += fetch_senate(roster, since, today, args.all_votes)
+                events += fetch_senate(roster, since, until, today, args.all_votes)
             except Exception as e:  # noqa: BLE001
                 log(f"  senate: ERROR {e}")
 
@@ -709,11 +718,19 @@ def main() -> None:
         res = sanity_write_draft(project_id, dataset, token, merged)
         log(f"Wrote draft {DRAFT_ID}: {res.get('results', [])}")
 
-    # ── advance state ──
-    state["lastRun"] = today.isoformat()
+    # ── advance state (forward only) ──
+    # Move lastRun to the end of the window we just processed, but never backward — so you
+    # can back-load in chunks (Feb1–Feb21, then Feb21–Mar14, …) and the weekly run later
+    # resumes from wherever the chunks left off. seenExternalIds always grows.
+    prev = parse_date(state.get("lastRun") or "") if state.get("lastRun") else None
+    new_last = max([d for d in (prev, until) if d])
+    state["lastRun"] = new_last.isoformat()
     state["seenExternalIds"] = sorted(set(state.get("seenExternalIds", [])) | fresh_ids)
     save_state(state)
     log(f"State saved. lastRun={state['lastRun']}, tracked ids={len(state['seenExternalIds'])}")
+    if until < today:
+        log(f"NOTE: window ended {until} (before today {today}). Next chunk: "
+            f"--since {until} --until <later date>.")
     log("Done. Open Sanity Studio → Legislative Tracker (draft) to review 🆕 items, "
         "set Action Type + Category, then publish.")
 
