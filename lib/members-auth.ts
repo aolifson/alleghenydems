@@ -36,6 +36,28 @@ export function isAdminEmail(email: string): boolean {
     .includes(normalized)
 }
 
+// ── Preview-phase shared password ────────────────────────────────────────────
+// A single shared password (env MEMBERS_PREVIEW_PASSWORD) that lets reviewers
+// into the members area while the site is still private and real per-person
+// email links aren't deliverable yet (Resend domain unverified). Sessions
+// minted this way carry this sentinel email. REMOVE the env var at public
+// launch — its mere presence is the on/off switch.
+export const PREVIEW_SESSION_EMAIL = 'preview-reviewer@members.local'
+
+export function isPreviewPasswordEnabled(): boolean {
+  return Boolean(process.env.MEMBERS_PREVIEW_PASSWORD)
+}
+
+export function checkPreviewPassword(provided: string): boolean {
+  const secret = process.env.MEMBERS_PREVIEW_PASSWORD
+  if (!secret || !provided || provided.length !== secret.length) return false
+  let mismatch = 0
+  for (let i = 0; i < secret.length; i++) {
+    mismatch |= provided.charCodeAt(i) ^ secret.charCodeAt(i)
+  }
+  return mismatch === 0
+}
+
 export async function signMemberToken(email: string, purpose: TokenPurpose): Promise<string> {
   const key = secretKey()
   if (!key) throw new Error('AUTH_SECRET is not set')

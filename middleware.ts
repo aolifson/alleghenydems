@@ -83,7 +83,7 @@ async function hasValidMemberSession(request: NextRequest): Promise<boolean> {
 }
 
 // /api/members routes that must stay reachable without a session
-const MEMBERS_PUBLIC_API = /^\/api\/members\/(login|verify)(\/|$)/
+const MEMBERS_PUBLIC_API = /^\/api\/members\/(login|verify|preview-login)(\/|$)/
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
