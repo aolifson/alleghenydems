@@ -11,9 +11,11 @@ import {
   EnvelopeIcon,
   LinkIcon,
   MasterDetailIcon,
+  SearchIcon,
   UsersIcon,
 } from '@sanity/icons'
 import { schemaTypes } from './sanity/schemaTypes'
+import CandidateFinder from './sanity/structure/CandidateFinder'
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET ?? 'production'
@@ -146,6 +148,16 @@ export default defineConfig({
             S.documentTypeListItem('voterGuide')
               .title('Voter Guides')
               .icon(MasterDetailIcon),
+
+            S.listItem()
+              .title('Candidate Finder')
+              .icon(SearchIcon)
+              .id('candidateFinder')
+              .child(
+                S.component(CandidateFinder)
+                  .title('Candidate Finder')
+                  .id('candidateFinder')
+              ),
 
             S.documentTypeListItem('legislativeTracker')
               .title('Legislative Tracker')
