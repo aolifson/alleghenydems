@@ -26,6 +26,7 @@ const DEFAULT_NAV_ITEMS: NavItem[] = [
     children: [
       { label: 'Volunteer', href: '/get-involved#volunteer' },
       { label: 'Become a Committee Member', href: '/become-a-committee-member' },
+      { label: 'Run for Office', href: '/run-for-office' },
       { label: 'Events', href: '/events' },
       { label: 'Donate', href: 'https://secure.actblue.com', external: true },
     ],

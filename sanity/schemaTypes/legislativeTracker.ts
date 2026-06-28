@@ -91,20 +91,53 @@ export const legislativeActionType = defineType({
         ],
       },
     }),
+    defineField({
+      name: 'voteResult',
+      title: 'Vote Result',
+      type: 'string',
+      description: 'Outcome + tally, e.g. "Passed 105–98". Auto-filled for imported votes.',
+    }),
+    defineField({
+      name: 'partyBreakdown',
+      title: 'Party Split',
+      type: 'string',
+      description: 'How each caucus voted, e.g. "Dem 100–2 · GOP 5–96". Auto-filled.',
+    }),
+    defineField({
+      name: 'crossedParty',
+      title: 'Crossed Party Lines',
+      type: 'boolean',
+      initialValue: false,
+      description: 'TRUE when this official voted against most of their own caucus — a high-signal accountability flag.',
+    }),
+    defineField({
+      name: 'billSummary',
+      title: 'Bill Summary (plain)',
+      type: 'text',
+      rows: 2,
+      description: 'Plainer description of the bill than its formal title. Auto-filled where available.',
+    }),
   ],
   preview: {
-    select: { title: 'official', subtitle: 'category', type: 'type', needsReview: 'needsReview' },
-    prepare({ title, subtitle, type, needsReview }) {
+    select: {
+      title: 'official', subtitle: 'category', type: 'type', needsReview: 'needsReview',
+      voteValue: 'voteValue', voteResult: 'voteResult', crossed: 'crossedParty',
+    },
+    prepare({ title, subtitle, type, needsReview, voteValue, voteResult, crossed }) {
       const labels: Record<string, string> = {
         accomplishment: 'Delivered',
         blocked: 'Blocked',
         harmful: 'Harmful',
       }
       const prefix = needsReview ? '🆕 REVIEW · ' : ''
-      return {
-        title: `${prefix}${title}`,
-        subtitle: [subtitle, labels[String(type)]].filter(Boolean).join(' · '),
-      }
+      const cross = crossed ? '⚠ CROSSED PARTY · ' : ''
+      // For review items, lead the subtitle with the at-a-glance vote context;
+      // for finished items, show category + classification.
+      const reviewBits = [voteValue ? `Voted ${voteValue}` : '', voteResult].filter(Boolean).join(' · ')
+      const subtitleText = needsReview
+        ? `${cross}${reviewBits || subtitle}`
+        : [subtitle, labels[String(type)]].filter(Boolean).join(' · ')
+      return { title: `${prefix}${title}`, subtitle: subtitleText }
     },
   },
 })

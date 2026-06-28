@@ -171,6 +171,7 @@ export interface VoterGuideCandidate {
   _key?: string
   name: string
   campaignWebsite?: string
+  volunteerUrl?: string
   facebookUrl?: string
   instagramUrl?: string
   xUrl?: string
@@ -236,6 +237,10 @@ export interface LegislativeAction {
   billId?: string
   chamber?: 'pa-house' | 'pa-senate' | 'us-house' | 'us-senate'
   voteValue?: 'Yea' | 'Nay' | 'Present' | 'Not Voting'
+  voteResult?: string
+  partyBreakdown?: string
+  crossedParty?: boolean
+  billSummary?: string
 }
 
 export interface LegislativeLocalEntry {

@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import SocialLinks from '@/components/social-links'
+import VolunteerButton from '@/components/volunteer-button'
 import { urlFor } from '@/sanity/lib/image'
 import type { VoterGuideCandidate, VoterGuideDistrict, VoterGuideRace } from '@/sanity/lib/queries'
 
@@ -190,6 +191,10 @@ export default function VoterGuideStateCommittee({ race, districts }: Props) {
                           instagramUrl={candidate.instagramUrl}
                           xUrl={candidate.xUrl}
                         />
+
+                        <div>
+                          <VolunteerButton candidate={candidate} />
+                        </div>
                       </div>
                     )
                   })}

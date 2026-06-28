@@ -223,19 +223,75 @@ def district_num(value) -> int | None:
 #   }
 
 
+def _party_letter(party: str) -> str:
+    p = (party or "").strip().lower()
+    if p in ("d", "democrat", "democratic", "dem"):
+        return "D"
+    if p in ("r", "republican", "rep", "gop"):
+        return "R"
+    return "O"
+
+
+def analyze_roll(per_person: list, member_party: str, member_value: str) -> dict:
+    """Summarize a roll call from (party, value) pairs for ALL voters.
+
+    Returns tally string, per-party breakdown, and whether the member broke with
+    the majority of their own party — the signals a reviewer needs at a glance.
+    """
+    oy = on = 0
+    by = {"D": [0, 0], "R": [0, 0]}  # party -> [yea, nay]
+    for party, value in per_person:
+        v = (value or "").strip().lower()
+        pl = _party_letter(party)
+        if v in ("yea", "yes", "aye"):
+            oy += 1
+            if pl in by:
+                by[pl][0] += 1
+        elif v in ("nay", "no"):
+            on += 1
+            if pl in by:
+                by[pl][1] += 1
+    crossed = False
+    mp = _party_letter(member_party)
+    mv = (member_value or "").strip().lower()
+    if mp in by and mv in ("yea", "nay"):
+        dy, dn = by[mp]
+        if dy or dn:
+            party_majority = "yea" if dy >= dn else "nay"
+            crossed = mv != party_majority
+    breakdown = f"Dem {by['D'][0]}–{by['D'][1]} · GOP {by['R'][0]}–{by['R'][1]}"
+    return {"tally": f"{oy}–{on}", "breakdown": breakdown, "crossed": crossed}
+
+
 def event_to_action(ev: dict) -> dict:
     """Turn a normalized vote event into a draft legislativeAction item."""
     vote = ev.get("voteValue", "")
+    yes_no = "YES" if vote == "Yea" else "NO" if vote == "Nay" else vote
     bill = ev.get("billId", "").strip()
     title = (ev.get("billTitle") or "").strip()
-    desc = f"Voted {vote} on {bill}".strip()
+    summary = (ev.get("billSummary") or "").strip()
+    result = (ev.get("voteResult") or "").strip()       # e.g. "Passed 105–98"
+    breakdown = (ev.get("partyBreakdown") or "").strip()  # e.g. "Dem 100–2 · GOP 5–96"
+    crossed = ev.get("crossedParty")
+    party = ev.get("party", "")
+
+    # ── At-a-glance review block (first lines an editor sees) ──
+    lines = [f"Voted {yes_no} on {bill}" + (f" — {result}" if result else "")]
     if title:
-        desc += f": {title}"
-    desc += (
-        "\n\n[AUTO-IMPORTED — needs editor review. Set the Action Type "
+        lines[0] += f"  ({title})"
+    if crossed:
+        lines.append(f"⚠ CROSSED PARTY: {ev.get('official','This member')} ({party}) voted "
+                     f"against most of their own caucus.")
+    if breakdown:
+        lines.append(f"Party split: {breakdown}.")
+    if summary and summary != title:
+        lines.append(f"Bill: {summary}")
+    lines.append(
+        "\n[AUTO-IMPORTED — needs editor review. Set the Action Type "
         "(accomplishment / blocked / harmful), choose a real Category, rewrite this "
         "description in plain language for voters, and confirm the source before publishing.]"
     )
+    desc = "\n".join(lines)
     return {
         "_type": "legislativeAction",
         "_key": make_key(),
@@ -256,6 +312,10 @@ def event_to_action(ev: dict) -> dict:
         "billId": bill,
         "chamber": ev.get("chamber"),
         "voteValue": vote if vote in ("Yea", "Nay", "Present", "Not Voting") else None,
+        "billSummary": summary or title or None,
+        "voteResult": result or None,
+        "partyBreakdown": breakdown or None,
+        "crossedParty": bool(crossed),
     }
 
 
@@ -287,6 +347,7 @@ def fetch_legiscan(api_key: str, roster: list, since: dt.date, until: dt.date,
     # Primary key is chamber + district (uniquely identifies a seat, so it survives
     # name changes/marriages); last name is only a tie-breaker. Editors never enter IDs.
     session_people = call("getSessionPeople", id=session_id).get("sessionpeople", {}).get("people", [])
+    pid_party = {p.get("people_id"): p.get("party") for p in session_people}  # for party-split analysis
     people: dict = {}  # people_id -> roster official
     for o in state_roster:
         pid = o.get("legiscanPeopleId")  # explicit override wins
@@ -333,6 +394,7 @@ def fetch_legiscan(api_key: str, roster: list, since: dt.date, until: dt.date,
         bill = call("getBill", id=bid).get("bill", {})
         bnum = bill.get("bill_number", str(bid))
         btitle = bill.get("title", "")
+        bsummary = bill.get("description", "")  # LegiScan "description" is usually plainer than title
         for v in bill.get("votes", []):
             vdate = parse_date(v.get("date", ""))
             if not vdate or vdate < since or vdate > until:
@@ -341,17 +403,27 @@ def fetch_legiscan(api_key: str, roster: list, since: dt.date, until: dt.date,
             if not is_significant_vote(v.get("desc", ""), v.get("yea"), v.get("nay"), keep_all):
                 continue
             rc = call("getRollCall", id=v["roll_call_id"]).get("roll_call", {})
-            for pv in rc.get("votes", []):
+            rc_votes = rc.get("votes", [])
+            per_person = [(pid_party.get(pv.get("people_id")),
+                           LEGISCAN_VOTE.get(pv.get("vote_id"), pv.get("vote_text", "")))
+                          for pv in rc_votes]
+            passed = rc.get("passed")
+            for pv in rc_votes:
                 pid = pv.get("people_id")
                 if pid not in people:
                     continue
                 o = people[pid]
+                mvalue = LEGISCAN_VOTE.get(pv.get("vote_id"), pv.get("vote_text", ""))
+                a = analyze_roll(per_person, o.get("party", ""), mvalue)
+                outcome = "Passed" if passed == 1 else "Failed" if passed == 0 else ""
                 events.append({
                     "externalId": f"legiscan-rc{rc.get('roll_call_id')}-p{pid}",
                     "official": o["name"], "party": o.get("party", "R"),
                     "office": o.get("office", ""), "chamber": o.get("chamber"),
-                    "billId": f"PA {bnum}", "billTitle": btitle,
-                    "voteValue": LEGISCAN_VOTE.get(pv.get("vote_id"), pv.get("vote_text", "")),
+                    "billId": f"PA {bnum}", "billTitle": btitle, "billSummary": bsummary,
+                    "voteValue": mvalue,
+                    "voteResult": f"{outcome} {a['tally']}".strip(),
+                    "partyBreakdown": a["breakdown"], "crossedParty": a["crossed"],
                     "date": vdate.isoformat(),
                     "sourceLabel": f"LegiScan roll call — PA {bnum}",
                     "sourceUrl": rc.get("url") or bill.get("url", ""),
@@ -425,18 +497,26 @@ def fetch_congress_house(api_key: str, roster: list, since: dt.date, until: dt.d
         if not is_significant_vote(title, yea, nay, keep_all):
             continue
         bill_id = v.get("legislationNumber") or v.get("bill", {}).get("number") or f"Roll {rollnum}"
+        bill_summary = v.get("legislationTitle") or v.get("bill", {}).get("title") or ""
         url = v.get("url") or f"https://clerk.house.gov/Votes/{vdate.year}{rollnum}"
+        per_person = [(r.get("voteParty") or r.get("party"),
+                       _norm_vote(r.get("voteCast") or r.get("vote") or "")) for r in recs]
+        result_word = (v.get("result") or "").strip()
         for rec in recs:
             o = match_rep(rec)
             if not o:
                 continue
             slug = norm_name(o.get("lastName") or o["name"])
+            mvalue = _norm_vote(rec.get("voteCast") or rec.get("vote") or "")
+            a = analyze_roll(per_person, o.get("party", ""), mvalue)
             events.append({
                 "externalId": f"ushouse-{congress}-{session}-rc{rollnum}-{slug}",
                 "official": o["name"], "party": o.get("party", "D"),
                 "office": o.get("office", ""), "chamber": "us-house",
-                "billId": f"US {bill_id}", "billTitle": title,
-                "voteValue": _norm_vote(rec.get("voteCast") or rec.get("vote") or ""),
+                "billId": f"US {bill_id}", "billTitle": title, "billSummary": bill_summary,
+                "voteValue": mvalue,
+                "voteResult": (f"{result_word} " if result_word else "") + a["tally"],
+                "partyBreakdown": a["breakdown"], "crossedParty": a["crossed"],
                 "date": vdate.isoformat(),
                 "sourceLabel": f"U.S. House roll call {rollnum}",
                 "sourceUrl": url,
@@ -489,24 +569,34 @@ def fetch_senate(roster: list, since: dt.date, until: dt.date, today: dt.date,
             continue
         question = detail.findtext("vote_question_text") or detail.findtext("question") or ""
         doc = (detail.findtext("document/document_name") or "").strip()
+        doc_title = (detail.findtext("document/document_title")
+                     or detail.findtext("vote_title") or "").strip()
         yeas = detail.findtext("count/yeas") or detail.findtext(".//yeas") or 0
         nays = detail.findtext("count/nays") or detail.findtext(".//nays") or 0
         if not is_significant_vote(question, yeas, nays, keep_all):
             continue
-        for member in detail.findall(".//member"):
+        result_word = (detail.findtext("vote_result") or "").strip()
+        all_members = detail.findall(".//member")
+        per_person = [(m.findtext("party"), _norm_vote(m.findtext("vote_cast") or ""))
+                      for m in all_members]
+        for member in all_members:
             lis = (member.findtext("lis_member_id") or "").strip()
             last = norm_name(member.findtext("last_name") or "")
             o = sens_by_lis.get(lis) or sens_by_name.get(last)
             if not o:
                 continue
             key = lis or last
+            mvalue = _norm_vote(member.findtext("vote_cast") or "")
+            a = analyze_roll(per_person, o.get("party", ""), mvalue)
             events.append({
                 "externalId": f"ussenate-{congress}-{session}-rc{num}-{key}",
                 "official": o["name"], "party": o.get("party", "D"),
                 "office": o.get("office", ""), "chamber": "us-senate",
                 "billId": f"US {doc}" if doc else f"Senate Vote {num}",
-                "billTitle": question,
-                "voteValue": _norm_vote(member.findtext("vote_cast") or ""),
+                "billTitle": question, "billSummary": doc_title,
+                "voteValue": mvalue,
+                "voteResult": (f"{result_word} " if result_word else "") + a["tally"],
+                "partyBreakdown": a["breakdown"], "crossedParty": a["crossed"],
                 "date": vdate.isoformat(),
                 "sourceLabel": f"U.S. Senate roll call {num}",
                 "sourceUrl": vurl,

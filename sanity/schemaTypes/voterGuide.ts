@@ -66,6 +66,13 @@ export const voterGuideCandidateType = defineType({
       validation: (rule) => rule.uri({ scheme: ['http', 'https'] }),
     }),
     defineField({
+      name: 'volunteerUrl',
+      title: 'Volunteer / Sign-up URL',
+      type: 'url',
+      description: 'Optional. Full URL to the campaign’s volunteer or sign-up page. If left blank, the card shows a general "Volunteer with ACDC" link.',
+      validation: (rule) => rule.uri({ scheme: ['http', 'https'] }),
+    }),
+    defineField({
       name: 'facebookUrl',
       title: 'Facebook URL',
       type: 'url',

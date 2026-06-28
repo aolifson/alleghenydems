@@ -52,8 +52,21 @@ function RecordCard({ item }: { item: LegislativeAction }) {
         <span className={`text-xs font-semibold px-2 py-0.5 rounded border ${b.cls}`}>{b.label}</span>
         <span className="text-xs text-[var(--color-text-muted)]">{item.date}</span>
         {item.billId && <span className="text-xs font-medium text-[var(--color-blue)]">{item.billId}</span>}
+        {item.voteValue && (
+          <span className="text-xs font-semibold text-[var(--color-text)]">
+            Voted {item.voteValue}{item.voteResult ? ` · ${item.voteResult}` : ''}
+          </span>
+        )}
+        {item.crossedParty && (
+          <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
+            ⚠ Crossed party
+          </span>
+        )}
       </div>
       <p className="text-sm text-[var(--color-text)] mb-3 whitespace-pre-line">{item.description}</p>
+      {item.partyBreakdown && (
+        <p className="text-xs text-[var(--color-text-muted)] mb-3">Party split: {item.partyBreakdown}</p>
+      )}
       {item.sourceUrl && (
         <a
           href={item.sourceUrl}

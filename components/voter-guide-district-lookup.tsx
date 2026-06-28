@@ -5,6 +5,7 @@ import type { FormEvent, KeyboardEvent } from 'react'
 import Image from 'next/image'
 import PrintButton from '@/components/print-button'
 import SocialLinks from '@/components/social-links'
+import VolunteerButton from '@/components/volunteer-button'
 import VoterGuideStateCommittee from '@/components/voter-guide-state-committee'
 import { urlFor } from '@/sanity/lib/image'
 import type { VoterGuideCandidate, VoterGuideDistrict, VoterGuideRace } from '@/sanity/lib/queries'
@@ -434,6 +435,10 @@ function CandidateCard({ candidate }: { candidate: VoterGuideCandidate }) {
         instagramUrl={candidate.instagramUrl}
         xUrl={candidate.xUrl}
       />
+
+      <div>
+        <VolunteerButton candidate={candidate} />
+      </div>
     </div>
   )
 }
