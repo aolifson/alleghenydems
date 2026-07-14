@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACDC Site Guide — Managing Content</title>
+<style>
+  :root {
+    --navy: #1a2744;
+    --blue: #2563eb;
+    --blue-mid: #1d4ed8;
+    --blue-light: #dbeafe;
+    --red: #dc2626;
+    --gold: #d97706;
+    --green: #16a34a;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --surface: #f8fafc;
+    --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; color: var(--text); background: var(--white); line-height: 1.6; }
+
+  /* ── Sticky top nav ── */
+  .top-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--navy); color: white;
+    padding: 0 1.5rem;
+    display: flex; align-items: center; gap: 1.5rem;
+    font-size: 0.8rem; height: 44px; overflow-x: auto;
+  }
+  .top-nav a { color: rgba(255,255,255,0.75); text-decoration: none; white-space: nowrap; }
+  .top-nav a:hover { color: white; }
+  .top-nav a.current { color: white; font-weight: 700; border-bottom: 2px solid var(--blue); }
+  .top-nav .brand { font-weight: 700; color: white; margin-right: 0.5rem; }
+
+  /* ── Page header ── */
+  .page-head { background: var(--navy); color: white; padding: 2.5rem 2rem 2rem; }
+  .page-head .inner { max-width: 960px; margin: 0 auto; }
+  .page-head h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
+  .page-head p { color: rgba(255,255,255,0.75); margin-top: 0.5rem; max-width: 720px; }
+  .page-head code { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: white; }
+
+  /* ── Sections ── */
+  .section { padding: 3rem 2rem; max-width: 960px; margin: 0 auto; }
+  .section-band { background: var(--surface); }
+  h2 { font-size: 1.75rem; font-weight: 800; color: var(--navy); margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 3px solid var(--blue); display: inline-block; }
+  h3 { font-size: 1.2rem; font-weight: 700; color: var(--navy); margin: 2rem 0 0.75rem; }
+  h4 { font-size: 1rem; font-weight: 600; color: var(--blue-mid); margin: 1.5rem 0 0.5rem; }
+  p { margin-bottom: 0.875rem; color: var(--text); }
+  .lead { font-size: 1.05rem; color: var(--muted); margin-bottom: 1.5rem; }
+  ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+  li { margin-bottom: 0.375rem; }
+  code { background: #f1f5f9; border: 1px solid var(--border); border-radius: 4px; padding: 0.125rem 0.375rem; font-size: 0.85em; font-family: 'Menlo', 'Consolas', monospace; color: var(--navy); }
+  a.detail-link { color: var(--blue-mid); font-weight: 600; text-decoration: none; }
+  a.detail-link:hover { text-decoration: underline; }
+
+  /* ── Callout boxes ── */
+  .callout { border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; display: flex; gap: 0.75rem; align-items: flex-start; }
+  .callout-tip { background: #f0fdf4; border-left: 4px solid #16a34a; }
+  .callout-info { background: var(--blue-light); border-left: 4px solid var(--blue); }
+  .callout-warn { background: #fffbeb; border-left: 4px solid var(--gold); }
+  .callout-icon { font-size: 1.1rem; margin-top: 0.05rem; }
+  .callout p { margin: 0; font-size: 0.9rem; }
+
+  /* ── Steps ── */
+  .steps { counter-reset: step; list-style: none; padding: 0; }
+  .steps li { counter-increment: step; display: flex; gap: 1rem; margin-bottom: 1rem; align-items: flex-start; }
+  .steps li::before {
+    content: counter(step);
+    background: var(--blue); color: white;
+    font-weight: 700; font-size: 0.85rem;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 0.1rem;
+  }
+
+  /* ── Two-col layout ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* ── Quick-finder / concept table ── */
+  .concept-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  .concept-table th { background: var(--navy); color: white; padding: 0.625rem 1rem; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  .concept-table td { padding: 0.625rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .concept-table tr:last-child td { border-bottom: none; }
+  .concept-table a { color: var(--blue-mid); font-weight: 600; text-decoration: none; }
+  .concept-table a:hover { text-decoration: underline; }
+
+  /* ── Editor / form mockup ── */
+  .studio-layout { display: flex; height: 340px; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; font-size: 0.8rem; }
+  .studio-sidebar { width: 210px; background: #111827; color: #d1d5db; flex-shrink: 0; display: flex; flex-direction: column; overflow-y: auto; }
+  .studio-sidebar .studio-header { background: #1f2937; padding: 0.625rem 0.875rem; font-weight: 700; color: white; font-size: 0.78rem; border-bottom: 1px solid #374151; }
+  .studio-sidebar .studio-item { padding: 0.45rem 0.875rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #9ca3af; font-size: 0.78rem; }
+  .studio-sidebar .studio-item.active { background: #1d4ed8; color: white; border-right: 3px solid #60a5fa; }
+  .studio-sidebar .studio-item .icon { font-size: 0.9rem; }
+  .studio-sidebar hr { border: none; border-top: 1px solid #374151; margin: 0.25rem 0; }
+  .studio-main { flex: 1; background: #f9fafb; overflow-y: auto; }
+  .studio-toolbar { background: white; border-bottom: 1px solid #e5e7eb; padding: 0.625rem 1rem; font-size: 0.75rem; color: #6b7280; display: flex; justify-content: space-between; align-items: center; }
+  .studio-doc-list { padding: 0.5rem; }
+  .studio-doc-item { background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.625rem 0.875rem; margin-bottom: 0.375rem; }
+  .studio-doc-item .doc-title { font-weight: 600; font-size: 0.82rem; color: var(--navy); }
+  .studio-doc-item .doc-meta { font-size: 0.72rem; color: #6b7280; margin-top: 0.125rem; }
+
+  /* ── Form field mockup ── */
+  .mock-form { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem 1.25rem; }
+  .form-field { margin-bottom: 0.875rem; }
+  .form-label { font-size: 0.75rem; font-weight: 600; color: #374151; display: block; margin-bottom: 0.25rem; }
+  .form-desc { font-size: 0.7rem; color: #6b7280; margin-bottom: 0.25rem; }
+  .form-input { width: 100%; border: 1px solid #d1d5db; border-radius: 5px; padding: 0.4rem 0.625rem; font-size: 0.82rem; color: var(--text); background: #f9fafb; }
+  .form-input.placeholder { color: #9ca3af; }
+  .form-toggle { display: flex; align-items: center; gap: 0.75rem; }
+  .toggle-pill { width: 42px; height: 22px; background: #d1d5db; border-radius: 11px; position: relative; cursor: pointer; }
+  .toggle-pill.on { background: var(--blue); }
+  .toggle-pill::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: white; border-radius: 50%; transition: left 0.15s; }
+  .toggle-pill.on::after { left: 23px; }
+  .toggle-label { font-size: 0.82rem; color: var(--text); font-weight: 500; }
+  .form-ref-input { width: 100%; border: 1px solid #d1d5db; border-radius: 5px; padding: 0.4rem 0.625rem; font-size: 0.82rem; background: #f9fafb; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .ref-tag { background: var(--blue-light); color: var(--blue-mid); font-size: 0.72rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 3px; }
+  .form-section-label { font-size: 0.7rem; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.5px; padding: 0.375rem 0; border-top: 1px solid #e5e7eb; margin-top: 0.5rem; }
+  .form-publish-bar { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 0.625rem 0.875rem; display: flex; align-items: center; justify-content: space-between; margin-top: 0.75rem; }
+  .publish-btn { background: var(--green); color: white; font-size: 0.8rem; font-weight: 700; padding: 0.35rem 1rem; border-radius: 4px; }
+
+  /* ── Pager ── */
+  .pager { max-width: 960px; margin: 0 auto; padding: 0 2rem 3rem; display: flex; justify-content: space-between; gap: 1rem; }
+  .pager a { text-decoration: none; font-size: 0.9rem; font-weight: 700; color: var(--blue-mid); border: 2px solid var(--border); border-radius: 8px; padding: 0.75rem 1.25rem; }
+  .pager a:hover { border-color: var(--blue); }
+  .pager .pg-label { display: block; font-size: 0.7rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── Print ── */
+  @media print {
+    .top-nav, .pager { display: none; }
+    .section { padding: 1.5rem 1rem; }
+    h2 { break-before: page; }
+    h2:first-child { break-before: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Sticky Nav ── -->
+<nav class="top-nav">
+  <span class="brand">ACDC Site Guide</span>
+  <a href="index.html">Overview</a>
+  <a href="cms-guide.html" class="current">Managing Content</a>
+  <a href="local-committees.html">Local Committee Sites</a>
+  <a href="costs.html">Costs</a>
+</nav>
+
+<div class="page-head">
+  <div class="inner">
+    <h1>Managing Content</h1>
+    <p>The editor's guide to the dashboard at <code>alleghenydems.com/studio</code>. Log in and you'll see the full menu of content types on the left. This page covers the county site; committee editors have their own, simpler view — covered in <a href="local-committees.html" style="color:white;font-weight:700;">Local Committee Sites</a>.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     QUICK FINDER
+══════════════════════════════════════════════════════════════ -->
+<div class="section" id="quick-finder">
+  <h2>Quick Finder — "I want to change…"</h2>
+  <p class="lead">Almost everything lives in one of a few places. Find your task here, then jump to the how-to.</p>
+
+  <table class="concept-table">
+    <thead>
+      <tr><th>I want to change…</th><th>Go to (left-hand menu)</th><th>How-to</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>The <strong>homepage</strong> headline, sub-text, or banner image</td>
+        <td><strong>Site Settings → Homepage Hero</strong></td>
+        <td><a href="#site-settings">Site Settings ↓</a></td>
+      </tr>
+      <tr>
+        <td>The <strong>top menu / navigation</strong></td>
+        <td><strong>Site Settings → Navigation</strong> <em>(read the caveat first)</em></td>
+        <td><a href="#site-settings">Site Settings ↓</a></td>
+      </tr>
+      <tr>
+        <td>Office <strong>address, phone, email,</strong> or social links</td>
+        <td><strong>Site Settings</strong> (Contact &amp; Social tabs)</td>
+        <td><a href="#site-settings">Site Settings ↓</a></td>
+      </tr>
+      <tr>
+        <td>An <strong>event</strong></td>
+        <td><strong>Events</strong></td>
+        <td><a href="#events">Events ↓</a></td>
+      </tr>
+      <tr>
+        <td>A <strong>news article</strong></td>
+        <td><strong>News &amp; Updates</strong></td>
+        <td><a href="#news">News ↓</a></td>
+      </tr>
+      <tr>
+        <td>An <strong>alert banner</strong> at the top of the site</td>
+        <td><strong>Action Alerts</strong></td>
+        <td><a href="#alerts">Action Alerts ↓</a></td>
+      </tr>
+      <tr>
+        <td><strong>Voter guide</strong> races or candidates</td>
+        <td><strong>Voter Guides</strong> (+ <strong>Candidate Finder</strong>)</td>
+        <td><a href="#voter-guide">Voter Guide ↓</a></td>
+      </tr>
+      <tr>
+        <td><strong>Legislative tracker</strong> entries or scorecards</td>
+        <td><strong>Legislative Tracker</strong></td>
+        <td><a href="#tracker">Tracker ↓</a></td>
+      </tr>
+      <tr>
+        <td>The wording on a <strong>page</strong> — Who We Are, Get Involved, Run for Office, About, Vote, Contact…</td>
+        <td><strong>Pages (Advanced)</strong> (bottom of the menu)</td>
+        <td><a href="#pages">Pages ↓</a></td>
+      </tr>
+      <tr>
+        <td>The <strong>leadership team</strong> or an <strong>elected official's</strong> info</td>
+        <td><strong>Committee &amp; People → Committee Members</strong></td>
+        <td><a href="#people">People ↓</a></td>
+      </tr>
+      <tr>
+        <td><strong>Members-only documents</strong> (bylaws, minutes, forms)</td>
+        <td><strong>Committee &amp; People → 🔒 Internal Documents</strong></td>
+        <td><a href="#members-content">Members Content ↓</a></td>
+      </tr>
+      <tr>
+        <td><strong>Who can log in</strong> to the members area</td>
+        <td><strong>Committee &amp; People → Committee Members</strong> (active + email)</td>
+        <td><a href="#members-content">Members Content ↓</a></td>
+      </tr>
+      <tr>
+        <td><strong>Vote-reminder sign-ups</strong> (view / export)</td>
+        <td><strong>Outreach → Vote Reminder Signups</strong></td>
+        <td><a href="#outreach">Outreach ↓</a></td>
+      </tr>
+      <tr>
+        <td>A <strong>local committee's</strong> site, branding, or content</td>
+        <td><strong>Municipalities</strong> (and the committee's own scoped login)</td>
+        <td><a href="local-committees.html">Committee guide →</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     EDIT → PUBLISH
+══════════════════════════════════════════════════════════════ -->
+<div class="section-band" id="publish">
+<div class="section">
+  <h2>The One Rule That Matters: <em>Edit → Publish</em></h2>
+  <p class="lead">Every change is a private draft until you publish it.</p>
+
+  <p>Every time you change something, the dashboard <strong>automatically saves your work as a draft</strong>. A draft is private — it does <strong>not</strong> appear on the public website yet. Your change only goes live when you click the green <strong>Publish</strong> button at the bottom-right of the screen.</p>
+  <p>You can edit and re-publish any item as many times as you like — each round of edits just needs its own Publish click. If you close the tab without publishing, your edits aren't lost: they're waiting as a draft the next time you open that item. They're simply not on the live site until you publish them.</p>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">⚠️</span>
+    <p><strong>If a change isn't showing up on the website,</strong> the most likely reason is that it was saved as a draft but never published. Open the item again and click <strong>Publish</strong>.</p>
+  </div>
+
+  <div class="mock-form" style="max-width:480px;">
+    <div class="form-field">
+      <label class="form-label">Page Content</label>
+      <div class="form-input">Interested in running as a Democrat? We're here to help…</div>
+    </div>
+    <div class="form-publish-bar" style="background:#fffbeb;border-color:#fde68a;">
+      <span style="font-size:0.78rem;color:var(--gold);font-weight:600;">● Unpublished draft — not live yet</span>
+      <div class="publish-btn">Publish</div>
+    </div>
+  </div>
+  <p style="font-size:0.82rem;color:var(--muted);">Click the green <strong>Publish</strong> button and the banner changes to "Published" — now it's on the live site, within a few minutes.</p>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <p>There's no publishing queue, no approval workflow, and no technical steps. Fill in the form, click <strong>Publish</strong>, done.</p>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     STUDIO MAP
+══════════════════════════════════════════════════════════════ -->
+<div class="section" id="studio-map">
+  <h2>The Dashboard Menu</h2>
+  <p class="lead">What you'll see in the left-hand menu when you log in as a county editor.</p>
+
+  <div class="studio-layout" style="height:370px;">
+    <div class="studio-sidebar">
+      <div class="studio-header">Allegheny Dems</div>
+      <div class="studio-item active"><span class="icon">⚙️</span> Site Settings</div>
+      <hr>
+      <div class="studio-item"><span class="icon">🏠</span> Municipalities</div>
+      <hr>
+      <div class="studio-item"><span class="icon">🔔</span> Action Alerts</div>
+      <hr>
+      <div class="studio-item"><span class="icon">📅</span> Events</div>
+      <div class="studio-item"><span class="icon">📰</span> News &amp; Updates</div>
+      <div class="studio-item"><span class="icon">🗳️</span> Voter Guides</div>
+      <div class="studio-item"><span class="icon">🔍</span> Candidate Finder</div>
+      <div class="studio-item"><span class="icon">📋</span> Legislative Tracker</div>
+      <hr>
+      <div class="studio-item"><span class="icon">✉️</span> Outreach</div>
+      <hr>
+      <div class="studio-item"><span class="icon">👥</span> Committee &amp; People</div>
+      <hr>
+      <div class="studio-item"><span class="icon">🔗</span> External Links</div>
+      <div class="studio-item"><span class="icon">📄</span> Pages (Advanced)</div>
+    </div>
+    <div class="studio-main">
+      <div class="studio-toolbar">
+        <span>Events — All</span>
+        <span style="color:var(--green);font-weight:600;">✓ Saved</span>
+      </div>
+      <div class="studio-doc-list">
+        <div class="studio-doc-item">
+          <div class="doc-title">Spring Volunteer Kickoff</div>
+          <div class="doc-meta">April 12, 2026 · 6:00 PM · County-wide</div>
+        </div>
+        <div class="studio-doc-item">
+          <div class="doc-title">Fox Chapel Monthly Meeting</div>
+          <div class="doc-meta">March 20, 2026 · Fox Chapel Borough Building</div>
+        </div>
+        <div class="studio-doc-item">
+          <div class="doc-title">Canvassing Training</div>
+          <div class="doc-meta">April 5, 2026 · County-wide · Shared with all committees</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SITE SETTINGS
+══════════════════════════════════════════════════════════════ -->
+<div class="section-band" id="site-settings">
+<div class="section">
+  <h2>Site Settings — Homepage, Navigation, Contact</h2>
+  <p class="lead">One place for site-wide items: the homepage hero, the top menu, contact info, and social links. Each is a tab across the top of the Site Settings screen.</p>
+
+  <h3>Homepage Hero</h3>
+  <p>The homepage's big headline, the sentence under it, and the banner image live in <strong>Site Settings → Homepage Hero</strong>. If the fields are blank, the site shows sensible built-in defaults — so to take control, just fill them in and Publish.</p>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">🏠</span>
+    <p>There's no single "Homepage" button. The hero comes from Site Settings; the rest of the homepage (alerts, upcoming events, latest news) fills in automatically from your Action Alerts, Events, and News. The three "What the Committee Does" cards are fixed text — changing those needs a developer.</p>
+  </div>
+
+  <h3>Navigation</h3>
+  <p>The top menu is edited in <strong>Site Settings → Navigation</strong>. Each item has a label, a link, and optional dropdown sub-links.</p>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">⚠️</span>
+    <p><strong>All-or-nothing:</strong> if Navigation Items is left empty, the site shows its built-in default menu. As soon as you add <em>any</em> item, your list <em>replaces the whole menu</em> — so enter every top-level item and dropdown you want, not just the new one. Two items are always added automatically and shouldn't be entered: <strong>Local Committees</strong> and <strong>Member Login</strong>.</p>
+  </div>
+
+  <h3>Contact &amp; Social</h3>
+  <p>Office address, phone, email, office hours, Facebook page, and Instagram handle live in the <strong>Contact Info</strong> and <strong>Social Media</strong> tabs. They feed the footer, the contact page, and the homepage Facebook feed. The <strong>Technical / Integrations</strong> tab holds the Google Analytics ID and Facebook Pixel — leave those alone unless you know you need them.</p>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     EVENTS
+══════════════════════════════════════════════════════════════ -->
+<div class="section" id="events">
+  <h2>Events</h2>
+  <p class="lead">Creating an event takes about two minutes. Fill in the title, date, location, and a short description. The options at the bottom control where it appears.</p>
+
+  <div class="two-col">
+    <div>
+      <div class="mock-form">
+        <div class="form-section-label">Event Details</div>
+        <div class="form-field">
+          <label class="form-label">Event Title *</label>
+          <div class="form-input">Spring Volunteer Kickoff</div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Date &amp; Time *</label>
+          <div class="form-input">April 12, 2026 · 6:00 PM</div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Location</label>
+          <div class="form-input">Fox Chapel Borough Building</div>
+        </div>
+        <div class="form-section-label">Where does this appear?</div>
+        <div class="form-field">
+          <label class="form-label">Municipality</label>
+          <div class="form-desc">Leave blank for county-wide. Or pick a committee to show it only on their site.</div>
+          <div class="form-input placeholder">— County-wide (no committee) —</div>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Share with all municipality sites</label>
+          <div class="form-toggle">
+            <div class="toggle-pill on"></div>
+            <span class="toggle-label">Yes — show on every committee site</span>
+          </div>
+        </div>
+        <div class="form-publish-bar">
+          <span style="font-size:0.78rem;color:var(--green);font-weight:600;">Ready to publish</span>
+          <div class="publish-btn">Publish</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h4>Where Will It Appear?</h4>
+      <table class="concept-table" style="font-size:0.82rem;">
+        <thead><tr><th>Municipality set?</th><th>Share with all?</th><th>Shows up on…</th></tr></thead>
+        <tbody>
+          <tr><td>❌ Not set</td><td>❌ Off</td><td>County site only</td></tr>
+          <tr style="background:#f0fdf4;"><td>❌ Not set</td><td>✅ On</td><td><strong>County + every committee site</strong></td></tr>
+          <tr><td>✅ Fox Chapel</td><td>—</td><td>Fox Chapel site only</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-tip" style="margin-top:1rem;">
+        <span class="callout-icon">💡</span>
+        <p><strong>Election Day reminders, volunteer drives, major announcements</strong> — turn on "Share with all" and every active committee site shows it automatically. One post, everywhere.</p>
+      </div>
+      <p style="font-size:0.82rem;color:var(--muted);">Other useful fields: an <strong>RSVP link</strong> (Mobilize etc.), an event image, and <strong>Feature on Homepage</strong> to pin it to the homepage events section.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     NEWS
+══════════════════════════════════════════════════════════════ -->
+<div class="section-band" id="news">
+<div class="section">
+  <h2>News &amp; Updates</h2>
+  <p class="lead">Works exactly like events — write the article, optionally attach a photo, choose where it appears.</p>
+  <p>One extra option: <strong>Feature on Homepage</strong> pins the article to the top of the homepage news section. The same municipality/sharing controls apply: blank = county, pick a committee to scope it, or share with all committee sites.</p>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ACTION ALERTS
+══════════════════════════════════════════════════════════════ -->
+<div class="section" id="alerts">
+  <h2>Action Alerts</h2>
+  <p class="lead">A prominent banner at the top of the site for time-sensitive calls to action.</p>
+  <p>Fill in the message, pick an <strong>urgency level</strong> (which sets the color — red for urgent, blue for take-action, gold for announcements), and optionally add a button label and link. Alerts use the same sharing controls as events: county-wide, one committee, or every committee site. Remove an alert by unpublishing it.</p>
+
+  <div class="mock-form" style="max-width:480px;">
+    <div class="form-section-label">Alert</div>
+    <div class="form-field">
+      <label class="form-label">Message *</label>
+      <div class="form-input">Polls close at 8 PM — find your polling place at vote.pa.gov</div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Urgency</label>
+      <div class="form-ref-input">
+        <span class="ref-tag" style="background:#fee2e2;color:#991b1b;">🚨 Urgent — Red</span>
+      </div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Share with all committee sites</label>
+      <div class="form-toggle">
+        <div class="toggle-pill on"></div>
+        <span class="toggle-label">Yes — show everywhere</span>
+      </div>
+    </div>
+    <div class="form-publish-bar">
+      <span style="font-size:0.78rem;color:var(--green);font-weight:600;">Ready to publish</span>
+      <div class="publish-btn">Publish</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     VOTER GUIDE
+══════════════════════════════════════════════════════════════ -->
+<div class="section-band" id="voter-guide">
+<div class="section">
+  <h2>Voter Guide</h2>
+  <p class="lead">Managed under <strong>Voter Guides</strong>, race by race. The public search — by street address, ZIP, or borough — is automatic.</p>
+
+  <p>Each race holds the office title, its districts, and the candidates — with party, ballot status, endorsement, and notes. When a resident enters their address, the site looks up their congressional, PA Senate, and PA House districts and shows only the races on their ballot. There's nothing to configure per resident.</p>
+  <p>For bulk updates, use the <strong>Candidate Finder</strong> tool (in the left menu, just under Voter Guides) to search and jump to candidates across the whole guide.</p>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">💡</span>
+    <p>The voter guide is most valuable when updated before each election cycle. Add candidates as soon as primaries are decided — residents return specifically to look up their ballot before Election Day.</p>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">🏘️</span>
+    <p>On a local committee's site, the voter guide <strong>pre-filters automatically</strong> using that committee's search terms — visitors see their races immediately. See <a class="detail-link" href="local-committees.html">Local Committee Sites</a>.</p>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     LEGISLATIVE TRACKER
+══════════════════════════════════════════════════════════════ -->
+<div class="section" id="tracker">
+  <h2>Legislative Tracker &amp; Scorecards</h2>
+  <p class="lead">Each entry is one official's action on a bill — and most entries arrive on their own.</p>
+
+  <p>An entry's plain-English fields: the <strong>official</strong>, their <strong>party</strong> and <strong>office</strong>, an <strong>Action Type</strong> (Accomplishment, Blocked, or Harmful — shown to the public as "Delivered / Blocked / Harmful"), a <strong>category</strong> (Education, Healthcare, Democracy…), a one-sentence description, and a link to the source. Vote entries can also carry how they voted, the tally, and the party split.</p>
+
+  <h3>The weekly review workflow</h3>
+  <p>An automated importer pulls new roll-call votes from LegiScan (Pennsylvania) and Congress.gov (federal) each week and drops them in as unpublished drafts flagged <strong>"Needs Review."</strong> Your job:</p>
+  <ol class="steps">
+    <li>Open the <strong>Legislative Tracker</strong> and look for entries marked <strong>🆕 REVIEW</strong>.</li>
+    <li>Confirm the framing and set the <strong>Action Type</strong>; check the source link.</li>
+    <li>Turn <strong>"Needs Review"</strong> off, then <strong>Publish</strong>. Un-reviewed drafts never show on the public page.</li>
+  </ol>
+
+  <h3>Community tagging</h3>
+  <p>Fill in the <strong>Municipalities Affected</strong> field with the boroughs or neighborhoods impacted — <em>Fox Chapel</em>, <em>Mt. Lebanon</em>, <em>Squirrel Hill</em>. Use the same spelling committees use in their voter-guide search terms. On a committee's site, the tracker then shows only that committee's entries by default (visitors can clear the filter).</p>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">📊</span>
+    <p>The <strong>official scorecards</strong> at <code>/legislative-tracker/scorecards</code> build themselves from these entries — you don't maintain them separately. Every tagged official gets a scorecard tallying delivered / blocked / harmful, each with its own shareable social card. Scorecards lead with the <em>record, not the party</em>: a bad record is highlighted, never buried.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGES
+══════════════════════════════════════════════════════════════ -->
+<div class="section-band" id="pages">
+<div class="section">
+  <h2>Editing a Page</h2>
+  <p class="lead">Who We Are, Get Involved, Run for Office, About, Vote, Contact, Become a Committee Member, and similar pages all live under <strong>Pages (Advanced)</strong> — and edit like a word processor.</p>
+
+  <ol class="steps">
+    <li>In the left menu, click <strong>Pages (Advanced)</strong> (at the bottom).</li>
+    <li>Click the page you want to change — for example <strong>"Get Involved in ACDC."</strong></li>
+    <li>Edit any of: the <strong>Hero Headline</strong> (big title at the top), the <strong>Hero Subhead</strong> (the line under it), or the <strong>Page Content</strong> — paragraphs, headings, bold, bullet lists, links, and images.</li>
+    <li>Click the green <strong>Publish</strong> button. Your change is live within a few minutes.</li>
+  </ol>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">⚠️</span>
+    <p>Leave the <strong>"Slug (URL)"</strong> field alone on a page that's already live. That's the page's web address — changing it breaks existing links and menu items pointing at the page.</p>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ️</span>
+    <p><strong>Editing</strong> an existing page is self-serve, as above. <strong>Creating a brand-new page</strong> at a new web address (and adding it to the menu) currently needs a quick hand from a developer.</p>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PEOPLE
+══════════════════════════════════════════════════════════════ -->
+<div class="section" id="people">
+  <h2>People — Leadership &amp; Elected Officials</h2>
+  <p class="lead">The leadership grid on "Who We Are" and the Elected Officials page are both built from <strong>Committee &amp; People → Committee Members</strong>. Each person is a single entry.</p>
+
+  <p>Elected officials are simply the entries whose <strong>"Ward / Municipality"</strong> field is set to <code>elected-official</code>.</p>
+
+  <p>To fix out-of-date info:</p>
+  <ol class="steps">
+    <li>Go to <strong>Committee &amp; People → Committee Members</strong>.</li>
+    <li>Use the <strong>search box</strong> at the top and type the person's name.</li>
+    <li>Update the <strong>Title / Role</strong>, photo, or other details. If someone has left office, either change the entry to the new office-holder, or turn their <strong>"Active Member"</strong> toggle off to remove them from the site.</li>
+    <li>Click <strong>Publish</strong>.</li>
+  </ol>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">💡</span>
+    <p>To add a <strong>brand-new elected official</strong>, click <strong>Create new</strong>, fill in their name and title, and set <strong>"Ward / Municipality"</strong> to exactly <code>elected-official</code> — that's what puts them on the Elected Officials page. Then Publish.</p>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">🔐</span>
+    <p>A member's <strong>phone number</strong> is only shown publicly if their <strong>"Show Phone Publicly"</strong> toggle is on (off by default). It's always visible in the members-only roster.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     MEMBERS-ONLY CONTENT
+══════════════════════════════════════════════════════════════ -->
+<div class="section-band" id="members-content">
+<div class="section">
+  <h2>Members-Only Content — Documents, Roster &amp; Access</h2>
+  <p class="lead">Everything in the members area at <code>/members</code> is managed from <strong>Committee &amp; People</strong>.</p>
+
+  <ul>
+    <li><strong>Documents</strong> — go to <strong>🔒 Internal Documents</strong>. Create an entry, upload the file (PDF, Word, etc.), give it a title, pick a <strong>category</strong> (Bylaws, Minutes, Forms, Training, or Other), and Publish. It appears in the members library, grouped by category. Turn a document's <strong>Active</strong> toggle off to hide it without deleting it.</li>
+    <li><strong>The roster</strong> is your <strong>Committee Members</strong> list — the same records that power the public directory. Members see everyone's phone and email in the private roster, plus a CSV download.</li>
+    <li><strong>Who can log in</strong> — a person can sign in (via one-time email link) only if their email is on an <strong>active</strong> Committee Members record. Site admins can be added separately. Set a departing member to inactive and their access ends.</li>
+  </ul>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     OUTREACH
+══════════════════════════════════════════════════════════════ -->
+<div class="section" id="outreach">
+  <h2>Outreach — Vote-Reminder Sign-ups</h2>
+  <p class="lead">When residents sign up through <strong>Remind Me to Vote</strong>, their details collect under <strong>Outreach → Vote Reminder Signups</strong>.</p>
+  <p>Each sign-up records the email, first name, ZIP, and how they plan to vote (by mail, in person, or undecided). Open the list to review it or export it for your GOTV email or phone effort. You don't create these by hand — they come in from the public form, and every reminder email includes a one-click unsubscribe.</p>
+</div>
+
+<!-- Pager -->
+<div class="pager">
+  <a href="index.html"><span class="pg-label">Previous</span>← Overview</a>
+  <a href="local-committees.html"><span class="pg-label">Next</span>Local Committee Sites →</a>
+</div>
+
+<!-- Footer -->
+<div style="background:var(--navy);color:rgba(255,255,255,0.5);text-align:center;padding:1.5rem;font-size:0.78rem;">
+  Allegheny County Democratic Committee — Site Guide · Updated July 2026
+</div>
+
+</body>
+</html>

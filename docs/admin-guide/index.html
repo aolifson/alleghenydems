@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACDC Site Guide — Overview</title>
+<style>
+  :root {
+    --navy: #1a2744;
+    --blue: #2563eb;
+    --blue-mid: #1d4ed8;
+    --blue-light: #dbeafe;
+    --red: #dc2626;
+    --gold: #d97706;
+    --green: #16a34a;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --surface: #f8fafc;
+    --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; color: var(--text); background: var(--white); line-height: 1.6; }
+
+  /* ── Sticky top nav ── */
+  .top-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--navy); color: white;
+    padding: 0 1.5rem;
+    display: flex; align-items: center; gap: 1.5rem;
+    font-size: 0.8rem; height: 44px; overflow-x: auto;
+  }
+  .top-nav a { color: rgba(255,255,255,0.75); text-decoration: none; white-space: nowrap; }
+  .top-nav a:hover { color: white; }
+  .top-nav a.current { color: white; font-weight: 700; border-bottom: 2px solid var(--blue); }
+  .top-nav .brand { font-weight: 700; color: white; margin-right: 0.5rem; }
+
+  /* ── Cover ── */
+  .cover {
+    background: var(--navy); color: white;
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+  }
+  .cover h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.5rem; }
+  .cover .sub { font-size: 1.1rem; color: rgba(255,255,255,0.75); margin-bottom: 2rem; max-width: 640px; margin-left: auto; margin-right: auto; }
+  .cover .badge { display: inline-block; background: var(--blue); color: white; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 9999px; margin: 0.25rem; }
+  .cover .badge.new { background: var(--green); }
+
+  /* ── Sections ── */
+  .section { padding: 3rem 2rem; max-width: 960px; margin: 0 auto; }
+  .section-band { background: var(--surface); }
+  h2 { font-size: 1.75rem; font-weight: 800; color: var(--navy); margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 3px solid var(--blue); display: inline-block; }
+  h3 { font-size: 1.2rem; font-weight: 700; color: var(--navy); margin: 2rem 0 0.75rem; }
+  h4 { font-size: 1rem; font-weight: 600; color: var(--blue-mid); margin: 1.5rem 0 0.5rem; }
+  p { margin-bottom: 0.875rem; color: var(--text); }
+  .lead { font-size: 1.05rem; color: var(--muted); margin-bottom: 1.5rem; }
+  ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+  li { margin-bottom: 0.375rem; }
+  code { background: #f1f5f9; border: 1px solid var(--border); border-radius: 4px; padding: 0.125rem 0.375rem; font-size: 0.85em; font-family: 'Menlo', 'Consolas', monospace; color: var(--navy); }
+  a.detail-link { color: var(--blue-mid); font-weight: 600; text-decoration: none; }
+  a.detail-link:hover { text-decoration: underline; }
+
+  /* ── Callout boxes ── */
+  .callout { border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; display: flex; gap: 0.75rem; align-items: flex-start; }
+  .callout-tip { background: #f0fdf4; border-left: 4px solid #16a34a; }
+  .callout-info { background: var(--blue-light); border-left: 4px solid var(--blue); }
+  .callout-warn { background: #fffbeb; border-left: 4px solid var(--gold); }
+  .callout-icon { font-size: 1.1rem; margin-top: 0.05rem; }
+  .callout p { margin: 0; font-size: 0.9rem; }
+
+  /* ── Feature comparison table ── */
+  .compare-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  .compare-table th { background: var(--navy); color: white; padding: 0.625rem 1rem; text-align: left; font-size: 0.8rem; }
+  .compare-table td { padding: 0.625rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table .check { color: var(--green); font-weight: 700; }
+  .compare-table .new-badge { display: inline-block; background: #dcfce7; color: #166534; font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 3px; margin-left: 0.4rem; vertical-align: middle; }
+  .compare-table .improved-badge { display: inline-block; background: #dbeafe; color: #1e40af; font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 3px; margin-left: 0.4rem; vertical-align: middle; }
+
+  /* ── Guide map cards ── */
+  .guide-map { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .guide-card { display: block; text-decoration: none; border: 2px solid var(--border); border-radius: 10px; padding: 1.25rem; background: white; transition: border-color 0.15s; }
+  .guide-card:hover { border-color: var(--blue); }
+  .guide-card .gc-icon { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  .guide-card h4 { margin: 0 0 0.375rem; color: var(--navy); font-size: 1rem; }
+  .guide-card p { font-size: 0.82rem; color: var(--muted); margin: 0 0 0.5rem; }
+  .guide-card .gc-go { font-size: 0.8rem; font-weight: 700; color: var(--blue-mid); }
+
+  /* ── Browser chrome wrapper ── */
+  .browser {
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    margin: 1.25rem 0;
+    font-size: 0.85rem;
+  }
+  .browser-bar {
+    background: #f1f5f9; padding: 0.5rem 0.75rem;
+    display: flex; align-items: center; gap: 0.5rem;
+    border-bottom: 1px solid #cbd5e1;
+  }
+  .browser-dots { display: flex; gap: 5px; }
+  .browser-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .browser-dot.r { background: #ef4444; }
+  .browser-dot.y { background: #f59e0b; }
+  .browser-dot.g { background: #22c55e; }
+  .browser-url {
+    flex: 1; background: white; border: 1px solid #cbd5e1;
+    border-radius: 6px; padding: 0.2rem 0.5rem;
+    font-size: 0.78rem; color: var(--muted); margin-left: 0.25rem;
+  }
+
+  /* ── Voter guide / search mockup ── */
+  .mock-search-bar { background: white; border: 2px solid var(--blue); border-radius: 8px; padding: 0.5rem 0.75rem; display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0; }
+  .mock-search-btn { background: var(--blue); color: white; font-size: 0.72rem; font-weight: 700; padding: 0.3rem 0.75rem; border-radius: 4px; }
+  .mock-result { border: 1px solid var(--border); border-radius: 6px; padding: 0.625rem 0.875rem; margin-bottom: 0.375rem; background: white; }
+  .mock-result .mr-race { font-size: 0.72rem; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.3px; }
+  .mock-result .mr-name { font-size: 0.85rem; font-weight: 600; color: var(--navy); }
+  .mock-result .mr-detail { font-size: 0.7rem; color: var(--muted); margin-top: 0.1rem; }
+
+  /* ── Legislative tracker mockup ── */
+  .mock-bill { border: 1px solid var(--border); border-radius: 6px; padding: 0.625rem 0.875rem; margin-bottom: 0.375rem; background: white; display: flex; gap: 0.75rem; align-items: flex-start; }
+  .mock-bill .bill-status { font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 3px; white-space: nowrap; flex-shrink: 0; margin-top: 0.15rem; }
+  .bill-status.passed { background: #dcfce7; color: #166534; }
+  .bill-status.pending { background: #fef3c7; color: #92400e; }
+  .bill-status.failed { background: #fee2e2; color: #991b1b; }
+  .mock-bill .bill-title { font-size: 0.82rem; font-weight: 600; color: var(--navy); }
+  .mock-bill .bill-detail { font-size: 0.7rem; color: var(--muted); margin-top: 0.1rem; }
+
+  /* ── Alert banner mockup ── */
+  .mock-alert { padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; }
+  .mock-alert.urgent { background: var(--red); color: white; }
+  .mock-alert.action { background: var(--blue); color: white; }
+  .mock-alert.announce { background: var(--gold); color: var(--navy); }
+
+  /* ── Pager ── */
+  .pager { max-width: 960px; margin: 0 auto; padding: 0 2rem 3rem; display: flex; justify-content: space-between; gap: 1rem; }
+  .pager a { text-decoration: none; font-size: 0.9rem; font-weight: 700; color: var(--blue-mid); border: 2px solid var(--border); border-radius: 8px; padding: 0.75rem 1.25rem; }
+  .pager a:hover { border-color: var(--blue); }
+  .pager .pg-label { display: block; font-size: 0.7rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── Print ── */
+  @media print {
+    .top-nav, .pager { display: none; }
+    .section { padding: 1.5rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Sticky Nav ── -->
+<nav class="top-nav">
+  <span class="brand">ACDC Site Guide</span>
+  <a href="index.html" class="current">Overview</a>
+  <a href="cms-guide.html">Managing Content</a>
+  <a href="local-committees.html">Local Committee Sites</a>
+  <a href="costs.html">Costs</a>
+</nav>
+
+<!-- ── Cover ── -->
+<div class="cover">
+  <p style="font-size:0.8rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:0.75rem;">Allegheny County Democratic Committee</p>
+  <h1>Your New Website</h1>
+  <p class="sub">Everything on the current site — plus powerful new tools for voters, members, and organizers — all managed from one simple dashboard.</p>
+  <div>
+    <span class="badge existing">Events &amp; News</span>
+    <span class="badge existing">Voter Resources</span>
+    <span class="badge new">✦ Voter Guide</span>
+    <span class="badge new">✦ Legislative Tracker &amp; Scorecards</span>
+    <span class="badge new">✦ Local Committee Sites</span>
+    <span class="badge new">✦ Members-Only Area</span>
+    <span class="badge new">✦ Get-Out-the-Vote Tools</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     HOW THIS GUIDE IS ORGANIZED
+══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <h2>This Guide, in Four Pages</h2>
+  <p class="lead">This page is the overview — what the new site does. The other three pages go deep on the parts you'll actually work with.</p>
+
+  <div class="guide-map">
+    <a class="guide-card" href="cms-guide.html">
+      <div class="gc-icon">🛠️</div>
+      <h4>Managing Content</h4>
+      <p>The full editor's guide to the dashboard — with a quick-finder table: "I want to change X, where do I go?"</p>
+      <span class="gc-go">Open the CMS guide →</span>
+    </a>
+    <a class="guide-card" href="local-committees.html">
+      <div class="gc-icon">🏘️</div>
+      <h4>Local Committee Sites</h4>
+      <p>How committee sites work, how committees manage their own content, and how to launch a new one.</p>
+      <span class="gc-go">Open the committee guide →</span>
+    </a>
+    <a class="guide-card" href="costs.html">
+      <div class="gc-icon">💰</div>
+      <h4>What It Costs</h4>
+      <p>Current 2026 pricing for the two services behind the site, modeled on committees managing their own content.</p>
+      <span class="gc-go">See the cost breakdown →</span>
+    </a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WHAT'S NEW
+══════════════════════════════════════════════════════════════ -->
+<div class="section-band">
+<div class="section">
+  <h2>What's New vs. the Current Site</h2>
+  <p class="lead">The new site carries over everything from the current alleghenydems.com, then adds major features that weren't possible before.</p>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>Current Site</th>
+        <th>New Site</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Events calendar</strong></td>
+        <td><span class="check">✓</span> Yes</td>
+        <td><span class="check">✓</span> Yes <span class="improved-badge">Improved</span></td>
+      </tr>
+      <tr>
+        <td><strong>News &amp; updates</strong></td>
+        <td><span class="check">✓</span> Yes</td>
+        <td><span class="check">✓</span> Yes <span class="improved-badge">Improved</span></td>
+      </tr>
+      <tr>
+        <td><strong>Get involved / volunteer</strong></td>
+        <td><span class="check">✓</span> Yes</td>
+        <td><span class="check">✓</span> Yes</td>
+      </tr>
+      <tr>
+        <td><strong>Committee info &amp; contacts</strong></td>
+        <td><span class="check">✓</span> Yes</td>
+        <td><span class="check">✓</span> Yes</td>
+      </tr>
+      <tr>
+        <td><strong>One simple content dashboard</strong></td>
+        <td>WordPress + plugins</td>
+        <td><span class="check">✓</span> <strong>New</strong> <span class="new-badge">NEW</span></td>
+      </tr>
+      <tr>
+        <td><strong>Action alerts &amp; banners</strong></td>
+        <td>—</td>
+        <td><span class="check">✓</span> <strong>New</strong> <span class="new-badge">NEW</span></td>
+      </tr>
+      <tr>
+        <td><strong>Searchable voter guide</strong> (by address)</td>
+        <td>—</td>
+        <td><span class="check">✓</span> <strong>New</strong> <span class="new-badge">NEW</span></td>
+      </tr>
+      <tr>
+        <td><strong>Legislative tracker &amp; scorecards</strong></td>
+        <td>—</td>
+        <td><span class="check">✓</span> <strong>New</strong> <span class="new-badge">NEW</span></td>
+      </tr>
+      <tr>
+        <td><strong>Local committee sites</strong> (self-manageable)</td>
+        <td>—</td>
+        <td><span class="check">✓</span> <strong>New</strong> <span class="new-badge">NEW</span></td>
+      </tr>
+      <tr>
+        <td><strong>Members-only area</strong> (roster, documents)</td>
+        <td>—</td>
+        <td><span class="check">✓</span> <strong>New</strong> <span class="new-badge">NEW</span></td>
+      </tr>
+      <tr>
+        <td><strong>Get-out-the-vote tools</strong> (plan &amp; reminders)</td>
+        <td>—</td>
+        <td><span class="check">✓</span> <strong>New</strong> <span class="new-badge">NEW</span></td>
+      </tr>
+      <tr>
+        <td><strong>Mobile-friendly design</strong></td>
+        <td>Partial</td>
+        <td><span class="check">✓</span> Fully responsive <span class="improved-badge">Improved</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     THE FEATURES AT A GLANCE
+══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <h2>The Features at a Glance</h2>
+  <p class="lead">A short tour. Each feature links to its detailed guide.</p>
+
+  <h3>🛠️ One Dashboard for Everything</h3>
+  <p>Every piece of content — events, news, alerts, the voter guide, pages, people — is managed from a single dashboard at <code>alleghenydems.com/studio</code>. No WordPress logins, no plugins to update, no broken page builders. Fill in a form, click <strong>Publish</strong>, and the change is live within minutes. <a class="detail-link" href="cms-guide.html">Full CMS guide →</a></p>
+
+  <h3>🗳️ Searchable Voter Guide</h3>
+  <p>Residents look up every race on their ballot — from U.S. Senate to school board — with candidates, party, ballot status, and endorsements in one place. They type their <strong>street address</strong> and the guide finds their exact congressional, PA Senate, and PA House districts; a ZIP or borough name works too. <a class="detail-link" href="cms-guide.html#voter-guide">How to manage it →</a></p>
+
+  <div class="browser" style="max-width:600px;">
+    <div class="browser-bar">
+      <div class="browser-dots"><div class="browser-dot r"></div><div class="browser-dot y"></div><div class="browser-dot g"></div></div>
+      <div class="browser-url">alleghenydems.com/voter-guide</div>
+    </div>
+    <div style="padding:0.875rem;background:var(--surface);">
+      <div style="font-size:0.72rem;font-weight:700;color:var(--navy);margin-bottom:0.5rem;">2026 VOTER GUIDE — Enter your address to see your ballot</div>
+      <div class="mock-search-bar">
+        <span style="flex:1;font-size:0.8rem;color:var(--muted);">123 Fox Chapel Rd, Pittsburgh, PA 15238…</span>
+        <div class="mock-search-btn">Look up</div>
+      </div>
+      <div style="font-size:0.7rem;color:var(--muted);margin:0.375rem 0 0.75rem;">Your districts: PA House 33 · PA Senate 38 · U.S. Congress 12 — showing 6 races on your ballot</div>
+      <div class="mock-result">
+        <div class="mr-race">U.S. Senate — Pennsylvania</div>
+        <div class="mr-name">Bob Casey Jr. <span style="font-size:0.7rem;background:#dbeafe;color:#1e40af;padding:0.1rem 0.4rem;border-radius:3px;font-weight:700;">ACDC Endorsed</span></div>
+        <div class="mr-detail">Democrat · Incumbent</div>
+      </div>
+      <div class="mock-result" style="color:var(--muted);font-size:0.78rem;text-align:center;border-style:dashed;">+ 5 more races on your ballot…</div>
+    </div>
+  </div>
+
+  <h3>📋 Legislative Tracker &amp; Scorecards</h3>
+  <p>Visitors follow how our representatives in Harrisburg and Washington actually voted — organized by <strong>official</strong>, framed by their record: what each one <strong>delivered</strong>, <strong>blocked</strong>, or pushed through that's <strong>harmful</strong>, every entry linked to its source. An automated importer pulls new roll-call votes weekly; editors just review and publish. Every official also gets a shareable <strong>scorecard</strong> summarizing their record. <a class="detail-link" href="cms-guide.html#tracker">How to manage it →</a></p>
+
+  <div class="browser" style="max-width:600px;">
+    <div class="browser-bar">
+      <div class="browser-dots"><div class="browser-dot r"></div><div class="browser-dot y"></div><div class="browser-dot g"></div></div>
+      <div class="browser-url">alleghenydems.com/legislative-tracker</div>
+    </div>
+    <div style="padding:0.875rem;background:var(--surface);">
+      <div class="mock-bill">
+        <div class="bill-status passed">Delivered</div>
+        <div>
+          <div class="bill-title">Sen. Lindsey Williams (D) — Voted Yea on SB 42, Voting Rights Expansion</div>
+          <div class="bill-detail">PA Senate · Passed 28–22 · Dem 22–0 · GOP 6–22 · Category: Democracy</div>
+        </div>
+      </div>
+      <div class="mock-bill">
+        <div class="bill-status failed">Harmful</div>
+        <div>
+          <div class="bill-title">Rep. Rob Mercuri (R) — Voted Yea on HB 77, School Voucher Expansion</div>
+          <div class="bill-detail">PA House · Passed 102–101 · Category: Education</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>🔔 Action Alerts</h3>
+  <p>A banner across the top of any page — county-wide or committee-specific — for time-sensitive calls to action: election-day reminders, volunteer pushes, endorsements. Three urgency levels set the color. <a class="detail-link" href="cms-guide.html#alerts">How to manage it →</a></p>
+
+  <div style="max-width:560px;border-radius:8px;overflow:hidden;border:1px solid var(--border);margin:1rem 0;">
+    <div class="mock-alert urgent">🚨 &nbsp;Election Day — Polls close at 8 PM. Find your polling place →</div>
+    <div class="mock-alert action" style="margin-top:2px;">📣 &nbsp;Phone bank tonight — 6 PM at Fox Chapel Borough Building. Sign up →</div>
+    <div class="mock-alert announce" style="margin-top:2px;">📢 &nbsp;ACDC endorses Jane Smith for PA House District 33 →</div>
+  </div>
+
+  <h3>🏘️ Local Committee Sites</h3>
+  <p>Every local committee can have its own fully branded website — its logo, colors, events, news, and a pre-filtered voter guide — connected to the county site and managed from the same dashboard. County content can be shared down to every committee site with one toggle. Committees can post their own content with a scoped login, or let the county handle it. Setting up a new committee site takes about ten minutes and no IT help. <a class="detail-link" href="local-committees.html">Full committee guide →</a></p>
+
+  <h3>🔒 Members-Only Area</h3>
+  <p>A private section at <code>alleghenydems.com/members</code> for committee members only. They sign in with a <strong>one-time email link</strong> — no password — and get the full <strong>member roster</strong> (with a CSV download), a <strong>documents library</strong> (bylaws, minutes, forms, training), and this guide. Access is controlled by the roster itself: only people with an active committee-member record can log in. <a class="detail-link" href="cms-guide.html#members-content">How to manage it →</a></p>
+
+  <h3>📣 Get-Out-the-Vote Tools</h3>
+  <p>Two voter-facing tools turn interest into turnout: <strong>Make a Plan to Vote</strong>, a GOTV hub with a live countdown to Election Day, and <strong>Remind Me to Vote</strong>, an email sign-up whose list collects in the dashboard, ready to export for your GOTV outreach. <a class="detail-link" href="cms-guide.html#outreach">How to manage it →</a></p>
+</div>
+
+<!-- Pager -->
+<div class="pager">
+  <span></span>
+  <a href="cms-guide.html"><span class="pg-label">Next</span>Managing Content →</a>
+</div>
+
+<!-- Footer -->
+<div style="background:var(--navy);color:rgba(255,255,255,0.5);text-align:center;padding:1.5rem;font-size:0.78rem;">
+  Allegheny County Democratic Committee — Site Guide · Updated July 2026
+</div>
+
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACDC Site Guide — What It Costs</title>
+<style>
+  :root {
+    --navy: #1a2744;
+    --blue: #2563eb;
+    --blue-mid: #1d4ed8;
+    --blue-light: #dbeafe;
+    --red: #dc2626;
+    --gold: #d97706;
+    --green: #16a34a;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --surface: #f8fafc;
+    --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; color: var(--text); background: var(--white); line-height: 1.6; }
+
+  /* ── Sticky top nav ── */
+  .top-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--navy); color: white;
+    padding: 0 1.5rem;
+    display: flex; align-items: center; gap: 1.5rem;
+    font-size: 0.8rem; height: 44px; overflow-x: auto;
+  }
+  .top-nav a { color: rgba(255,255,255,0.75); text-decoration: none; white-space: nowrap; }
+  .top-nav a:hover { color: white; }
+  .top-nav a.current { color: white; font-weight: 700; border-bottom: 2px solid var(--blue); }
+  .top-nav .brand { font-weight: 700; color: white; margin-right: 0.5rem; }
+
+  /* ── Page header ── */
+  .page-head { background: var(--navy); color: white; padding: 2.5rem 2rem 2rem; }
+  .page-head .inner { max-width: 960px; margin: 0 auto; }
+  .page-head h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
+  .page-head p { color: rgba(255,255,255,0.75); margin-top: 0.5rem; max-width: 720px; }
+
+  /* ── Sections ── */
+  .section { padding: 3rem 2rem; max-width: 960px; margin: 0 auto; }
+  .section-band { background: var(--surface); }
+  h2 { font-size: 1.75rem; font-weight: 800; color: var(--navy); margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 3px solid var(--blue); display: inline-block; }
+  h3 { font-size: 1.2rem; font-weight: 700; color: var(--navy); margin: 2rem 0 0.75rem; }
+  p { margin-bottom: 0.875rem; color: var(--text); }
+  .lead { font-size: 1.05rem; color: var(--muted); margin-bottom: 1.5rem; }
+  ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+  li { margin-bottom: 0.375rem; }
+  code { background: #f1f5f9; border: 1px solid var(--border); border-radius: 4px; padding: 0.125rem 0.375rem; font-size: 0.85em; font-family: 'Menlo', 'Consolas', monospace; color: var(--navy); }
+  a.detail-link { color: var(--blue-mid); font-weight: 600; text-decoration: none; }
+  a.detail-link:hover { text-decoration: underline; }
+
+  /* ── Callout boxes ── */
+  .callout { border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0; display: flex; gap: 0.75rem; align-items: flex-start; }
+  .callout-tip { background: #f0fdf4; border-left: 4px solid #16a34a; }
+  .callout-info { background: var(--blue-light); border-left: 4px solid var(--blue); }
+  .callout-warn { background: #fffbeb; border-left: 4px solid var(--gold); }
+  .callout-icon { font-size: 1.1rem; margin-top: 0.05rem; }
+  .callout p { margin: 0; font-size: 0.9rem; }
+
+  /* ── Tables ── */
+  .compare-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  .compare-table th { background: var(--navy); color: white; padding: 0.625rem 1rem; text-align: left; font-size: 0.8rem; }
+  .compare-table td { padding: 0.625rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table .check { color: var(--green); font-weight: 700; }
+
+  .cost-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  .cost-table th { background: var(--navy); color: white; padding: 0.625rem 1rem; text-align: left; font-size: 0.8rem; }
+  .cost-table td { padding: 0.625rem 1rem; border-bottom: 1px solid var(--border); }
+  .cost-table tr:last-child td { border-bottom: none; }
+  .cost-table .total { font-weight: 800; color: var(--navy); }
+
+  /* ── Pager ── */
+  .pager { max-width: 960px; margin: 0 auto; padding: 0 2rem 3rem; display: flex; justify-content: space-between; gap: 1rem; }
+  .pager a { text-decoration: none; font-size: 0.9rem; font-weight: 700; color: var(--blue-mid); border: 2px solid var(--border); border-radius: 8px; padding: 0.75rem 1.25rem; }
+  .pager a:hover { border-color: var(--blue); }
+  .pager .pg-label { display: block; font-size: 0.7rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── Print ── */
+  @media print {
+    .top-nav, .pager { display: none; }
+    .section { padding: 1.5rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Sticky Nav ── -->
+<nav class="top-nav">
+  <span class="brand">ACDC Site Guide</span>
+  <a href="index.html">Overview</a>
+  <a href="cms-guide.html">Managing Content</a>
+  <a href="local-committees.html">Local Committee Sites</a>
+  <a href="costs.html" class="current">Costs</a>
+</nav>
+
+<div class="page-head">
+  <div class="inner">
+    <h1>What It Costs</h1>
+    <p>Two services power the site: <strong>Sanity</strong> (the content editor &amp; database) and <strong>Vercel</strong> (the hosting). This page models costs on the assumption that <strong>most local committees will want to manage their own content</strong> — each self-managing committee adds one paid editor seat. Figures reflect 2026 pricing.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     THE TWO SERVICES
+══════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <h2>The Two Services</h2>
+
+  <table class="compare-table" style="margin-top:1.5rem">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th>What it does</th>
+        <th>What it costs (2026)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Vercel</strong><br><span style="font-size:0.8rem;color:var(--muted)">Hosts the website</span></td>
+        <td>Serves every page load, for the county site <em>and</em> every committee site — they all run on one deployment.</td>
+        <td><strong>Pro — $20/mo</strong> (per team member; one is enough). Includes $20 of usage, <strong>1&nbsp;TB</strong> fast data transfer, and 10M edge requests per month; overage $0.15/GB. The free Hobby plan technically fits our traffic (~9K views/mo) but its terms restrict it to <em>personal</em> use — an organization belongs on Pro.</td>
+      </tr>
+      <tr>
+        <td><strong>Sanity</strong><br><span style="font-size:0.8rem;color:var(--muted)">Content editor &amp; database</span></td>
+        <td>Stores and delivers all content (events, news, voter guide, tracker, roster…). Pages are cached, so Sanity is only queried when content changes — not on every visit.</td>
+        <td><strong>Growth — $15/editor/mo</strong> (~$12/seat billed annually). Needed for committee self-management, because <strong>scoped committee logins use custom editor roles, a paid feature</strong>. Every editor — county or committee — is a billed seat; read-only "viewer" accounts are free.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">⚠️</span>
+    <p><strong>Why not free?</strong> Sanity's free plan is generous (up to 20 users, 500K API requests/mo) and would cover a purely county-managed site. But it doesn't include <strong>custom roles</strong> — and custom roles are what stop a Fox Chapel editor from editing Mt. Lebanon's content. As soon as committees log in themselves, you need Growth.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     THE COST MODEL
+══════════════════════════════════════════════════════════════ -->
+<div class="section-band">
+<div class="section">
+  <h2>The Monthly Bill</h2>
+  <p class="lead">The formula is simple: <strong>$20 (hosting) + $15 × every editor seat</strong> — county editors plus one per self-managing committee.</p>
+
+  <table class="cost-table" style="max-width:640px;">
+    <thead>
+      <tr><th>Scenario (assumes 2 county editors)</th><th>Sanity seats</th><th>Monthly total</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>County-managed only <em>(no committee logins)</em></td>
+        <td>0 — free plan</td>
+        <td class="total">$20</td>
+      </tr>
+      <tr>
+        <td>3 self-managing committees</td>
+        <td>5 × $15 = $75</td>
+        <td class="total">$95</td>
+      </tr>
+      <tr style="background:#f0fdf4;">
+        <td><strong>5 self-managing committees</strong></td>
+        <td>7 × $15 = $105</td>
+        <td class="total">$125</td>
+      </tr>
+      <tr>
+        <td>10 self-managing committees</td>
+        <td>12 × $15 = $180</td>
+        <td class="total">$200</td>
+      </tr>
+      <tr>
+        <td>20 self-managing committees</td>
+        <td>22 × $15 = $330</td>
+        <td class="total">$350</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">💡</span>
+    <p><strong>Two ways to trim the bill:</strong> annual billing drops seats to roughly <strong>$12/mo</strong> (5 committees ≈ $104/mo total), and a committee can share one login among its volunteers — one seat per committee, not per person. Committees that stay county-managed cost nothing.</p>
+  </div>
+
+  <div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:1.25rem 1.5rem;margin-top:1rem;font-size:0.9rem;">
+    <p style="font-weight:600;margin-bottom:0.5rem;color:#92400e;">Committee sites add no hosting cost</p>
+    <p style="margin-bottom:0;">Every committee site runs on the same Vercel deployment. Adding Fox Chapel, Mt. Lebanon, or any other committee adds <strong>nothing</strong> to hosting — it's just another domain pointed at the same app. The <em>only</em> per-committee cost is the editor seat, and only if they self-manage.</p>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">📈</span>
+    <p><strong>Election-season spikes are covered.</strong> Even 5× normal traffic (~45K views/mo, tens of GB) stays far under Vercel Pro's 1&nbsp;TB — no overage charges expected. Costs scale with <em>how many committees want logins</em>, not with traffic.</p>
+  </div>
+
+  <p style="font-size:0.78rem;color:var(--muted);margin-top:1.5rem;">Pricing verified July 2026 against Vercel's and Sanity's published plans. Plan terms change — confirm current pricing before committing, especially whether custom editor roles sit on Sanity's Growth vs. Enterprise tier for your account.</p>
+</div>
+</div>
+
+<!-- Pager -->
+<div class="pager">
+  <a href="local-committees.html"><span class="pg-label">Previous</span>← Local Committee Sites</a>
+  <a href="index.html"><span class="pg-label">Back to</span>Overview →</a>
+</div>
+
+<!-- Footer -->
+<div style="background:var(--navy);color:rgba(255,255,255,0.5);text-align:center;padding:1.5rem;font-size:0.78rem;">
+  Allegheny County Democratic Committee — Site Guide · Updated July 2026
+</div>
+
+</body>
+</html>

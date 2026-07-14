@@ -7,9 +7,9 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'cdn.sanity.io' },
     ],
   },
-  // Bundle the relocated admin guide with the route that streams it.
+  // Bundle the admin-guide pages with the route that streams them.
   outputFileTracingIncludes: {
-    '/members/admin-guide': ['./private/admin-guide.html'],
+    '/members/admin-guide/[[...page]]': ['./docs/admin-guide/*.html'],
   },
   async redirects() {
     return [
