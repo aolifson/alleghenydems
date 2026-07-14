@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { PortableText } from '@portabletext/react'
 import PageHero from '@/components/page-hero'
 import { getPageBySlug } from '@/sanity/lib/queries'
-import { getMunicipalityPrefix } from '@/lib/tenant'
+import { getMunicipalityPrefix, getMunicipalitySlug } from '@/lib/tenant'
 import { prefixHref } from '@/lib/prefix-href'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 
@@ -61,7 +61,8 @@ const VOTER_LINKS = [
 ]
 
 export default async function VotePage() {
-  const page = await getPageBySlug('vote')
+  const municipalitySlug = await getMunicipalitySlug()
+  const page = await getPageBySlug('vote', municipalitySlug)
   const basePath = await getMunicipalityPrefix()
   const headline = page?.heroHeadline ?? 'Voter Resources'
   const subhead = page?.heroSubhead ?? 'Everything you need to register and vote in Allegheny County, Pennsylvania.'

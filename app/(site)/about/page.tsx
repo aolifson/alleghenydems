@@ -3,13 +3,15 @@ import Link from 'next/link'
 import { PortableText } from '@portabletext/react'
 import PageHero from '@/components/page-hero'
 import { getPageBySlug } from '@/sanity/lib/queries'
+import { getMunicipalitySlug } from '@/lib/tenant'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 
 export const metadata: Metadata = { title: 'About' }
 export const revalidate = 86400
 
 export default async function AboutPage() {
-  const page = await getPageBySlug('about')
+  const municipalitySlug = await getMunicipalitySlug()
+  const page = await getPageBySlug('about', municipalitySlug)
   const headline = page?.heroHeadline ?? page?.title ?? 'About'
   const body = stripDuplicatedHeroBlocks(page?.body, headline, page?.heroSubhead)
 

@@ -153,6 +153,8 @@ export interface MunicipalitySettings extends SanityDocument {
   instagramHandle?: string
   footerText?: string
   navigationItems?: NavItem[]
+  hiddenDefaultNavSections?: string[]
+  additionalNavItems?: NavItem[]
   googleAnalyticsId?: string
   isActive?: boolean
   voterGuideSearchTerms?: string[]
@@ -449,13 +451,15 @@ export async function getElectedOfficials(): Promise<CommitteeMember[]> {
   return dedupeMembersByName(members)
 }
 
-export async function getWhoWeAreMembers(): Promise<CommitteeMember[]> {
+export async function getWhoWeAreMembers(municipalitySlug = 'allegheny-county'): Promise<CommitteeMember[]> {
   const members = await client.fetch<CommitteeMember[]>(
     `*[
       _type == "committeeMember" &&
       isActive != false &&
-      (!defined(district) || district == "" || lower(district) == "who-we-are")
-    ] | order(displayOrder asc, name asc)`
+      (!defined(district) || district == "" || lower(district) == "who-we-are") &&
+      ${municipalityFilter(municipalitySlug)}
+    ] | order(displayOrder asc, name asc)`,
+    { municipalitySlug }
   )
   return dedupeMembersByName(members)
 }
@@ -476,9 +480,17 @@ export async function getAllEventsForCalendar(municipalitySlug = 'allegheny-coun
 }
 
 export async function getPageBySlug(slug: string, municipalitySlug = 'allegheny-county'): Promise<PageDocument | null> {
-  return client.fetch(
+  const page = await client.fetch<PageDocument | null>(
     `*[_type == "page" && slug.current == $slug && ${municipalityFilter(municipalitySlug)}][0]`,
     { slug, municipalitySlug }
+  )
+  if (page || municipalitySlug === 'allegheny-county') return page
+  // Municipality sites fall back to the county's page when the committee
+  // hasn't created its own version — a bare hero with no body is worse than
+  // county copy. A committee page always wins when it exists.
+  return client.fetch<PageDocument | null>(
+    `*[_type == "page" && slug.current == $slug && ${municipalityFilter('allegheny-county')}][0]`,
+    { slug }
   )
 }
 

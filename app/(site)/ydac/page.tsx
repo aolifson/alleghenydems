@@ -2,13 +2,15 @@ import type { Metadata } from 'next'
 import { PortableText } from '@portabletext/react'
 import PageHero from '@/components/page-hero'
 import { getPageBySlug } from '@/sanity/lib/queries'
+import { getMunicipalitySlug } from '@/lib/tenant'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 
 export const metadata: Metadata = { title: 'YDAC' }
 export const revalidate = 3600
 
 export default async function YdacPage() {
-  const page = await getPageBySlug('ydac')
+  const municipalitySlug = await getMunicipalitySlug()
+  const page = await getPageBySlug('ydac', municipalitySlug)
 
   const body = stripDuplicatedHeroBlocks(
     page?.body,

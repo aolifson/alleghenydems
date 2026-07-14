@@ -6,46 +6,7 @@ import { usePathname } from 'next/navigation'
 import type { NavItem, MunicipalityListItem } from '@/sanity/lib/queries'
 import { useMunicipalityPrefix, prefixHref } from '@/lib/municipality-prefix-context'
 import { ExternalLinkIcon, isExternalHref } from '@/components/external-link'
-
-// One visitor intent per top-level item; every destination appears exactly once.
-const DEFAULT_NAV_ITEMS: NavItem[] = [
-  {
-    label: 'About',
-    href: '/about',
-    children: [
-      { label: 'Who We Are', href: '/about/who-we-are' },
-      { label: 'What We Do', href: '/about' },
-      { label: 'Elected Officials', href: '/elected-officials' },
-      { label: 'Legislative Tracker', href: '/legislative-tracker' },
-      { label: 'News', href: '/news' },
-    ],
-  },
-  {
-    label: 'Get Involved',
-    href: '/get-involved',
-    children: [
-      { label: 'Volunteer', href: '/get-involved#volunteer' },
-      { label: 'Become a Committee Member', href: '/become-a-committee-member' },
-      { label: 'Run for Office', href: '/run-for-office' },
-      { label: 'Events', href: '/events' },
-      { label: 'Donate', href: 'https://secure.actblue.com', external: true },
-    ],
-  },
-  {
-    label: 'Vote',
-    href: '/vote',
-    children: [
-      { label: 'Make a Plan to Vote', href: '/plan-to-vote' },
-      { label: '2026 Voter Guide', href: '/voter-guide' },
-      { label: 'Register to Vote', href: 'https://www.pavoterservices.pa.gov/pages/VoterRegistrationApplication.aspx', external: true },
-      { label: 'Vote by Mail', href: 'https://www.vote.pa.gov/Voting-in-PA/Pages/Mail-and-Absentee-Ballot.aspx', external: true },
-      { label: 'Find Your Polling Place', href: 'https://www.pavoterservices.pa.gov/pages/pollingplaceinfo.aspx', external: true },
-      { label: 'Election Calendar', href: 'https://www.vote.pa.gov/About-Elections/Pages/Election-Calendar.aspx', external: true },
-    ],
-  },
-  { label: 'Committee Directory', href: '/committee-members' },
-  { label: 'Contact', href: '/contact' },
-]
+import { DEFAULT_NAV_ITEMS } from '@/lib/default-nav'
 
 const FACEBOOK_URL = 'https://www.facebook.com/AlleghenyDems'
 const INSTAGRAM_URL = 'https://www.instagram.com/allegheny.dems'

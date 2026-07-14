@@ -1,5 +1,59 @@
 import { defineField, defineType } from 'sanity'
 import { HomeIcon } from '@sanity/icons'
+import { DEFAULT_NAV_SECTION_OPTIONS } from '@/lib/default-nav'
+
+// Shared shape for both "Additional Sections" and the legacy full-override
+// "Full Navigation Override" field, so the two array schemas can't drift.
+function navItemArrayField(name: string, title: string, description: string) {
+  return defineField({
+    name,
+    title,
+    type: 'array',
+    group: 'nav',
+    description,
+    of: [
+      {
+        type: 'object',
+        name: 'navItem',
+        title: 'Nav Item',
+        fields: [
+          defineField({
+            name: 'label',
+            title: 'Label',
+            type: 'string',
+            validation: (r) => r.required(),
+          }),
+          defineField({
+            name: 'href',
+            title: 'Link',
+            type: 'string',
+            description: 'Internal: /about, /events. External: https://example.com — links to outside websites automatically open in a new tab and show a small ↗ icon.',
+            validation: (r) => r.required(),
+          }),
+          defineField({
+            name: 'children',
+            title: 'Dropdown Items',
+            type: 'array',
+            of: [
+              {
+                type: 'object',
+                name: 'navChild',
+                title: 'Dropdown Link',
+                fields: [
+                  defineField({ name: 'label', title: 'Label', type: 'string', validation: (r) => r.required() }),
+                  defineField({ name: 'href', title: 'Link', type: 'string', description: 'Internal path (/about) or full external URL — links to outside websites automatically open in a new tab and show a small ↗ icon.', validation: (r) => r.required() }),
+                  defineField({ name: 'external', title: 'Opens in new tab', type: 'boolean', initialValue: false }),
+                ],
+                preview: { select: { title: 'label', subtitle: 'href' } },
+              },
+            ],
+          }),
+        ],
+        preview: { select: { title: 'label', subtitle: 'href' } },
+      },
+    ],
+  })
+}
 
 export const municipalityType = defineType({
   name: 'municipality',
@@ -156,54 +210,33 @@ export const municipalityType = defineType({
     }),
 
     // ── Navigation ────────────────────────────────────────────
+    // Default behavior: inherit the county nav, with the two fields below
+    // used to hide sections that don't apply and add ones that do.
+    // "Full Navigation Override" is the advanced escape hatch for a
+    // committee that wants to replace the menu entirely — when it has any
+    // items, it wins and the hide/add fields below are ignored.
     defineField({
-      name: 'navigationItems',
-      title: 'Navigation Override',
+      name: 'hiddenDefaultNavSections',
+      title: 'Hide Default Sections',
       type: 'array',
       group: 'nav',
-      description: 'Leave empty to use the county default navigation.',
-      of: [
-        {
-          type: 'object',
-          name: 'navItem',
-          title: 'Nav Item',
-          fields: [
-            defineField({
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-              validation: (r) => r.required(),
-            }),
-            defineField({
-              name: 'href',
-              title: 'Link',
-              type: 'string',
-              description: 'Internal: /about, /events. External: https://example.com — links to outside websites automatically open in a new tab and show a small ↗ icon.',
-              validation: (r) => r.required(),
-            }),
-            defineField({
-              name: 'children',
-              title: 'Dropdown Items',
-              type: 'array',
-              of: [
-                {
-                  type: 'object',
-                  name: 'navChild',
-                  title: 'Dropdown Link',
-                  fields: [
-                    defineField({ name: 'label', title: 'Label', type: 'string', validation: (r) => r.required() }),
-                    defineField({ name: 'href', title: 'Link', type: 'string', description: 'Internal path (/about) or full external URL — links to outside websites automatically open in a new tab and show a small ↗ icon.', validation: (r) => r.required() }),
-                    defineField({ name: 'external', title: 'Opens in new tab', type: 'boolean', initialValue: false }),
-                  ],
-                  preview: { select: { title: 'label', subtitle: 'href' } },
-                },
-              ],
-            }),
-          ],
-          preview: { select: { title: 'label', subtitle: 'href' } },
-        },
-      ],
+      description: 'Top-level county nav sections to remove from this committee\'s menu (e.g. hide "Vote" if it doesn\'t apply locally). Has no effect if "Full Navigation Override" below is filled in.',
+      of: [{ type: 'string' }],
+      options: {
+        list: DEFAULT_NAV_SECTION_OPTIONS,
+        layout: 'grid',
+      },
     }),
+    navItemArrayField(
+      'additionalNavItems',
+      'Additional Sections',
+      'Extra top-level sections to append after the (filtered) county default nav — e.g. a "Ward Map" or "Local Events" section specific to this committee. Has no effect if "Full Navigation Override" below is filled in.'
+    ),
+    navItemArrayField(
+      'navigationItems',
+      'Full Navigation Override (Advanced)',
+      'Completely replaces the menu — the county default nav and the Hide/Additional Sections fields above are ignored entirely. Leave empty unless this committee needs full control over their navigation structure (not just which sections show).'
+    ),
 
     // ── Technical ─────────────────────────────────────────────
     defineField({

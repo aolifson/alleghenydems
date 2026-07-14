@@ -3,6 +3,7 @@ import { PortableText } from '@portabletext/react'
 import PageHero from '@/components/page-hero'
 import ExternalLink from '@/components/external-link'
 import { getPageBySlug } from '@/sanity/lib/queries'
+import { getMunicipalitySlug } from '@/lib/tenant'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 import { ACDC_VOLUNTEER_URL } from '@/lib/links'
 
@@ -10,7 +11,8 @@ export const metadata: Metadata = { title: 'Get Involved' }
 export const revalidate = 86400
 
 export default async function GetInvolvedPage() {
-  const page = await getPageBySlug('get-involved')
+  const municipalitySlug = await getMunicipalitySlug()
+  const page = await getPageBySlug('get-involved', municipalitySlug)
   const headline = page?.heroHeadline ?? 'Get Involved'
   const subhead = page?.heroSubhead ?? 'There are many ways to support Democrats in Allegheny County. Find the right fit for you.'
   const body = stripDuplicatedHeroBlocks(page?.body, headline, subhead)

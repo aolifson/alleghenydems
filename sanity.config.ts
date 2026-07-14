@@ -74,6 +74,14 @@ export default defineConfig({
                     .title('News & Updates')
                     .filter(`municipality->slug.current == "${municipalitySlug}"`)
                 ),
+              S.listItem()
+                .title('Pages')
+                .icon(DocumentIcon)
+                .child(
+                  S.documentTypeList('page')
+                    .title('Pages')
+                    .filter(`municipality->slug.current == "${municipalitySlug}"`)
+                ),
               S.divider(),
               // Read-only view of county content shared with this municipality
               S.listItem()

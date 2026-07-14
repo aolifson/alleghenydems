@@ -4,6 +4,7 @@ import { PortableText } from '@portabletext/react'
 import PageHero from '@/components/page-hero'
 import { portableTextComponents } from '@/components/portable-text-components'
 import { getPageBySlug } from '@/sanity/lib/queries'
+import { getMunicipalitySlug } from '@/lib/tenant'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 
 export const metadata: Metadata = { title: 'Run for Office' }
@@ -32,7 +33,8 @@ const RESOURCES = [
 ]
 
 export default async function RunForOfficePage() {
-  const page = await getPageBySlug('run-for-office')
+  const municipalitySlug = await getMunicipalitySlug()
+  const page = await getPageBySlug('run-for-office', municipalitySlug)
   const headline = page?.heroHeadline ?? 'Run for Office'
   const subhead = page?.heroSubhead ?? 'Interested in running as a Democrat in Allegheny County? We\'re here to help.'
   const body = stripDuplicatedHeroBlocks(page?.body, headline, subhead)

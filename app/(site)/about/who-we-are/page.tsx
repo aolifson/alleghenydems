@@ -5,15 +5,17 @@ import PageHero from '@/components/page-hero'
 import SocialLinks from '@/components/social-links'
 import { urlFor } from '@/sanity/lib/image'
 import { getPageBySlug, getWhoWeAreMembers } from '@/sanity/lib/queries'
+import { getMunicipalitySlug } from '@/lib/tenant'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 
 export const metadata: Metadata = { title: 'Who We Are' }
 export const revalidate = 86400
 
 export default async function WhoWeArePage() {
+  const municipalitySlug = await getMunicipalitySlug()
   const [page, leaders] = await Promise.all([
-    getPageBySlug('who-we-are'),
-    getWhoWeAreMembers(),
+    getPageBySlug('who-we-are', municipalitySlug),
+    getWhoWeAreMembers(municipalitySlug),
   ])
   const headline = page?.heroHeadline ?? page?.title ?? 'Who We Are'
   const body = stripDuplicatedHeroBlocks(page?.body, headline, page?.heroSubhead)

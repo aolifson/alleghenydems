@@ -6,6 +6,7 @@ import { getMunicipalitySlug, getMunicipalityPrefix } from '@/lib/tenant'
 import { MunicipalityPrefixProvider } from '@/lib/municipality-prefix-context'
 import { urlFor } from '@/sanity/lib/image'
 import { WORDPRESS_NAV_ITEMS, WORDPRESS_BASE_URL } from '@/lib/wordpress-nav'
+import { resolveInheritedNavItems } from '@/lib/default-nav'
 
 // WordPress hybrid mode: all nav links point to alleghenydems.com.
 // Set NEXT_PUBLIC_WP_NAV=false in Vercel env vars to disable (e.g. training project).
@@ -30,9 +31,19 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const logoUrl = municipalitySettings?.logo ? urlFor(municipalitySettings.logo).width(80).height(80).url() : null
   const municipalityName = isCounty ? null : (municipalitySettings?.name ?? null)
 
-  const navItems: NavItem[] | null | undefined = wpMode
-    ? WORDPRESS_NAV_ITEMS as unknown as NavItem[]
-    : effectiveSettings?.navigationItems
+  // Full Navigation Override wins outright when set. Otherwise, municipality
+  // sites inherit the county default nav, filtered by "Hide Default
+  // Sections" and extended with "Additional Sections"; the county site
+  // itself just gets the plain default nav (no hide/add fields apply there).
+  const fullOverride = effectiveSettings?.navigationItems
+  const navItems: NavItem[] = wpMode
+    ? (WORDPRESS_NAV_ITEMS as unknown as NavItem[])
+    : fullOverride && fullOverride.length > 0
+      ? fullOverride
+      : resolveInheritedNavItems(
+          isCounty ? null : municipalitySettings?.hiddenDefaultNavSections,
+          isCounty ? null : municipalitySettings?.additionalNavItems
+        )
 
   return (
     <MunicipalityPrefixProvider basePath={basePath}>

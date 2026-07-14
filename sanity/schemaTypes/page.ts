@@ -1,4 +1,29 @@
 import { defineField, defineType } from 'sanity'
+import type { SlugIsUniqueValidator } from 'sanity'
+
+// Slugs only need to be unique per-municipality (or per-county, for
+// municipality-less pages) — this lets Fox Chapel and Mt. Lebanon each have
+// their own "who-we-are" page at the same slug without colliding with the
+// county's own "who-we-are" page. Sanity's default isUnique check is scoped
+// only to _type, so without this override the second municipality to use a
+// given slug would be blocked.
+const isSlugUniquePerMunicipality: SlugIsUniqueValidator = async (slug, context) => {
+  const { document, getClient } = context
+  const client = getClient({ apiVersion: '2024-01-01' })
+  const id = document?._id.replace(/^drafts\./, '') ?? ''
+  const municipalityRef = (document as { municipality?: { _ref?: string } } | undefined)?.municipality?._ref
+
+  const query = municipalityRef
+    ? `!defined(*[_type == "page" && !(_id in [$draft, $published]) && slug.current == $slug && municipality._ref == $municipalityRef][0]._id)`
+    : `!defined(*[_type == "page" && !(_id in [$draft, $published]) && slug.current == $slug && !defined(municipality)][0]._id)`
+
+  return client.fetch(query, {
+    draft: `drafts.${id}`,
+    published: id,
+    slug,
+    ...(municipalityRef ? { municipalityRef } : {}),
+  })
+}
 
 export const pageType = defineType({
   name: 'page',
@@ -16,8 +41,8 @@ export const pageType = defineType({
       name: 'slug',
       title: 'Slug (URL)',
       type: 'slug',
-      options: { source: 'title' },
-      description: 'Auto-generated from the title. Click "Generate" then do not change after publishing — this becomes the page URL.',
+      options: { source: 'title', isUnique: isSlugUniquePerMunicipality },
+      description: 'Auto-generated from the title. Click "Generate" then do not change after publishing — this becomes the page URL. Only needs to be unique within this municipality (or within county pages) — e.g. every committee can have their own "who-we-are" page.',
       readOnly: ({ document }) => !!(document?.slug as { current?: string } | undefined)?.current,
       validation: (r) => r.required().error('Slug is required. Click Generate.'),
     }),
