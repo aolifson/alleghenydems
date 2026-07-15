@@ -102,10 +102,10 @@ export const eventType = defineType({
     { title: 'Date (Upcoming First)', name: 'dateAsc', by: [{ field: 'date', direction: 'asc' }] },
   ],
   preview: {
-    select: { title: 'title', subtitle: 'date', media: 'image' },
-    prepare({ title, subtitle, media }) {
-      const date = subtitle ? new Date(subtitle).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'No date'
-      return { title, subtitle: date, media }
+    select: { title: 'title', date: 'date', media: 'image', municipalityName: 'municipality.name' },
+    prepare({ title, date, media, municipalityName }) {
+      const dateLabel = date ? new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'No date'
+      return { title, subtitle: `${municipalityName ?? 'ACDC'} · ${dateLabel}`, media }
     },
   },
 })

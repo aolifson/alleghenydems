@@ -120,13 +120,14 @@ export const actionAlertType = defineType({
       headline: 'headline',
       urgency: 'urgency',
       isActive: 'isActive',
+      municipalityName: 'municipality.name',
     },
-    prepare({ title, headline, urgency, isActive }) {
+    prepare({ title, headline, urgency, isActive, municipalityName }) {
       const urgencyEmoji = urgency === 'urgent' ? '🔴' : urgency === 'action' ? '🟡' : '🔵'
       const status = isActive ? '✅' : '⏸️'
       return {
         title: `${status} ${urgencyEmoji} ${title}`,
-        subtitle: headline,
+        subtitle: `${municipalityName ?? 'ACDC'} · ${headline}`,
       }
     },
   },

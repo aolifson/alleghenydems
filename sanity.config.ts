@@ -15,7 +15,9 @@ import {
   UsersIcon,
 } from '@sanity/icons'
 import { schemaTypes } from './sanity/schemaTypes'
+import { municipalityTemplates } from './sanity/schemaTypes/templates'
 import CandidateFinder from './sanity/structure/CandidateFinder'
+import { byMunicipalityListItem } from './sanity/structure/byMunicipality'
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET ?? 'production'
@@ -138,20 +140,29 @@ export default defineConfig({
             S.divider(),
 
             // ── Action Alerts ──
-            S.documentTypeListItem('actionAlert')
-              .title('Action Alerts')
-              .icon(BellIcon),
+            byMunicipalityListItem(S, {
+              type: 'actionAlert',
+              title: 'Action Alerts',
+              icon: BellIcon,
+              ordering: [{ field: 'startDate', direction: 'desc' }],
+            }),
 
             S.divider(),
 
             // ── Main content ──
-            S.documentTypeListItem('event')
-              .title('Events')
-              .icon(CalendarIcon),
+            byMunicipalityListItem(S, {
+              type: 'event',
+              title: 'Events',
+              icon: CalendarIcon,
+              ordering: [{ field: 'date', direction: 'asc' }],
+            }),
 
-            S.documentTypeListItem('news')
-              .title('News & Updates')
-              .icon(DocumentsIcon),
+            byMunicipalityListItem(S, {
+              type: 'news',
+              title: 'News & Updates',
+              icon: DocumentsIcon,
+              ordering: [{ field: 'publishedAt', direction: 'desc' }],
+            }),
 
             S.documentTypeListItem('voterGuide')
               .title('Voter Guides')
@@ -212,13 +223,11 @@ export default defineConfig({
               .icon(LinkIcon)
               .child(S.documentTypeList('externalLink').title('External Links')),
 
-            S.listItem()
-              .title('Pages (Advanced)')
-              .icon(DocumentIcon)
-              .child(
-                S.documentTypeList('page')
-                  .title('Pages')
-              ),
+            byMunicipalityListItem(S, {
+              type: 'page',
+              title: 'Pages (Advanced)',
+              icon: DocumentIcon,
+            }),
 
           ])
       },
@@ -228,5 +237,7 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
+    // Function form so the default per-type templates are kept.
+    templates: (prev) => [...prev, ...municipalityTemplates],
   },
 })

@@ -95,9 +95,9 @@ export const pageType = defineType({
     }),
   ],
   preview: {
-    select: { title: 'title', subtitle: 'slug.current' },
-    prepare({ title, subtitle }) {
-      return { title, subtitle: `/${subtitle}` }
+    select: { title: 'title', slug: 'slug.current', municipalityName: 'municipality.name' },
+    prepare({ title, slug, municipalityName }) {
+      return { title, subtitle: `${municipalityName ?? 'ACDC'} · /${slug}` }
     },
   },
 })

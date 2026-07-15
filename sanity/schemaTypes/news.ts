@@ -117,9 +117,9 @@ export const newsType = defineType({
     { title: 'Published (Newest First)', name: 'publishedDesc', by: [{ field: 'publishedAt', direction: 'desc' }] },
   ],
   preview: {
-    select: { title: 'title', subtitle: 'publishedAt', media: 'image', isExternal: 'isExternal' },
-    prepare({ title, subtitle, media, isExternal }) {
-      return { title, subtitle: `${subtitle ?? ''}${isExternal ? ' · External' : ''}`, media }
+    select: { title: 'title', publishedAt: 'publishedAt', media: 'image', isExternal: 'isExternal', municipalityName: 'municipality.name' },
+    prepare({ title, publishedAt, media, isExternal, municipalityName }) {
+      return { title, subtitle: `${municipalityName ?? 'ACDC'} · ${publishedAt ?? ''}${isExternal ? ' · External' : ''}`, media }
     },
   },
 })
