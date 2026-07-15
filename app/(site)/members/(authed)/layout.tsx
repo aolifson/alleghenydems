@@ -4,6 +4,7 @@ const MEMBERS_NAV = [
   { label: 'Overview', href: '/members' },
   { label: 'Roster', href: '/members/roster' },
   { label: 'Documents', href: '/members/documents' },
+  { label: 'Vote Review', href: '/members/review' },
 ]
 
 export default function MembersLayout({ children }: { children: React.ReactNode }) {

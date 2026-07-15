@@ -11,7 +11,7 @@ export default function MembersHomePage() {
         Resources for Allegheny County Democratic Committee members. This area is not visible to the public.
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
         {[
           {
             title: 'Member Roster',
@@ -24,6 +24,12 @@ export default function MembersHomePage() {
             description: 'Bylaws, minutes, forms, and training materials.',
             href: '/members/documents',
             icon: '📁',
+          },
+          {
+            title: 'Vote Review Queue',
+            description: 'Approve or reject auto-imported legislative votes before they reach the public tracker.',
+            href: '/members/review',
+            icon: '🗳️',
           },
           {
             title: 'Admin Guide',
