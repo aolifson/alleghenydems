@@ -18,6 +18,11 @@ import { schemaTypes } from './sanity/schemaTypes'
 import { municipalityTemplates } from './sanity/schemaTypes/templates'
 import CandidateFinder from './sanity/structure/CandidateFinder'
 import { byMunicipalityListItem } from './sanity/structure/byMunicipality'
+import {
+  bucketedByMunicipalityListItem,
+  eventBucketItems,
+  newsBucketItems,
+} from './sanity/structure/timeBuckets'
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET ?? 'production'
@@ -64,17 +69,25 @@ export default defineConfig({
                 .title('Events')
                 .icon(CalendarIcon)
                 .child(
-                  S.documentTypeList('event')
+                  S.list()
                     .title('Events')
-                    .filter(`municipality->slug.current == "${municipalitySlug}"`)
+                    .items(
+                      eventBucketItems(S, {
+                        filter: `municipality->slug.current == "${municipalitySlug}"`,
+                      })
+                    )
                 ),
               S.listItem()
                 .title('News & Updates')
                 .icon(DocumentsIcon)
                 .child(
-                  S.documentTypeList('news')
+                  S.list()
                     .title('News & Updates')
-                    .filter(`municipality->slug.current == "${municipalitySlug}"`)
+                    .items(
+                      newsBucketItems(S, {
+                        filter: `municipality->slug.current == "${municipalitySlug}"`,
+                      })
+                    )
                 ),
               S.listItem()
                 .title('Pages')
@@ -97,17 +110,25 @@ export default defineConfig({
                         .title('Shared Events')
                         .icon(CalendarIcon)
                         .child(
-                          S.documentTypeList('event')
+                          S.list()
                             .title('Shared Events')
-                            .filter(`!defined(municipality) && (shareWithAll == true || "${municipalitySlug}" in sharedWith[]->slug.current)`)
+                            .items(
+                              eventBucketItems(S, {
+                                filter: `!defined(municipality) && (shareWithAll == true || "${municipalitySlug}" in sharedWith[]->slug.current)`,
+                              })
+                            )
                         ),
                       S.listItem()
                         .title('Shared News')
                         .icon(DocumentsIcon)
                         .child(
-                          S.documentTypeList('news')
+                          S.list()
                             .title('Shared News')
-                            .filter(`!defined(municipality) && (shareWithAll == true || "${municipalitySlug}" in sharedWith[]->slug.current)`)
+                            .items(
+                              newsBucketItems(S, {
+                                filter: `!defined(municipality) && (shareWithAll == true || "${municipalitySlug}" in sharedWith[]->slug.current)`,
+                              })
+                            )
                         ),
                     ])
                 ),
@@ -150,18 +171,16 @@ export default defineConfig({
             S.divider(),
 
             // ── Main content ──
-            byMunicipalityListItem(S, {
+            bucketedByMunicipalityListItem(S, {
               type: 'event',
               title: 'Events',
               icon: CalendarIcon,
-              ordering: [{ field: 'date', direction: 'asc' }],
             }),
 
-            byMunicipalityListItem(S, {
+            bucketedByMunicipalityListItem(S, {
               type: 'news',
               title: 'News & Updates',
               icon: DocumentsIcon,
-              ordering: [{ field: 'publishedAt', direction: 'desc' }],
             }),
 
             S.documentTypeListItem('voterGuide')
