@@ -77,10 +77,42 @@ Everything here is either invisible to the live site or fully reversible.
       Sourdough Co., M&O Landscaping → each project's Settings → General → Transfer project
       → Alan Olifson Projects. Leaves the ACDC org holding only ACDC-relevant projects.
 - [ ] **Test the refactor branch on a Preview deployment first — merge comes next, in its
-      own section below.** Push `multi-project-refactor` / open a PR and use the Vercel
-      preview URL it generates. Logged into Sanity, verify what the doc's "Known limitation"
-      flagged as never checked in a real browser: the workspace switcher, editing a doc in
-      each workspace, and the `HiddenSharedItemsInput` checkboxes.
+      own section below.**
+      - *Mechanics:* the Vercel GitHub App (reconnected — see ✅ Done) watches every push to
+        this repo. Any push to a branch that isn't `main` auto-triggers a **Preview
+        Deployment** — the build happens on push alone, a PR isn't what causes it. Opening
+        a PR is just the easiest place to *find* the resulting link: Vercel's bot comments
+        the preview URL directly on the PR.
+      - `multi-project-refactor` is already pushed to `origin` (latest commit `bb50437`) —
+        a preview build likely already exists, no new push needed. Two ways to get the URL:
+        - **Open a PR** (recommended): GitHub → PR from `multi-project-refactor` into
+          `main`. Don't merge it. Within a minute or two the Vercel bot comments with the
+          preview link.
+        - **Or skip the PR**: Vercel dashboard → ACDC team → `alleghenydems` project →
+          Deployments tab → filter by branch `multi-project-refactor` → latest one → Visit.
+      - **What this checks:** before the refactor there was one Sanity Studio for the whole
+        county. This splits it into multiple "workspaces" in the same Studio — `county`
+        (unchanged) plus a new `fox-chapel` one, so Fox Chapel editors only ever see Fox
+        Chapel's own content. That's new code, only exercised so far by `curl` against
+        public pages — never opened in a browser as a logged-in editor. Steps, on the
+        preview URL:
+        1. Go to `<preview-url>/studio`. Confirm the workspace switcher (top-left) lists
+           **"Allegheny Dems"** (county) and **"fox-chapel (Municipality)"**, and both open
+           without erroring.
+        2. In "Allegheny Dems", open any document, confirm the edit form renders. **Don't
+           save** — see gotcha below, this workspace writes to the real live project.
+        3. Switch to "fox-chapel", same check — open a document. This project isn't public
+           yet, so a real save here (if you want extra confidence) is low-risk.
+        4. Still in "fox-chapel", open **Municipality Settings** → **Shared County Content**
+           tab → **Hide Shared County Items**. Should show a live list of checkboxes pulled
+           from the county project — the one hand-written piece of UI in this refactor, so
+           the most likely thing to be broken. Blank/stuck/erroring = the bug to look for.
+        5. In a normal tab (not Studio), visit `<preview-url>/municipalities/fox-chapel` —
+           `curl` only reads raw text, so this is just eyeballing that it looks right.
+      - **Gotcha:** anything not Fox-Chapel-specific reads the same env var as the real live
+        site (`NEXT_PUBLIC_SANITY_PROJECT_ID`), so step 2's county workspace shows today's
+        real data — expected, not stale. Only fox-chapel (steps 3–4) runs on the new,
+        isolated project actually being tested here.
 - [ ] **Sanity CORS** on both new projects (`6tkl67at`, `ihpwz2dj`): add
       `https://alleghenydems.com` and `https://www.alleghenydems.com`. (Correcting this doc:
       an earlier version said `.org` — the real production domain, per `middleware.ts`, is
