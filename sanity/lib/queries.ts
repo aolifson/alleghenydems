@@ -1,4 +1,4 @@
-import { client } from './client'
+import { client, getTenantClient, type TenantClient } from './client'
 import type { SanityDocument } from 'next-sanity'
 
 // ─── Types ──────────────────────────────────────────────────────────
@@ -309,10 +309,38 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
 }
 
 export async function getMunicipalitySettings(municipalitySlug: string): Promise<MunicipalitySettings | null> {
-  return client.fetch(
-    `*[_type == "municipality" && slug.current == $municipalitySlug && isActive == true][0]`,
-    { municipalitySlug }
-  )
+  const tenant = getTenantClient(municipalitySlug)
+  if (!tenant.isMigrated) {
+    return client.fetch(
+      `*[_type == "municipality" && slug.current == $municipalitySlug && isActive == true][0]`,
+      { municipalitySlug }
+    )
+  }
+
+  // Migrated tenants: branding/nav/contact live in their own project's
+  // municipalitySettings singleton; slug/domain routing stays in the
+  // county's thin municipality registry (see docs/MULTI-PROJECT-MIGRATION.md).
+  const [registryDoc, ownSettings] = await Promise.all([
+    client.fetch<{ slug: { current: string }; customDomain?: string; subdomain?: string; isActive?: boolean } | null>(
+      `*[_type == "municipality" && slug.current == $municipalitySlug && isActive == true][0]{ slug, customDomain, subdomain, isActive }`,
+      { municipalitySlug }
+    ),
+    // Typed as the full interface for convenience — this doc doesn't actually
+    // store slug/customDomain/subdomain/isActive (those are county-registry-
+    // only), but the merge below always overrides them with registryDoc's
+    // values before this is returned.
+    tenant.client.fetch<MunicipalitySettings | null>(`*[_type == "municipalitySettings"][0]`),
+  ])
+  if (!registryDoc || !ownSettings) return null
+
+  const merged: MunicipalitySettings = {
+    ...ownSettings,
+    slug: registryDoc.slug,
+    customDomain: registryDoc.customDomain,
+    subdomain: registryDoc.subdomain,
+    isActive: registryDoc.isActive,
+  }
+  return stampSourceProject<MunicipalitySettings>(merged, tenant, ['logo', 'heroImage'])
 }
 
 export interface MunicipalityListItem {
@@ -345,59 +373,169 @@ function municipalityFilter(slug: string): string {
   return `(municipality->slug.current == $municipalitySlug || shareWithAll == true || $municipalitySlug in sharedWith[]->slug.current)`
 }
 
-export async function getFeaturedEvents(limit = 3, municipalitySlug = 'allegheny-county'): Promise<Event[]> {
-  return client.fetch(
-    `*[_type == "event" && isFeatured == true && date >= $now && ${municipalityFilter(municipalitySlug)}] | order(date asc) [0...$limit]`,
-    { now: new Date().toISOString(), limit, municipalitySlug }
+// ─── Migrated-municipality helpers ─────────────────────────────────────────
+// A migrated municipality (see lib/municipality-projects.ts) owns its content
+// in its own Sanity project. Its site shows that content plus county items
+// pushed down via shareWithAll/sharedWith — minus anything the committee has
+// opted out of via `hiddenSharedItems` on their own municipalitySettings doc.
+// Not-yet-migrated municipalities keep using `municipalityFilter` above,
+// unchanged, against the single county project.
+
+// County image refs fetched from a migrated tenant's OWN project need a
+// builder pointed at that project (see sanity/lib/image.ts) — stamp it on
+// after fetch since GROQ can't add it, and Sanity's image type can't carry it.
+function stampSourceProject<T extends Record<string, unknown>>(
+  doc: T,
+  tenant: TenantClient,
+  imageFields: string[]
+): T {
+  if (!tenant.isMigrated) return doc
+  const stamped: Record<string, unknown> = { ...doc }
+  for (const field of imageFields) {
+    const value = stamped[field]
+    if (value && typeof value === 'object') {
+      stamped[field] = { ...(value as object), _sourceProject: { projectId: tenant.projectId, dataset: tenant.dataset } }
+    }
+  }
+  return stamped as T
+}
+
+function mergeAndSort<T extends Record<string, unknown>>(
+  own: T[],
+  shared: T[],
+  key: string,
+  direction: 'asc' | 'desc',
+  limit?: number
+): T[] {
+  const merged = [...own, ...shared]
+  merged.sort((a, b) => {
+    const av = String(a[key] ?? '')
+    const bv = String(b[key] ?? '')
+    const cmp = av < bv ? -1 : av > bv ? 1 : 0
+    return direction === 'asc' ? cmp : -cmp
+  })
+  return typeof limit === 'number' ? merged.slice(0, limit) : merged
+}
+
+async function getHiddenSharedItemIds(tenant: TenantClient): Promise<string[]> {
+  if (!tenant.isMigrated) return []
+  const settings = await tenant.client.fetch<{ hiddenSharedItems?: string[] } | null>(
+    `*[_type == "municipalitySettings"][0]{ hiddenSharedItems }`
   )
+  return settings?.hiddenSharedItems ?? []
+}
+
+// Shared-from-county filter for a migrated tenant, run against the county
+// project. Mirrors municipalityFilter's share logic but excludes anything
+// the committee has opted out of.
+function sharedFromCountyFilter(): string {
+  return `!defined(municipality) && (shareWithAll == true || $municipalitySlug in sharedWith[]->slug.current) && !(_id in $hiddenSharedItems)`
+}
+
+// Shared shape for the four list queries below (featured/upcoming/past
+// events, and their news equivalents): in legacy mode, one query against
+// the county project exactly as before. In migrated mode, the tenant's own
+// content plus county items shared-down to them, merged and sorted in JS
+// since they come from two separate projects.
+async function fetchTenantScopedList<T extends Record<string, unknown>>(
+  type: 'event' | 'news',
+  ownAndCountyFilter: string,
+  legacyFilter: string,
+  sortField: string,
+  sortDirection: 'asc' | 'desc',
+  limit: number,
+  municipalitySlug: string,
+  imageFields: string[]
+): Promise<T[]> {
+  const tenant = getTenantClient(municipalitySlug)
+  if (!tenant.isMigrated) {
+    return client.fetch(
+      `*[_type == "${type}" && ${ownAndCountyFilter} && ${legacyFilter}] | order(${sortField} ${sortDirection}) [0...$limit]`,
+      { now: new Date().toISOString(), limit, municipalitySlug }
+    )
+  }
+
+  const hiddenSharedItems = await getHiddenSharedItemIds(tenant)
+  const [own, shared] = await Promise.all([
+    tenant.client.fetch<T[]>(
+      `*[_type == "${type}" && ${ownAndCountyFilter}] | order(${sortField} ${sortDirection})`,
+      { now: new Date().toISOString() }
+    ),
+    client.fetch<T[]>(
+      `*[_type == "${type}" && ${ownAndCountyFilter} && ${sharedFromCountyFilter()}] | order(${sortField} ${sortDirection})`,
+      { now: new Date().toISOString(), municipalitySlug, hiddenSharedItems }
+    ),
+  ])
+  const stampedOwn = own.map((doc) => stampSourceProject(doc, tenant, imageFields))
+  return mergeAndSort(stampedOwn, shared, sortField, sortDirection, limit)
+}
+
+// Single-document lookups (by slug): try the tenant's own project first,
+// then fall back to a matching county item shared down to them.
+async function fetchTenantScopedDoc<T extends Record<string, unknown>>(
+  type: 'event' | 'news',
+  slug: string,
+  municipalitySlug: string,
+  imageFields: string[]
+): Promise<T | null> {
+  const tenant = getTenantClient(municipalitySlug)
+  if (!tenant.isMigrated) {
+    return client.fetch(
+      `*[_type == "${type}" && slug.current == $slug && ${municipalityFilter(municipalitySlug)}][0]`,
+      { slug, municipalitySlug }
+    )
+  }
+
+  const own = await tenant.client.fetch<T | null>(`*[_type == "${type}" && slug.current == $slug][0]`, { slug })
+  if (own) return stampSourceProject(own, tenant, imageFields)
+
+  const hiddenSharedItems = await getHiddenSharedItemIds(tenant)
+  return client.fetch<T | null>(
+    `*[_type == "${type}" && slug.current == $slug && ${sharedFromCountyFilter()}][0]`,
+    { slug, municipalitySlug, hiddenSharedItems }
+  )
+}
+
+export async function getFeaturedEvents(limit = 3, municipalitySlug = 'allegheny-county'): Promise<Event[]> {
+  return fetchTenantScopedList<Event>('event', 'isFeatured == true && date >= $now', municipalityFilter(municipalitySlug), 'date', 'asc', limit, municipalitySlug, ['image'])
 }
 
 export async function getUpcomingEvents(limit = 20, municipalitySlug = 'allegheny-county'): Promise<Event[]> {
-  return client.fetch(
-    `*[_type == "event" && date >= $now && ${municipalityFilter(municipalitySlug)}] | order(date asc) [0...$limit]`,
-    { now: new Date().toISOString(), limit, municipalitySlug }
-  )
+  return fetchTenantScopedList<Event>('event', 'date >= $now', municipalityFilter(municipalitySlug), 'date', 'asc', limit, municipalitySlug, ['image'])
 }
 
 export async function getPastEvents(limit = 10, municipalitySlug = 'allegheny-county'): Promise<Event[]> {
-  return client.fetch(
-    `*[_type == "event" && date < $now && ${municipalityFilter(municipalitySlug)}] | order(date desc) [0...$limit]`,
-    { now: new Date().toISOString(), limit, municipalitySlug }
-  )
+  return fetchTenantScopedList<Event>('event', 'date < $now', municipalityFilter(municipalitySlug), 'date', 'desc', limit, municipalitySlug, ['image'])
 }
 
 export async function getEventBySlug(slug: string, municipalitySlug = 'allegheny-county'): Promise<Event | null> {
-  return client.fetch(
-    `*[_type == "event" && slug.current == $slug && ${municipalityFilter(municipalitySlug)}][0]`,
-    { slug, municipalitySlug }
-  )
+  return fetchTenantScopedDoc<Event>('event', slug, municipalitySlug, ['image'])
 }
 
 export async function getLatestNews(limit = 6, municipalitySlug = 'allegheny-county'): Promise<NewsPost[]> {
-  return client.fetch(
-    `*[_type == "news" && ${municipalityFilter(municipalitySlug)}] | order(publishedAt desc) [0...$limit]`,
-    { limit, municipalitySlug }
-  )
+  return fetchTenantScopedList<NewsPost>('news', 'defined(_id)', municipalityFilter(municipalitySlug), 'publishedAt', 'desc', limit, municipalitySlug, ['image'])
 }
 
 export async function getFeaturedNews(limit = 3, municipalitySlug = 'allegheny-county'): Promise<NewsPost[]> {
-  return client.fetch(
-    `*[_type == "news" && isFeatured == true && ${municipalityFilter(municipalitySlug)}] | order(publishedAt desc) [0...$limit]`,
-    { limit, municipalitySlug }
-  )
+  return fetchTenantScopedList<NewsPost>('news', 'isFeatured == true', municipalityFilter(municipalitySlug), 'publishedAt', 'desc', limit, municipalitySlug, ['image'])
 }
 
 export async function getNewsPost(slug: string, municipalitySlug = 'allegheny-county'): Promise<NewsPost | null> {
-  return client.fetch(
-    `*[_type == "news" && slug.current == $slug && ${municipalityFilter(municipalitySlug)}][0]`,
-    { slug, municipalitySlug }
-  )
+  return fetchTenantScopedDoc<NewsPost>('news', slug, municipalitySlug, ['image'])
+}
+
+// Committee roster types aren't shareable/push-down content (no
+// shareWithAll/sharedWith field) — a migrated tenant simply owns its own
+// rows, with no county merge needed.
+function tenantScopedFilter(baseFilter: string, municipalitySlug: string, tenant: TenantClient): string {
+  return tenant.isMigrated ? baseFilter : `${baseFilter} && ${municipalityFilter(municipalitySlug)}`
 }
 
 export async function getCommitteeMembers(municipalitySlug = 'allegheny-county'): Promise<CommitteeMember[]> {
+  const tenant = getTenantClient(municipalitySlug)
   // Phone is projected only when the member opted into showing it publicly,
   // so private numbers never reach the public payload.
-  const members = await client.fetch<CommitteeMember[]>(
+  const members = await tenant.client.fetch<CommitteeMember[]>(
     `*[
       _type == "committeeMember" &&
       isActive == true &&
@@ -405,7 +543,7 @@ export async function getCommitteeMembers(municipalitySlug = 'allegheny-county')
         defined(district) &&
         lower(district) in ["elected-official", "elected officials", "who-we-are"]
       ) &&
-      ${municipalityFilter(municipalitySlug)}
+      ${tenantScopedFilter('true', municipalitySlug, tenant)}
     ] | order(district asc, displayOrder asc, name asc) {
       _id, _type, name, title, district, bio, photo, email,
       "phone": select(showPhonePublicly == true => phone),
@@ -415,26 +553,28 @@ export async function getCommitteeMembers(municipalitySlug = 'allegheny-county')
     }`,
     { municipalitySlug }
   )
-  return dedupeMembersByName(members)
+  return dedupeMembersByName(members).map((m) => stampSourceProject(m, tenant, ['photo']))
 }
 
 export async function getCommitteeDirectoryEntries(municipalitySlug = 'allegheny-county'): Promise<CommitteeDirectoryEntry[]> {
-  return client.fetch(
+  const tenant = getTenantClient(municipalitySlug)
+  return tenant.client.fetch(
     `*[
       _type == "committeeDirectoryEntry" &&
       isActive != false &&
-      ${municipalityFilter(municipalitySlug)}
+      ${tenantScopedFilter('true', municipalitySlug, tenant)}
     ] | order(committee asc, ward asc, district asc, displayOrder asc, firstName asc, lastName asc)`,
     { municipalitySlug }
   )
 }
 
 export async function getCommitteeContactEntries(municipalitySlug = 'allegheny-county'): Promise<CommitteeContactEntry[]> {
-  return client.fetch(
+  const tenant = getTenantClient(municipalitySlug)
+  return tenant.client.fetch(
     `*[
       _type == "committeeContactEntry" &&
       isActive != false &&
-      ${municipalityFilter(municipalitySlug)}
+      ${tenantScopedFilter('true', municipalitySlug, tenant)}
     ] | order(committee asc, displayOrder asc)`,
     { municipalitySlug }
   )
@@ -452,16 +592,17 @@ export async function getElectedOfficials(): Promise<CommitteeMember[]> {
 }
 
 export async function getWhoWeAreMembers(municipalitySlug = 'allegheny-county'): Promise<CommitteeMember[]> {
-  const members = await client.fetch<CommitteeMember[]>(
+  const tenant = getTenantClient(municipalitySlug)
+  const members = await tenant.client.fetch<CommitteeMember[]>(
     `*[
       _type == "committeeMember" &&
       isActive != false &&
       (!defined(district) || district == "" || lower(district) == "who-we-are") &&
-      ${municipalityFilter(municipalitySlug)}
+      ${tenantScopedFilter('true', municipalitySlug, tenant)}
     ] | order(displayOrder asc, name asc)`,
     { municipalitySlug }
   )
-  return dedupeMembersByName(members)
+  return dedupeMembersByName(members).map((m) => stampSourceProject(m, tenant, ['photo']))
 }
 
 export async function getExternalLinks(): Promise<ExternalLink[]> {
@@ -470,24 +611,51 @@ export async function getExternalLinks(): Promise<ExternalLink[]> {
   )
 }
 
+const CALENDAR_EVENT_PROJECTION = `{
+  _id, _type, title, slug, date, endDate, locationName, locationAddress, description, rsvpUrl, isFeatured
+}`
+
 export async function getAllEventsForCalendar(municipalitySlug = 'allegheny-county'): Promise<Event[]> {
-  return client.fetch(
-    `*[_type == "event" && ${municipalityFilter(municipalitySlug)}] | order(date asc) {
-      _id, _type, title, slug, date, endDate, locationName, locationAddress, description, rsvpUrl, isFeatured
-    }`,
-    { municipalitySlug }
-  )
+  const tenant = getTenantClient(municipalitySlug)
+  if (!tenant.isMigrated) {
+    return client.fetch(
+      `*[_type == "event" && ${municipalityFilter(municipalitySlug)}] | order(date asc) ${CALENDAR_EVENT_PROJECTION}`,
+      { municipalitySlug }
+    )
+  }
+
+  const hiddenSharedItems = await getHiddenSharedItemIds(tenant)
+  const [own, shared] = await Promise.all([
+    tenant.client.fetch<Event[]>(`*[_type == "event"] | order(date asc) ${CALENDAR_EVENT_PROJECTION}`),
+    client.fetch<Event[]>(
+      `*[_type == "event" && ${sharedFromCountyFilter()}] | order(date asc) ${CALENDAR_EVENT_PROJECTION}`,
+      { municipalitySlug, hiddenSharedItems }
+    ),
+  ])
+  return mergeAndSort(own, shared, 'date', 'asc')
 }
 
 export async function getPageBySlug(slug: string, municipalitySlug = 'allegheny-county'): Promise<PageDocument | null> {
-  const page = await client.fetch<PageDocument | null>(
-    `*[_type == "page" && slug.current == $slug && ${municipalityFilter(municipalitySlug)}][0]`,
-    { slug, municipalitySlug }
-  )
-  if (page || municipalitySlug === 'allegheny-county') return page
-  // Municipality sites fall back to the county's page when the committee
-  // hasn't created its own version — a bare hero with no body is worse than
-  // county copy. A committee page always wins when it exists.
+  const tenant = getTenantClient(municipalitySlug)
+
+  if (!tenant.isMigrated) {
+    const page = await client.fetch<PageDocument | null>(
+      `*[_type == "page" && slug.current == $slug && ${municipalityFilter(municipalitySlug)}][0]`,
+      { slug, municipalitySlug }
+    )
+    if (page || municipalitySlug === 'allegheny-county') return page
+    // Municipality sites fall back to the county's page when the committee
+    // hasn't created its own version — a bare hero with no body is worse than
+    // county copy. A committee page always wins when it exists.
+    return client.fetch<PageDocument | null>(
+      `*[_type == "page" && slug.current == $slug && ${municipalityFilter('allegheny-county')}][0]`,
+      { slug }
+    )
+  }
+
+  const ownPage = await tenant.client.fetch<PageDocument | null>(`*[_type == "page" && slug.current == $slug][0]`, { slug })
+  if (ownPage) return stampSourceProject(ownPage, tenant, ['heroImage'])
+  // Same inherit-from-county fallback as legacy mode, above.
   return client.fetch<PageDocument | null>(
     `*[_type == "page" && slug.current == $slug && ${municipalityFilter('allegheny-county')}][0]`,
     { slug }
@@ -518,12 +686,33 @@ export async function getLegislativeTrackerBySlug(slug: string): Promise<Legisla
   )
 }
 
+const ACTIVE_ALERT_FILTER = 'isActive == true && startDate <= $now && (endDate == null || endDate >= $now)'
+
 export async function getActiveActionAlerts(municipalitySlug = 'allegheny-county'): Promise<ActionAlert[]> {
-  return client.withConfig({ useCdn: false }).fetch(
-    `*[_type == "actionAlert" && isActive == true && startDate <= $now && (endDate == null || endDate >= $now) && ${municipalityFilter(municipalitySlug)}] | order(startDate desc)`,
-    { now: new Date().toISOString(), municipalitySlug },
-    { next: { revalidate: 300 } }
-  )
+  const tenant = getTenantClient(municipalitySlug)
+  const now = new Date().toISOString()
+  if (!tenant.isMigrated) {
+    return client.withConfig({ useCdn: false }).fetch(
+      `*[_type == "actionAlert" && ${ACTIVE_ALERT_FILTER} && ${municipalityFilter(municipalitySlug)}] | order(startDate desc)`,
+      { now, municipalitySlug },
+      { next: { revalidate: 300 } }
+    )
+  }
+
+  const hiddenSharedItems = await getHiddenSharedItemIds(tenant)
+  const [own, shared] = await Promise.all([
+    tenant.client.withConfig({ useCdn: false }).fetch<ActionAlert[]>(
+      `*[_type == "actionAlert" && ${ACTIVE_ALERT_FILTER}] | order(startDate desc)`,
+      { now },
+      { next: { revalidate: 300 } }
+    ),
+    client.withConfig({ useCdn: false }).fetch<ActionAlert[]>(
+      `*[_type == "actionAlert" && ${ACTIVE_ALERT_FILTER} && ${sharedFromCountyFilter()}] | order(startDate desc)`,
+      { now, municipalitySlug, hiddenSharedItems },
+      { next: { revalidate: 300 } }
+    ),
+  ])
+  return mergeAndSort(own, shared, 'startDate', 'desc')
 }
 
 // ─── Members-only queries ─────────────────────────────────────────────
@@ -613,9 +802,30 @@ export async function getInternalDocs(): Promise<InternalDoc[]> {
 }
 
 export async function getBannerAlert(municipalitySlug = 'allegheny-county'): Promise<ActionAlert | null> {
-  return client.withConfig({ useCdn: false }).fetch(
-    `*[_type == "actionAlert" && isActive == true && showInBanner == true && startDate <= $now && (endDate == null || endDate >= $now) && ${municipalityFilter(municipalitySlug)}] | order(startDate desc)[0]`,
-    { now: new Date().toISOString(), municipalitySlug },
-    { next: { revalidate: 300 } }
-  )
+  const tenant = getTenantClient(municipalitySlug)
+  const now = new Date().toISOString()
+  const bannerFilter = `${ACTIVE_ALERT_FILTER} && showInBanner == true`
+
+  if (!tenant.isMigrated) {
+    return client.withConfig({ useCdn: false }).fetch(
+      `*[_type == "actionAlert" && ${bannerFilter} && ${municipalityFilter(municipalitySlug)}] | order(startDate desc)[0]`,
+      { now, municipalitySlug },
+      { next: { revalidate: 300 } }
+    )
+  }
+
+  const hiddenSharedItems = await getHiddenSharedItemIds(tenant)
+  const [own, shared] = await Promise.all([
+    tenant.client.withConfig({ useCdn: false }).fetch<ActionAlert[]>(
+      `*[_type == "actionAlert" && ${bannerFilter}] | order(startDate desc)`,
+      { now },
+      { next: { revalidate: 300 } }
+    ),
+    client.withConfig({ useCdn: false }).fetch<ActionAlert[]>(
+      `*[_type == "actionAlert" && ${bannerFilter} && ${sharedFromCountyFilter()}] | order(startDate desc)`,
+      { now, municipalitySlug, hiddenSharedItems },
+      { next: { revalidate: 300 } }
+    ),
+  ])
+  return mergeAndSort(own, shared, 'startDate', 'desc')[0] ?? null
 }

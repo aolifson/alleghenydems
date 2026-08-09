@@ -4,7 +4,7 @@ import { DEFAULT_NAV_SECTION_OPTIONS } from '@/lib/default-nav'
 
 // Shared shape for both "Additional Sections" and the legacy full-override
 // "Full Navigation Override" field, so the two array schemas can't drift.
-function navItemArrayField(name: string, title: string, description: string) {
+export function navItemArrayField(name: string, title: string, description: string) {
   return defineField({
     name,
     title,
