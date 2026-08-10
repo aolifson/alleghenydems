@@ -7,6 +7,7 @@ import type { NavItem, MunicipalityListItem } from '@/sanity/lib/queries'
 import { useMunicipalityPrefix, prefixHref } from '@/lib/municipality-prefix-context'
 import { ExternalLinkIcon, isExternalHref } from '@/components/external-link'
 import { DEFAULT_NAV_ITEMS } from '@/lib/default-nav'
+import { ACDC_DONATE_URL } from '@/lib/links'
 
 const FACEBOOK_URL = 'https://www.facebook.com/AlleghenyDems'
 const INSTAGRAM_URL = 'https://www.instagram.com/allegheny.dems'
@@ -264,7 +265,7 @@ export default function Nav({
             Merch Store
           </Link>
           <Link
-            href="https://secure.actblue.com"
+            href={ACDC_DONATE_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="px-4 py-2 bg-[var(--color-red)] hover:bg-[var(--color-red-dark)] text-white text-sm font-semibold rounded transition-colors inline-flex items-center gap-1"
@@ -405,7 +406,7 @@ export default function Nav({
               Merch Store
             </Link>
             <Link
-              href="https://secure.actblue.com"
+              href={ACDC_DONATE_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-center px-4 py-2 bg-[var(--color-red)] text-white text-sm font-semibold rounded inline-flex items-center justify-center gap-1"

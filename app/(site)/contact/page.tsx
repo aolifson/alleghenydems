@@ -5,7 +5,6 @@ import { portableTextComponents } from '@/components/portable-text-components'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 import { getPageBySlug, getSiteSettings, getMunicipalitySettings } from '@/sanity/lib/queries'
 import { getMunicipalitySlug } from '@/lib/tenant'
-import ContactForm from '@/components/contact-form'
 
 export const metadata: Metadata = { title: 'Contact' }
 export const revalidate = 86400
@@ -43,7 +42,7 @@ export default async function ContactPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-5xl">
+      <div className="max-w-3xl">
         {/* Contact Info */}
         <div>
           <h2 className="font-semibold text-[var(--color-blue)] mb-4">Office Information</h2>
@@ -97,12 +96,6 @@ export default async function ContactPage() {
               </div>
             )}
           </div>
-        </div>
-
-        {/* Contact Form */}
-        <div>
-          <h2 className="font-semibold text-[var(--color-blue)] mb-4">Send a Message</h2>
-          <ContactForm />
         </div>
       </div>
     </div>

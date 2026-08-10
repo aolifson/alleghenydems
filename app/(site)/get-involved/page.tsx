@@ -6,7 +6,7 @@ import { portableTextComponents } from '@/components/portable-text-components'
 import { getPageBySlug } from '@/sanity/lib/queries'
 import { getMunicipalitySlug } from '@/lib/tenant'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
-import { ACDC_VOLUNTEER_URL } from '@/lib/links'
+import { ACDC_DONATE_URL, ACDC_VOLUNTEER_URL } from '@/lib/links'
 
 export const metadata: Metadata = { title: 'Get Involved' }
 export const revalidate = 86400
@@ -34,7 +34,7 @@ export default async function GetInvolvedPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[
             { label: 'Volunteer', description: 'Join phone banks, canvasses, and campaign activities across the county.', href: ACDC_VOLUNTEER_URL, icon: '🤝', external: true },
-            { label: 'Donate', description: 'Support the Allegheny County Democratic Committee with a contribution.', href: 'https://secure.actblue.com', icon: '💙', external: true },
+            { label: 'Donate', description: 'Support the Allegheny County Democratic Committee with a contribution.', href: ACDC_DONATE_URL, icon: '💙', external: true },
             { label: 'Become a Committee Person', description: 'Represent your ward or municipality as an elected committee person.', href: '/become-a-committee-member', icon: '⭐', external: false },
             { label: 'Young Democrats', description: 'Connect with the Young Democrats of Allegheny County.', href: 'https://linktr.ee/youngdems_agh', icon: '🌟', external: true },
           ].map(({ label, description, href, icon, external }) => {

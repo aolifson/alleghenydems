@@ -1,4 +1,5 @@
 import type { NavItem } from '@/sanity/lib/queries'
+import { ACDC_DONATE_URL } from '@/lib/links'
 
 // The county's default navigation. This is the shared source of truth for:
 //   1. What renders when a municipality has no navigation customization at all.
@@ -32,11 +33,11 @@ export const DEFAULT_NAV_ITEMS: DefaultNavSection[] = [
     label: 'Get Involved',
     href: '/get-involved',
     children: [
-      { label: 'Volunteer', href: '/get-involved#volunteer' },
+      { label: 'Volunteer', href: '/volunteer' },
       { label: 'Become a Committee Member', href: '/become-a-committee-member' },
       { label: 'Run for Office', href: '/run-for-office' },
       { label: 'Events', href: '/events' },
-      { label: 'Donate', href: 'https://secure.actblue.com', external: true },
+      { label: 'Donate', href: ACDC_DONATE_URL, external: true },
     ],
   },
   {
