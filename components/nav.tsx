@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import type { NavItem, MunicipalityListItem } from '@/sanity/lib/queries'
+import type { NavItem } from '@/sanity/lib/queries'
 import { useMunicipalityPrefix, prefixHref } from '@/lib/municipality-prefix-context'
 import { ExternalLinkIcon, isExternalHref } from '@/components/external-link'
 import { DEFAULT_NAV_ITEMS } from '@/lib/default-nav'
@@ -40,14 +40,12 @@ export default function Nav({
   navItems,
   logoUrl,
   municipalityName,
-  municipalities = [],
   wordpressBaseUrl,
   localActivePath,
 }: {
   navItems?: NavItem[] | null
   logoUrl?: string | null
   municipalityName?: string | null
-  municipalities?: MunicipalityListItem[]
   // When set, all non-local, non-external links are prefixed with this URL
   // and rendered as <a> tags pointing to the WordPress site.
   wordpressBaseUrl?: string
@@ -212,19 +210,6 @@ export default function Nav({
             )
           })}
 
-          {/* Local Committees — county site only, hidden when none exist */}
-          {municipalities.length > 0 && (
-            <Link
-              href={prefixHref('/local-committees', basePath)}
-              className={
-                isActive('/local-committees')
-                  ? "px-3 py-2 rounded text-sm font-semibold bg-[var(--color-navy)]/15 border-b-2 border-white/80 transition-colors"
-                  : "px-3 py-2 rounded text-sm font-medium hover:bg-[var(--color-navy)]/10 transition-colors"
-              }
-            >
-              Local Committees
-            </Link>
-          )}
         </nav>
 
         {/* Desktop right controls */}
@@ -379,15 +364,6 @@ export default function Nav({
               </div>
             )
           })}
-          {municipalities.length > 0 && (
-            <Link
-              href={prefixHref('/local-committees', basePath)}
-              className="block py-2 text-sm font-medium border-b border-white/10 text-white"
-              onClick={() => setOpen(false)}
-            >
-              Local Committees
-            </Link>
-          )}
           <Link
             href="/members"
             className="inline-flex items-center gap-1.5 py-2 text-sm text-white/70 hover:text-white"

@@ -1,8 +1,8 @@
 import Nav from '@/components/nav'
 import Footer from '@/components/footer'
 import ActionAlertBanner from '@/components/action-alert-banner'
-import { getSiteSettings, getMunicipalitySettings, getBannerAlert, getActiveMunicipalities } from '@/sanity/lib/queries'
-import type { NavItem, MunicipalityListItem } from '@/sanity/lib/queries'
+import { getSiteSettings, getMunicipalitySettings, getBannerAlert } from '@/sanity/lib/queries'
+import type { NavItem } from '@/sanity/lib/queries'
 import { getMunicipalitySlug, getMunicipalityPrefix } from '@/lib/tenant'
 import { MunicipalityPrefixProvider } from '@/lib/municipality-prefix-context'
 import { urlFor } from '@/sanity/lib/image'
@@ -20,11 +20,10 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const basePath = await getMunicipalityPrefix()
   const isCounty = municipalitySlug === 'allegheny-county'
 
-  const [settings, municipalitySettings, bannerAlert, municipalities] = await Promise.all([
+  const [settings, municipalitySettings, bannerAlert] = await Promise.all([
     isCounty ? getSiteSettings() : null,
     isCounty ? null : getMunicipalitySettings(municipalitySlug),
     getBannerAlert(municipalitySlug),
-    isCounty ? getActiveMunicipalities() : Promise.resolve([] as MunicipalityListItem[]),
   ])
 
   const effectiveSettings = isCounty ? settings : municipalitySettings
@@ -69,7 +68,6 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         navItems={navItems}
         logoUrl={logoUrl}
         municipalityName={municipalityName}
-        municipalities={municipalities}
         wordpressBaseUrl={wpMode ? WORDPRESS_BASE_URL : undefined}
         localActivePath="/voter-guide"
       />

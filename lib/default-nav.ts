@@ -34,7 +34,6 @@ export const DEFAULT_NAV_ITEMS: DefaultNavSection[] = [
     href: '/get-involved',
     children: [
       { label: 'Volunteer', href: '/volunteer' },
-      { label: 'Become a Committee Member', href: '/become-a-committee-member' },
       { label: 'Run for Office', href: '/run-for-office' },
       { label: 'Events', href: '/events' },
       { label: 'Donate', href: ACDC_DONATE_URL, external: true },
@@ -54,9 +53,18 @@ export const DEFAULT_NAV_ITEMS: DefaultNavSection[] = [
     ],
   },
   {
-    key: 'committee-directory',
-    label: 'Committee Directory',
-    href: '/committee-members',
+    // Committee content sits under one heading that opens with what a
+    // committee member actually is and does. Jumping a visitor straight to a
+    // bare directory assumed they already knew — and "Find Members and
+    // Positions" is the wording people are used to from the old site.
+    key: 'committee-members',
+    label: 'Committee Members',
+    href: '/become-a-committee-member',
+    children: [
+      { label: 'Become a Committee Member', href: '/become-a-committee-member' },
+      { label: 'Find Members and Positions', href: '/committee-members' },
+      { label: 'Local Committee Listing', href: '/local-committees' },
+    ],
   },
   {
     key: 'contact',
