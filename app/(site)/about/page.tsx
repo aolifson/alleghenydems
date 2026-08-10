@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PortableText } from '@portabletext/react'
 import PageHero from '@/components/page-hero'
+import { portableTextComponents } from '@/components/portable-text-components'
 import { getPageBySlug } from '@/sanity/lib/queries'
 import { getMunicipalitySlug } from '@/lib/tenant'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
@@ -25,7 +26,7 @@ export default async function AboutPage() {
 
       {body ? (
         <div className="prose-content">
-          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} />
+          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} components={portableTextComponents} />
         </div>
       ) : (
         <div className="prose-content space-y-4 text-[var(--color-text)]">

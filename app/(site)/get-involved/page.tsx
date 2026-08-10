@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { PortableText } from '@portabletext/react'
 import PageHero from '@/components/page-hero'
 import ExternalLink from '@/components/external-link'
+import { portableTextComponents } from '@/components/portable-text-components'
 import { getPageBySlug } from '@/sanity/lib/queries'
 import { getMunicipalitySlug } from '@/lib/tenant'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
@@ -27,7 +28,7 @@ export default async function GetInvolvedPage() {
 
       {body ? (
         <div className="prose-content">
-          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} />
+          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} components={portableTextComponents} />
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

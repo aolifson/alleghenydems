@@ -6,6 +6,7 @@ import { committeeMemberType } from './committeeMember'
 import { committeeDirectoryEntryType } from './committeeDirectoryEntry'
 import { committeeContactEntryType } from './committeeContactEntry'
 import { pageType } from './page'
+import { scheduledSectionType } from '../scheduledSection'
 
 // Schema for a migrated municipality's own Sanity project — a strict subset
 // of the county schema (sanity/schemaTypes/index.ts) with no
@@ -20,4 +21,5 @@ export const municipalityProjectSchemaTypes = [
   committeeDirectoryEntryType,
   committeeContactEntryType,
   pageType,
+  scheduledSectionType,
 ]

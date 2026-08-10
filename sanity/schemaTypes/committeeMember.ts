@@ -16,13 +16,30 @@ export const committeeMemberType = defineType({
       name: 'title',
       title: 'Title / Role',
       type: 'string',
-      description: 'e.g. Ward Chair, Vice Chair, Committee Person',
+      description: 'e.g. Ward Chair, Vice Chair, Committee Person, State Representative',
+    }),
+    defineField({
+      name: 'memberType',
+      title: 'Type',
+      type: 'string',
+      description: 'Controls where this person appears on the site. Committee Member → public Committee Directory. Elected Official → the Elected Officials page. Leadership → the "Who We Are" leadership section.',
+      options: {
+        list: [
+          { title: 'Committee Member', value: 'committee-member' },
+          { title: 'Elected Official', value: 'elected-official' },
+          { title: 'Leadership (Who We Are)', value: 'leadership' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'committee-member',
+      validation: (r) => r.required(),
     }),
     defineField({
       name: 'district',
       title: 'Ward / Municipality',
       type: 'string',
-      description: 'e.g. Ward 5, Mt. Lebanon, North Side. Leave blank for leadership/staff.',
+      description: 'e.g. Ward 5, Mt. Lebanon, North Side. Only applies to Committee Members — leave blank for Elected Officials and Leadership.',
+      hidden: ({ document }) => document?.memberType !== 'committee-member',
     }),
     defineField({
       name: 'photo',
@@ -124,13 +141,15 @@ export const committeeMemberType = defineType({
     }),
   ],
   orderings: [
+    { title: 'Type, then Name', name: 'typeName', by: [{ field: 'memberType', direction: 'asc' }, { field: 'name', direction: 'asc' }] },
     { title: 'District, then Name', name: 'districtName', by: [{ field: 'district', direction: 'asc' }, { field: 'name', direction: 'asc' }] },
     { title: 'Display Order', name: 'orderAsc', by: [{ field: 'displayOrder', direction: 'asc' }] },
   ],
   preview: {
-    select: { title: 'name', subtitle: 'title', description: 'district', media: 'photo' },
-    prepare({ title, subtitle, description, media }) {
-      return { title, subtitle: [subtitle, description].filter(Boolean).join(' · '), media }
+    select: { title: 'name', subtitle: 'title', description: 'district', media: 'photo', memberType: 'memberType' },
+    prepare({ title, subtitle, description, media, memberType }) {
+      const typeLabel = memberType === 'elected-official' ? 'Elected Official' : memberType === 'leadership' ? 'Leadership' : null
+      return { title, subtitle: [subtitle, description, typeLabel].filter(Boolean).join(' · '), media }
     },
   },
 })

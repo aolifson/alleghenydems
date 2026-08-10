@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import { PortableText } from '@portabletext/react'
 import PageHero from '@/components/page-hero'
-import SocialLinks from '@/components/social-links'
-import { urlFor } from '@/sanity/lib/image'
+import LeadershipGrid from '@/components/leadership-grid'
+import { portableTextComponents } from '@/components/portable-text-components'
 import { getPageBySlug, getWhoWeAreMembers } from '@/sanity/lib/queries'
 import { getMunicipalitySlug } from '@/lib/tenant'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
@@ -30,7 +29,7 @@ export default async function WhoWeArePage() {
 
       {body ? (
         <div className="prose-content">
-          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} />
+          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} components={portableTextComponents} />
         </div>
       ) : (
         <div className="prose-content space-y-4 text-[var(--color-text)]">
@@ -43,33 +42,8 @@ export default async function WhoWeArePage() {
       {leaders.length > 0 && (
         <section className="mt-10">
           <h2 className="text-2xl font-bold text-[var(--color-blue)] mb-4">Leadership</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {leaders.map((leader) => (
-              <article key={leader._id} className="bg-white rounded-lg border border-[var(--color-border)] p-4 text-center">
-                {leader.photo ? (
-                  <div className="relative w-20 h-20 mx-auto rounded-full overflow-hidden bg-[var(--color-blue-light)] mb-3">
-                    <Image
-                      src={urlFor(leader.photo).width(160).height(160).url()}
-                      alt={leader.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-20 h-20 mx-auto rounded-full bg-[var(--color-blue-light)] flex items-center justify-center text-[var(--color-blue)] font-bold text-xl mb-3">
-                    {leader.name.charAt(0)}
-                  </div>
-                )}
-                <h3 className="font-semibold text-[var(--color-text)]">{leader.name}</h3>
-                {leader.title && <p className="text-sm text-[var(--color-text-muted)] mb-2">{leader.title}</p>}
-                <SocialLinks
-                  facebookUrl={leader.facebookUrl}
-                  instagramUrl={leader.instagramUrl}
-                  xUrl={leader.xUrl}
-                />
-              </article>
-            ))}
-          </div>
+          <p className="text-sm text-[var(--color-text-muted)] mb-4">Click a card for bio and contact info.</p>
+          <LeadershipGrid members={leaders} />
         </section>
       )}
     </div>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { PortableText } from '@portabletext/react'
+import { portableTextComponents } from '@/components/portable-text-components'
 import { getNewsPost } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { getMunicipalitySlug } from '@/lib/tenant'
@@ -47,7 +48,7 @@ export default async function NewsPostPage({ params }: Props) {
       </h1>
       {post.body && (
         <div className="prose-content">
-          <PortableText value={post.body as Parameters<typeof PortableText>[0]['value']} />
+          <PortableText value={post.body as Parameters<typeof PortableText>[0]['value']} components={portableTextComponents} />
         </div>
       )}
     </article>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PortableText } from '@portabletext/react'
 import PageHero from '@/components/page-hero'
+import { portableTextComponents } from '@/components/portable-text-components'
 import { getPageBySlug } from '@/sanity/lib/queries'
 import { getMunicipalityPrefix, getMunicipalitySlug } from '@/lib/tenant'
 import { prefixHref } from '@/lib/prefix-href'
@@ -92,7 +93,7 @@ export default async function VotePage() {
 
       {body ? (
         <div className="prose-content max-w-4xl">
-          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} />
+          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} components={portableTextComponents} />
         </div>
       ) : (
         <>

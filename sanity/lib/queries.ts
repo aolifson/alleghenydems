@@ -1,4 +1,5 @@
 import { client, getTenantClient, type TenantClient } from './client'
+import { applyScheduledSections } from './pageBody'
 import type { SanityDocument } from 'next-sanity'
 
 // ─── Types ──────────────────────────────────────────────────────────
@@ -539,10 +540,7 @@ export async function getCommitteeMembers(municipalitySlug = 'allegheny-county')
     `*[
       _type == "committeeMember" &&
       isActive == true &&
-      !(
-        defined(district) &&
-        lower(district) in ["elected-official", "elected officials", "who-we-are"]
-      ) &&
+      memberType == "committee-member" &&
       ${tenantScopedFilter('true', municipalitySlug, tenant)}
     ] | order(district asc, displayOrder asc, name asc) {
       _id, _type, name, title, district, bio, photo, email,
@@ -584,8 +582,8 @@ export async function getElectedOfficials(): Promise<CommitteeMember[]> {
   const members = await client.fetch<CommitteeMember[]>(
     `*[
       _type == "committeeMember" &&
-      defined(district) &&
-      lower(district) in ["elected-official", "elected officials"]
+      isActive != false &&
+      memberType == "elected-official"
     ] | order(_updatedAt desc, name asc)`
   )
   return dedupeMembersByName(members)
@@ -593,13 +591,22 @@ export async function getElectedOfficials(): Promise<CommitteeMember[]> {
 
 export async function getWhoWeAreMembers(municipalitySlug = 'allegheny-county'): Promise<CommitteeMember[]> {
   const tenant = getTenantClient(municipalitySlug)
+  // Same phone-privacy projection as getCommitteeMembers — this feeds a
+  // public page too, so a private number must never leak just because this
+  // query happens to select a different slice of committeeMember docs.
   const members = await tenant.client.fetch<CommitteeMember[]>(
     `*[
       _type == "committeeMember" &&
       isActive != false &&
-      (!defined(district) || district == "" || lower(district) == "who-we-are") &&
+      memberType == "leadership" &&
       ${tenantScopedFilter('true', municipalitySlug, tenant)}
-    ] | order(displayOrder asc, name asc)`,
+    ] | order(displayOrder asc, name asc) {
+      _id, _type, name, title, district, bio, photo, email,
+      "phone": select(showPhonePublicly == true => phone),
+      "showPhonePublicly": showPhonePublicly == true,
+      facebookUrl, instagramUrl, xUrl, blueskyUrl, websiteUrl,
+      isActive, displayOrder
+    }`,
     { municipalitySlug }
   )
   return dedupeMembersByName(members).map((m) => stampSourceProject(m, tenant, ['photo']))
@@ -635,6 +642,10 @@ export async function getAllEventsForCalendar(municipalitySlug = 'allegheny-coun
   return mergeAndSort(own, shared, 'date', 'asc')
 }
 
+function withScheduledSections(page: PageDocument | null): PageDocument | null {
+  return page ? { ...page, body: applyScheduledSections(page.body) } : page
+}
+
 export async function getPageBySlug(slug: string, municipalitySlug = 'allegheny-county'): Promise<PageDocument | null> {
   const tenant = getTenantClient(municipalitySlug)
 
@@ -643,22 +654,26 @@ export async function getPageBySlug(slug: string, municipalitySlug = 'allegheny-
       `*[_type == "page" && slug.current == $slug && ${municipalityFilter(municipalitySlug)}][0]`,
       { slug, municipalitySlug }
     )
-    if (page || municipalitySlug === 'allegheny-county') return page
+    if (page || municipalitySlug === 'allegheny-county') return withScheduledSections(page)
     // Municipality sites fall back to the county's page when the committee
     // hasn't created its own version — a bare hero with no body is worse than
     // county copy. A committee page always wins when it exists.
-    return client.fetch<PageDocument | null>(
-      `*[_type == "page" && slug.current == $slug && ${municipalityFilter('allegheny-county')}][0]`,
-      { slug }
+    return withScheduledSections(
+      await client.fetch<PageDocument | null>(
+        `*[_type == "page" && slug.current == $slug && ${municipalityFilter('allegheny-county')}][0]`,
+        { slug }
+      )
     )
   }
 
   const ownPage = await tenant.client.fetch<PageDocument | null>(`*[_type == "page" && slug.current == $slug][0]`, { slug })
-  if (ownPage) return stampSourceProject(ownPage, tenant, ['heroImage'])
+  if (ownPage) return withScheduledSections(stampSourceProject(ownPage, tenant, ['heroImage']))
   // Same inherit-from-county fallback as legacy mode, above.
-  return client.fetch<PageDocument | null>(
-    `*[_type == "page" && slug.current == $slug && ${municipalityFilter('allegheny-county')}][0]`,
-    { slug }
+  return withScheduledSections(
+    await client.fetch<PageDocument | null>(
+      `*[_type == "page" && slug.current == $slug && ${municipalityFilter('allegheny-county')}][0]`,
+      { slug }
+    )
   )
 }
 
@@ -735,7 +750,7 @@ export async function getMemberRoster(): Promise<RosterRow[]> {
   const noCdn = client.withConfig({ useCdn: false })
   const [leadership, members, seats] = await Promise.all([
     noCdn.fetch<Array<{ _id: string; name: string; role?: string; email?: string; phone?: string }>>(
-      `*[_type == "committeeMember" && isActive == true && lower(district) == "who-we-are"]
+      `*[_type == "committeeMember" && isActive == true && memberType == "leadership"]
         | order(displayOrder asc, name asc) { _id, name, "role": title, email, phone }`,
       {},
       { cache: 'no-store' }
@@ -744,7 +759,7 @@ export async function getMemberRoster(): Promise<RosterRow[]> {
       `*[
         _type == "committeeMember" &&
         isActive == true &&
-        !(defined(district) && lower(district) in ["elected-official", "elected officials", "who-we-are"])
+        memberType == "committee-member"
       ] | order(district asc, name asc) { _id, name, "role": title, "seat": district, email, phone }`,
       {},
       { cache: 'no-store' }
