@@ -2,13 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import PageHero from '@/components/page-hero'
 import LocalCommitteeList from '@/components/local-committee-list'
-import { getActiveMunicipalities } from '@/sanity/lib/queries'
+import { getLocalCommittees } from '@/sanity/lib/queries'
 
 export const metadata: Metadata = { title: 'Local Committees' }
 export const revalidate = 3600
 
 export default async function LocalCommitteesPage() {
-  const committees = await getActiveMunicipalities()
+  const committees = await getLocalCommittees()
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">

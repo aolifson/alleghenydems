@@ -1,5 +1,6 @@
 import { client, getTenantClient, type TenantClient } from './client'
 import { applyScheduledSections } from './pageBody'
+import { canonicalCommitteeKey, displayCommitteeName } from '@/lib/committee-names'
 import type { SanityDocument } from 'next-sanity'
 
 // ─── Types ──────────────────────────────────────────────────────────
@@ -362,6 +363,85 @@ export async function getActiveMunicipalities(): Promise<MunicipalityListItem[]>
       _id, name, slug, logo, customDomain, subdomain, externalSiteUrl, contactEmail, facebookPageUrl
     }`
   )
+}
+
+export interface LocalCommittee {
+  _id: string
+  name: string
+  chair?: string
+  contactEmail?: string
+  websiteUrl?: string
+  facebookUrl?: string
+  instagramUrl?: string
+  otherUrl?: string
+  logo?: SanityImage
+  /** Set only for committees with a site on the ACDC platform. */
+  municipality?: MunicipalityListItem
+}
+
+/**
+ * Every Democratic committee in the county, merged from two sources: the
+ * imported contact list (complete — all 130+ committees, with chairs) and
+ * municipality records (only the couple dozen onboarded onto the platform,
+ * carrying logos and site URLs). Listing only municipalities — as this page
+ * used to — hid roughly three quarters of the committees.
+ */
+export async function getLocalCommittees(): Promise<LocalCommittee[]> {
+  const [contacts, municipalities] = await Promise.all([
+    client.fetch<Array<{
+      _id: string
+      committee: string
+      chair?: string
+      websiteUrl?: string
+      facebookUrl?: string
+      instagramUrl?: string
+      otherUrl?: string
+    }>>(
+      `*[_type == "committeeContactEntry" && isActive != false] | order(committee asc) {
+        _id, committee, chair, websiteUrl, facebookUrl, instagramUrl, otherUrl
+      }`
+    ),
+    getActiveMunicipalities(),
+  ])
+
+  const byKey = new Map(municipalities.map((m) => [canonicalCommitteeKey(m.name), m]))
+  const claimed = new Set<string>()
+
+  const merged: LocalCommittee[] = contacts.map((entry) => {
+    const key = canonicalCommitteeKey(entry.committee)
+    const municipality = byKey.get(key)
+    if (municipality) claimed.add(key)
+    return {
+      _id: entry._id,
+      // Prefer the municipality's properly-cased name over the imported
+      // uppercase code.
+      name: municipality?.name ?? displayCommitteeName(entry.committee),
+      chair: entry.chair,
+      contactEmail: municipality?.contactEmail,
+      websiteUrl: entry.websiteUrl,
+      facebookUrl: entry.facebookUrl ?? municipality?.facebookPageUrl,
+      instagramUrl: entry.instagramUrl,
+      otherUrl: entry.otherUrl,
+      logo: municipality?.logo,
+      municipality,
+    }
+  })
+
+  // A municipality with no contact-list row would otherwise vanish.
+  for (const municipality of municipalities) {
+    const key = canonicalCommitteeKey(municipality.name)
+    if (claimed.has(key)) continue
+    merged.push({
+      _id: municipality._id,
+      name: municipality.name,
+      contactEmail: municipality.contactEmail,
+      facebookUrl: municipality.facebookPageUrl,
+      logo: municipality.logo,
+      municipality,
+    })
+  }
+
+  return merged.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 // ─── Municipality filter helper ───────────────────────────────────────────────

@@ -3,16 +3,21 @@
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import { urlFor } from '@/sanity/lib/image'
-import type { MunicipalityListItem } from '@/sanity/lib/queries'
+import type { LocalCommittee } from '@/sanity/lib/queries'
 import ExternalLink from '@/components/external-link'
 
-// White-labeled committees link to their site on our platform; committees
-// with externalSiteUrl set in Sanity link out with the ↗ treatment.
-function committeeLink(m: MunicipalityListItem): { href: string; external: boolean } {
-  if (m.externalSiteUrl) return { href: m.externalSiteUrl, external: true }
-  if (m.customDomain) return { href: `https://${m.customDomain}`, external: false }
-  if (m.subdomain) return { href: `https://${m.subdomain}.alleghenydems.com`, external: false }
-  return { href: `/municipalities/${m.slug.current}`, external: false }
+// Committees onboarded onto our platform link to their own site; the rest
+// link to whatever website they gave us, with the ↗ external treatment.
+function committeeLink(c: LocalCommittee): { href: string; external: boolean } | null {
+  const m = c.municipality
+  if (m) {
+    if (m.externalSiteUrl) return { href: m.externalSiteUrl, external: true }
+    if (m.customDomain) return { href: `https://${m.customDomain}`, external: false }
+    if (m.subdomain) return { href: `https://${m.subdomain}.alleghenydems.com`, external: false }
+    return { href: `/municipalities/${m.slug.current}`, external: false }
+  }
+  if (c.websiteUrl) return { href: c.websiteUrl, external: true }
+  return null
 }
 
 function initials(name: string) {
@@ -50,13 +55,15 @@ function HouseIcon() {
   )
 }
 
-export default function LocalCommitteeList({ committees }: { committees: MunicipalityListItem[] }) {
+export default function LocalCommitteeList({ committees }: { committees: LocalCommittee[] }) {
   const [query, setQuery] = useState('')
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return committees
-    return committees.filter((m) => m.name.toLowerCase().includes(q))
+    return committees.filter((c) =>
+      [c.name, c.chair].filter(Boolean).join(' ').toLowerCase().includes(q)
+    )
   }, [committees, query])
 
   return (
@@ -84,16 +91,17 @@ export default function LocalCommitteeList({ committees }: { committees: Municip
         </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((m) => {
-            const link = committeeLink(m)
+          {filtered.map((c) => {
+            const link = committeeLink(c)
+            const onPlatform = Boolean(c.municipality) && !c.municipality?.externalSiteUrl
             return (
               <div
-                key={m._id}
+                key={c._id}
                 className="bg-white rounded-xl border border-[var(--color-border)] shadow-sm hover:shadow-md transition-shadow p-4 flex items-start gap-3"
               >
-                {m.logo?.asset ? (
+                {c.logo?.asset ? (
                   <Image
-                    src={urlFor(m.logo).width(96).height(96).url()}
+                    src={urlFor(c.logo).width(96).height(96).url()}
                     alt=""
                     width={44}
                     height={44}
@@ -104,14 +112,14 @@ export default function LocalCommitteeList({ committees }: { committees: Municip
                     aria-hidden="true"
                     className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-navy)] text-white text-sm font-display font-bold shrink-0"
                   >
-                    {initials(m.name)}
+                    {initials(c.name)}
                   </span>
                 )}
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-[var(--color-navy)] leading-snug">
-                    {m.name}
+                    {c.name}
                     {/* Team-facing marker: white-labeled sites we manage vs. committees with their own site */}
-                    {!link.external && (
+                    {onPlatform && (
                       <span
                         title="White-labeled site managed on the ACDC platform"
                         className="inline-flex ml-1.5 align-baseline text-[var(--color-text-muted)]/60"
@@ -121,8 +129,11 @@ export default function LocalCommitteeList({ committees }: { committees: Municip
                       </span>
                     )}
                   </p>
+                  {c.chair && (
+                    <p className="mt-0.5 text-sm text-[var(--color-text-muted)] truncate">Chair: {c.chair}</p>
+                  )}
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-                    {link.external ? (
+                    {link && (link.external ? (
                       <ExternalLink
                         href={link.href}
                         className="text-[var(--color-blue-mid)] hover:underline font-medium"
@@ -134,29 +145,32 @@ export default function LocalCommitteeList({ committees }: { committees: Municip
                       <a href={link.href} className="text-[var(--color-blue-mid)] hover:underline font-medium">
                         Visit site
                       </a>
-                    )}
-                    {m.facebookPageUrl && (
+                    ))}
+                    {c.facebookUrl && (
                       <a
-                        href={m.facebookPageUrl}
+                        href={c.facebookUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label={`${m.name} on Facebook`}
-                        title={`${m.name} on Facebook`}
+                        aria-label={`${c.name} on Facebook`}
+                        title={`${c.name} on Facebook`}
                         className="text-[var(--color-blue-mid)] hover:text-[var(--color-blue)]"
                       >
                         <FacebookIcon />
                         <span className="sr-only"> (opens in new tab)</span>
                       </a>
                     )}
-                    {m.contactEmail && (
+                    {c.contactEmail && (
                       <a
-                        href={`mailto:${m.contactEmail}`}
-                        aria-label={`Email ${m.name}`}
-                        title={`Email ${m.name}`}
+                        href={`mailto:${c.contactEmail}`}
+                        aria-label={`Email ${c.name}`}
+                        title={`Email ${c.name}`}
                         className="text-[var(--color-blue-mid)] hover:text-[var(--color-blue)]"
                       >
                         <MailIcon />
                       </a>
+                    )}
+                    {!link && !c.facebookUrl && !c.contactEmail && (
+                      <span className="text-xs text-[var(--color-text-muted)]">No public contact info</span>
                     )}
                   </div>
                 </div>
