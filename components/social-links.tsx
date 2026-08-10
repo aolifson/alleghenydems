@@ -4,7 +4,10 @@ interface SocialLinksProps {
   facebookUrl?: string
   instagramUrl?: string
   xUrl?: string
+  websiteUrl?: string
   className?: string
+  /** Prefixes each link's accessible name, e.g. "Jane Smith on Facebook". */
+  ownerName?: string
 }
 
 const ICON_CLASS = 'h-4 w-4'
@@ -33,49 +36,54 @@ function XIcon() {
   )
 }
 
+function GlobeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={ICON_CLASS} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3a13.5 13.5 0 0 1 0 18 13.5 13.5 0 0 1 0-18Z" />
+    </svg>
+  )
+}
+
+const LINK_CLASS =
+  'inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-blue-mid)] hover:bg-[var(--color-blue-light)] transition-colors'
+
 export default function SocialLinks({
   facebookUrl,
   instagramUrl,
   xUrl,
+  websiteUrl,
   className = '',
+  ownerName,
 }: SocialLinksProps) {
-  if (!facebookUrl && !instagramUrl && !xUrl) return null
+  const links = [
+    { href: facebookUrl, label: 'Facebook', icon: <FacebookIcon /> },
+    { href: instagramUrl, label: 'Instagram', icon: <InstagramIcon /> },
+    { href: xUrl, label: 'X', icon: <XIcon /> },
+    { href: websiteUrl, label: 'Website', icon: <GlobeIcon /> },
+  ].filter((link): link is { href: string; label: string; icon: React.ReactElement } => Boolean(link.href))
+
+  if (links.length === 0) return null
 
   return (
     <div className={`flex items-center justify-center gap-2 ${className}`}>
-      {facebookUrl && (
+      {links.map(({ href, label, icon }) => (
         <Link
-          href={facebookUrl}
+          key={label}
+          href={href}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Facebook"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-blue-mid)] hover:bg-[var(--color-blue-light)] transition-colors"
+          aria-label={ownerName ? `${ownerName} — ${label}` : label}
+          title={ownerName ? `${ownerName} — ${label}` : label}
+          // Cards may sit inside a click-to-open-bio surface; keep the link
+          // click from also triggering that.
+          onClick={(e) => e.stopPropagation()}
+          className={LINK_CLASS}
         >
-          <FacebookIcon />
+          {icon}
+          <span className="sr-only"> (opens in new tab)</span>
         </Link>
-      )}
-      {instagramUrl && (
-        <Link
-          href={instagramUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Instagram"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-blue-mid)] hover:bg-[var(--color-blue-light)] transition-colors"
-        >
-          <InstagramIcon />
-        </Link>
-      )}
-      {xUrl && (
-        <Link
-          href={xUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="X"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-blue-mid)] hover:bg-[var(--color-blue-light)] transition-colors"
-        >
-          <XIcon />
-        </Link>
-      )}
+      ))}
     </div>
   )
 }

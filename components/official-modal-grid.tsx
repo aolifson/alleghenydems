@@ -58,11 +58,16 @@ function OfficialDialog({ official, onClose }: { official: CommitteeMember | nul
               {official.title && (
                 <p className="mt-1 text-sm text-[var(--color-text-muted)]">{official.title}</p>
               )}
-              <div className="mt-2">
+              <div className="mt-2 flex justify-start">
+                {/* No websiteUrl here — the dialog has room for an explicit
+                    "Official website" text link below, which reads better than
+                    a globe icon. The compact card uses the icon instead. */}
                 <SocialLinks
                   facebookUrl={official.facebookUrl}
                   instagramUrl={official.instagramUrl}
                   xUrl={official.xUrl}
+                  ownerName={official.name}
+                  className="!justify-start"
                 />
               </div>
             </div>
@@ -107,33 +112,45 @@ export default function OfficialModalGrid({ officials }: { officials: CommitteeM
     <>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
         {officials.map((official) => (
-          <button
-            key={official._id}
-            type="button"
-            onClick={() => setSelected(official)}
-            className="flex flex-col items-center text-center gap-2 rounded-lg p-2 -m-2 cursor-pointer hover:bg-[var(--color-blue-light)]/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-blue)] transition-colors"
-          >
-            {official.photo?.asset ? (
-              <div className="relative w-24 h-24 rounded-full overflow-hidden bg-[var(--color-blue-light)] shrink-0 shadow-sm">
-                <Image
-                  src={urlFor(official.photo).width(192).height(192).url()}
-                  alt={official.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            ) : (
-              <div className="w-24 h-24 rounded-full bg-[var(--color-blue-light)] flex items-center justify-center shrink-0 text-[var(--color-blue)] font-bold text-2xl shadow-sm">
-                {official.name.charAt(0)}
-              </div>
-            )}
-            <div>
-              <p className="font-semibold text-sm text-[var(--color-text)] leading-tight">{official.name}</p>
-              {official.title && (
-                <p className="text-xs text-[var(--color-text-muted)] mt-0.5 leading-tight">{official.title}</p>
+          // The social links have to be siblings of the button, not inside it —
+          // nesting anchors within a button is invalid and swallows their clicks.
+          <div key={official._id} className="flex flex-col items-center text-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSelected(official)}
+              className="flex flex-col items-center text-center gap-2 rounded-lg p-2 -m-2 cursor-pointer hover:bg-[var(--color-blue-light)]/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-blue)] transition-colors"
+            >
+              {official.photo?.asset ? (
+                <div className="relative w-24 h-24 rounded-full overflow-hidden bg-[var(--color-blue-light)] shrink-0 shadow-sm">
+                  <Image
+                    src={urlFor(official.photo).width(192).height(192).url()}
+                    alt={official.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-24 h-24 rounded-full bg-[var(--color-blue-light)] flex items-center justify-center shrink-0 text-[var(--color-blue)] font-bold text-2xl shadow-sm">
+                  {official.name.charAt(0)}
+                </div>
               )}
-            </div>
-          </button>
+              <div>
+                <p className="font-semibold text-sm text-[var(--color-text)] leading-tight">{official.name}</p>
+                {official.title && (
+                  <p className="text-xs text-[var(--color-text-muted)] mt-0.5 leading-tight">{official.title}</p>
+                )}
+              </div>
+            </button>
+
+            <SocialLinks
+              facebookUrl={official.facebookUrl}
+              instagramUrl={official.instagramUrl}
+              xUrl={official.xUrl}
+              websiteUrl={official.websiteUrl}
+              ownerName={official.name}
+              className="mt-0.5"
+            />
+          </div>
         ))}
       </div>
 
