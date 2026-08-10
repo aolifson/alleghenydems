@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
-import SocialLinks from '@/components/social-links'
-import { getElectedOfficials } from '@/sanity/lib/queries'
-import { urlFor } from '@/sanity/lib/image'
+import OfficialModalGrid from '@/components/official-modal-grid'
+import { getElectedOfficials, type CommitteeMember } from '@/sanity/lib/queries'
 
 export const metadata: Metadata = { title: 'Elected Officials' }
 export const revalidate = 86400
@@ -17,6 +15,21 @@ const CATEGORY_ORDER = [
   'Allegheny County Council',
   'Other Officials',
 ]
+
+// District numbers live inside the title string ("State Representative—District
+// 21"), so they can't be ordered in GROQ. Pull the number out and sort on it,
+// otherwise districts read 10, 11, 12, 19, 2, 20 — the complaint that prompted
+// this. Titles with no district (Governor, Sheriff) sort first, then by name.
+function districtNumber(title?: string): number {
+  const match = title?.match(/district\s*[-—–]?\s*(\d+)/i)
+  return match ? Number(match[1]) : -1
+}
+
+function byDistrictThenName(a: CommitteeMember, b: CommitteeMember): number {
+  const districtDiff = districtNumber(a.title) - districtNumber(b.title)
+  if (districtDiff !== 0) return districtDiff
+  return a.name.localeCompare(b.name)
+}
 
 function categorize(title: string): string {
   const t = title.toLowerCase()
@@ -38,6 +51,7 @@ export default async function ElectedOfficialsPage() {
     ;(acc[cat] ??= []).push(o)
     return acc
   }, {})
+  for (const list of Object.values(byCategory)) list.sort(byDistrictThenName)
 
   const categories = CATEGORY_ORDER.filter(c => byCategory[c]?.length)
 
@@ -45,7 +59,7 @@ export default async function ElectedOfficialsPage() {
     <div className="max-w-7xl mx-auto px-4 py-10">
       <h1 className="font-display text-3xl font-bold text-[var(--color-blue)] mb-2">Elected Officials</h1>
       <p className="text-[var(--color-text-muted)] mb-8">
-        Democratic elected officials serving Allegheny County.
+        Democratic elected officials serving Allegheny County. Select anyone to read their biography.
       </p>
 
       {categories.map(cat => (
@@ -53,37 +67,7 @@ export default async function ElectedOfficialsPage() {
           <h2 className="text-lg font-bold text-[var(--color-blue)] border-b-2 border-[var(--color-blue-light)] pb-2 mb-5">
             {cat}
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-            {byCategory[cat].map(official => (
-              <div key={official._id} className="flex flex-col items-center text-center gap-2">
-                {official.photo ? (
-                  <div className="relative w-24 h-24 rounded-full overflow-hidden bg-[var(--color-blue-light)] flex-shrink-0 shadow-sm">
-                    <Image
-                      src={urlFor(official.photo).width(192).height(192).url()}
-                      alt={official.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-[var(--color-blue-light)] flex items-center justify-center flex-shrink-0 text-[var(--color-blue)] font-bold text-2xl shadow-sm">
-                    {official.name.charAt(0)}
-                  </div>
-                )}
-                <div>
-                  <p className="font-semibold text-sm text-[var(--color-text)] leading-tight">{official.name}</p>
-                  {official.title && (
-                    <p className="text-xs text-[var(--color-text-muted)] mt-0.5 leading-tight">{official.title}</p>
-                  )}
-                </div>
-                <SocialLinks
-                  facebookUrl={official.facebookUrl}
-                  instagramUrl={official.instagramUrl}
-                  xUrl={official.xUrl}
-                />
-              </div>
-            ))}
-          </div>
+          <OfficialModalGrid officials={byCategory[cat]} />
         </section>
       ))}
     </div>

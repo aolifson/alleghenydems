@@ -579,12 +579,22 @@ export async function getCommitteeContactEntries(municipalitySlug = 'allegheny-c
 }
 
 export async function getElectedOfficials(): Promise<CommitteeMember[]> {
+  // Explicit projection, matching getCommitteeMembers — an unprojected `*[…]`
+  // returns every field, including phone numbers the member never agreed to
+  // publish. Ordering is refined per-category in the page (districts sort
+  // numerically, which GROQ can't do against a string title).
   const members = await client.fetch<CommitteeMember[]>(
     `*[
       _type == "committeeMember" &&
       isActive != false &&
       memberType == "elected-official"
-    ] | order(_updatedAt desc, name asc)`
+    ] | order(name asc) {
+      _id, _type, name, title, bio, photo, email,
+      "phone": select(showPhonePublicly == true => phone),
+      "showPhonePublicly": showPhonePublicly == true,
+      facebookUrl, instagramUrl, xUrl, blueskyUrl, websiteUrl,
+      isActive, displayOrder
+    }`
   )
   return dedupeMembersByName(members)
 }
