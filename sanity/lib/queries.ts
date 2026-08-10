@@ -646,12 +646,18 @@ function withScheduledSections(page: PageDocument | null): PageDocument | null {
   return page ? { ...page, body: applyScheduledSections(page.body) } : page
 }
 
+// Datasets are on Sanity's public tier, so unpublished drafts are readable by
+// anyone querying the API — and `drafts.<id>` sorts before `<id>`, so without
+// this an editor's in-progress draft would win over the published version and
+// go live on the site. Every page lookup must stay published-only.
+const PUBLISHED_ONLY = '!(_id in path("drafts.**"))'
+
 export async function getPageBySlug(slug: string, municipalitySlug = 'allegheny-county'): Promise<PageDocument | null> {
   const tenant = getTenantClient(municipalitySlug)
 
   if (!tenant.isMigrated) {
     const page = await client.fetch<PageDocument | null>(
-      `*[_type == "page" && slug.current == $slug && ${municipalityFilter(municipalitySlug)}][0]`,
+      `*[_type == "page" && ${PUBLISHED_ONLY} && slug.current == $slug && ${municipalityFilter(municipalitySlug)}][0]`,
       { slug, municipalitySlug }
     )
     if (page || municipalitySlug === 'allegheny-county') return withScheduledSections(page)
@@ -660,18 +666,21 @@ export async function getPageBySlug(slug: string, municipalitySlug = 'allegheny-
     // county copy. A committee page always wins when it exists.
     return withScheduledSections(
       await client.fetch<PageDocument | null>(
-        `*[_type == "page" && slug.current == $slug && ${municipalityFilter('allegheny-county')}][0]`,
+        `*[_type == "page" && ${PUBLISHED_ONLY} && slug.current == $slug && ${municipalityFilter('allegheny-county')}][0]`,
         { slug }
       )
     )
   }
 
-  const ownPage = await tenant.client.fetch<PageDocument | null>(`*[_type == "page" && slug.current == $slug][0]`, { slug })
+  const ownPage = await tenant.client.fetch<PageDocument | null>(
+    `*[_type == "page" && ${PUBLISHED_ONLY} && slug.current == $slug][0]`,
+    { slug }
+  )
   if (ownPage) return withScheduledSections(stampSourceProject(ownPage, tenant, ['heroImage']))
   // Same inherit-from-county fallback as legacy mode, above.
   return withScheduledSections(
     await client.fetch<PageDocument | null>(
-      `*[_type == "page" && slug.current == $slug && ${municipalityFilter('allegheny-county')}][0]`,
+      `*[_type == "page" && ${PUBLISHED_ONLY} && slug.current == $slug && ${municipalityFilter('allegheny-county')}][0]`,
       { slug }
     )
   )
