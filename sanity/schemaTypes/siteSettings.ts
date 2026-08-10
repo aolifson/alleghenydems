@@ -166,6 +166,14 @@ export const siteSettingsType = defineType({
       group: 'footer',
       description: 'Short tagline or slogan shown at the bottom of every page.',
     }),
+    defineField({
+      name: 'paidForByText',
+      title: 'Paid For By Disclaimer',
+      type: 'string',
+      group: 'footer',
+      description:
+        'Campaign finance disclaimer shown in the footer copyright line. Set this to the exact wording your committee is required to use — check with whoever handles your compliance. Leave blank to fall back to "Paid for by <organization name>."',
+    }),
 
     // ── Technical / Integrations ──────────────────────────────────────
     defineField({

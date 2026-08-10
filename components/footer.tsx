@@ -34,6 +34,9 @@ export default function Footer({
   const instagramHandle = settings?.instagramHandle ?? DEFAULT_INSTAGRAM_HANDLE
   const instagramUrl = `https://www.instagram.com/${instagramHandle}`
   const orgName = ('name' in (settings ?? {})) ? (settings as MunicipalitySettings).name : 'Allegheny County Democratic Committee'
+  const paidForBy =
+    ('paidForByText' in (settings ?? {}) && (settings as SiteSettings).paidForByText) ||
+    `Paid for by ${orgName}.`
 
   return (
     <footer className="bg-[var(--color-navy)] text-white mt-auto">
@@ -109,7 +112,10 @@ export default function Footer({
       </div>
 
       <div className="border-t border-white/10 py-4 text-center text-xs text-white/40">
-        © {year} {orgName}. Paid for by {orgName}.
+        {/* Campaign-finance disclaimers have required wording that varies by
+            committee and jurisdiction, so it's editable in Site Settings
+            rather than assembled from the org name here. */}
+        © {year} {orgName}. {paidForBy}
       </div>
     </footer>
   )

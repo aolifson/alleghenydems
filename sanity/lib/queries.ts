@@ -132,6 +132,7 @@ export interface SiteSettings extends SanityDocument {
   address?: string
   officeHours?: string
   footerText?: string
+  paidForByText?: string
   googleCalendarEmbedUrl?: string
   googleAnalyticsId?: string
   facebookPixelId?: string
