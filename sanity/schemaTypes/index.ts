@@ -9,6 +9,7 @@ import { externalLinkType } from './externalLink'
 import { internalDocType } from './internalDoc'
 import { voteReminderType } from './voteReminder'
 import { pageType } from './page'
+import { planToVoteType } from './planToVote'
 import { scheduledSectionType } from './scheduledSection'
 import { siteSettingsType } from './siteSettings'
 import {
@@ -38,6 +39,7 @@ export const schemaTypes = [
   internalDocType,
   voteReminderType,
   pageType,
+  planToVoteType,
   scheduledSectionType,
   voterGuideCandidateType,
   voterGuideDistrictType,

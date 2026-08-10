@@ -365,6 +365,34 @@ export async function getActiveMunicipalities(): Promise<MunicipalityListItem[]>
   )
 }
 
+export interface PlanToVoteSettings {
+  heroHeadline?: string
+  heroIntro?: string
+  step1Title?: string
+  step1Body?: string
+  step2Title?: string
+  step2Body?: string
+  step3Title?: string
+  step3Body?: string
+  step4Title?: string
+  step4Body?: string
+  mailCardHeading?: string
+  inPersonCardHeading?: string
+  registerUrl?: string
+  checkRegistrationUrl?: string
+  applyMailBallotUrl?: string
+  trackBallotUrl?: string
+  pollingPlaceUrl?: string
+  earlyVotingUrl?: string
+  electionCalendarUrl?: string
+  helpHeading?: string
+  helpBody?: string
+}
+
+export async function getPlanToVoteSettings(): Promise<PlanToVoteSettings | null> {
+  return client.fetch(`*[_type == "planToVote" && _id == "planToVote"][0]`)
+}
+
 export interface LocalCommittee {
   _id: string
   name: string

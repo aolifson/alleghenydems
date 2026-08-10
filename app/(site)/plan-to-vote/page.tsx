@@ -4,6 +4,7 @@ import ExternalLink from '@/components/external-link'
 import ElectionCountdown from '@/components/election-countdown'
 import VoteReminderForm from '@/components/vote-reminder-form'
 import { ELECTION, VOTE_LINKS } from '@/lib/election'
+import { getPlanToVoteSettings } from '@/sanity/lib/queries'
 import { getMunicipalityPrefix } from '@/lib/tenant'
 import { prefixHref } from '@/lib/prefix-href'
 
@@ -57,65 +58,75 @@ function Deadline({ label, value }: { label: string; value: string }) {
 }
 
 export default async function PlanToVotePage() {
-  const basePath = await getMunicipalityPrefix()
+  const [basePath, cms] = await Promise.all([getMunicipalityPrefix(), getPlanToVoteSettings()])
+  // Every string and link below falls back to the value it had when this page
+  // was hard-coded, so an empty (or missing) Studio document renders exactly
+  // as before. Dates stay in lib/election.ts — see the note in the schema.
+  const links = {
+    register: cms?.registerUrl ?? VOTE_LINKS.register,
+    checkRegistration: cms?.checkRegistrationUrl ?? VOTE_LINKS.checkRegistration,
+    applyMailBallot: cms?.applyMailBallotUrl ?? VOTE_LINKS.applyMailBallot,
+    trackBallot: cms?.trackBallotUrl ?? VOTE_LINKS.trackBallot,
+    pollingPlace: cms?.pollingPlaceUrl ?? VOTE_LINKS.pollingPlace,
+    earlyVoting: cms?.earlyVotingUrl ?? VOTE_LINKS.earlyVoting,
+    electionCalendar: cms?.electionCalendarUrl ?? VOTE_LINKS.electionCalendar,
+  }
 
   return (
     <>
       {/* Hero with live countdown */}
       <section className="relative bg-[var(--color-navy)] text-white">
         <div className="max-w-5xl mx-auto px-4 py-10 md:py-12 text-center">
-          <h1 className="font-display text-3xl md:text-5xl font-bold mb-3">Make Your Plan to Vote</h1>
+          <h1 className="font-display text-3xl md:text-5xl font-bold mb-3">{cms?.heroHeadline ?? 'Make Your Plan to Vote'}</h1>
           <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto mb-6">
-            Voters who make a plan are far more likely to follow through. Here&rsquo;s everything you need,
-            in four quick steps.
+            {cms?.heroIntro ??
+              'Voters who make a plan are far more likely to follow through. Here\u2019s everything you need, in four quick steps.'}
           </p>
           <ElectionCountdown />
         </div>
       </section>
 
       <div className="max-w-4xl mx-auto px-4 py-10 space-y-6">
-        <StepCard step={1} title="Check that you're registered">
+        <StepCard step={1} title={cms?.step1Title ?? "Check that you're registered"}>
           <p className="text-sm text-[var(--color-text)]">
-            You must be registered at your current address to vote. It only takes a minute to check — or to
-            register if you&rsquo;ve moved or never have.
+            {cms?.step1Body ?? 'You must be registered at your current address to vote. It only takes a minute to check \u2014 or to register if you\u2019ve moved or never have.'}
           </p>
           <Deadline label="Register by" value={ELECTION.registrationDeadlineLabel} />
           <div className="flex flex-wrap gap-3">
-            <ActionButton href={VOTE_LINKS.checkRegistration} primary>Check my registration</ActionButton>
-            <ActionButton href={VOTE_LINKS.register}>Register to vote</ActionButton>
+            <ActionButton href={links.checkRegistration} primary>Check my registration</ActionButton>
+            <ActionButton href={links.register}>Register to vote</ActionButton>
           </div>
         </StepCard>
 
-        <StepCard step={2} title="Choose how you'll vote">
+        <StepCard step={2} title={cms?.step2Title ?? "Choose how you'll vote"}>
           <p className="text-sm text-[var(--color-text)]">
-            Pennsylvania lets any voter vote by mail — no excuse needed — or vote in person. Pick whichever
-            fits your life.
+            {cms?.step2Body ?? 'Pennsylvania lets any voter vote by mail \u2014 no excuse needed \u2014 or vote in person. Pick whichever fits your life.'}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="rounded-lg border border-[var(--color-border)] p-4 space-y-3">
-              <h3 className="font-semibold text-[var(--color-navy)]">✉️ Vote by mail</h3>
+              <h3 className="font-semibold text-[var(--color-navy)]">{cms?.mailCardHeading ?? '✉️ Vote by mail'}</h3>
               <Deadline label="Apply by" value={ELECTION.mailBallotApplicationDeadlineLabel} />
               <Deadline label="Return it" value={ELECTION.mailBallotReturnLabel} />
               <div className="flex flex-wrap gap-2">
-                <ActionButton href={VOTE_LINKS.applyMailBallot} primary>Apply for a mail ballot</ActionButton>
-                <ActionButton href={VOTE_LINKS.trackBallot}>Track my ballot</ActionButton>
+                <ActionButton href={links.applyMailBallot} primary>Apply for a mail ballot</ActionButton>
+                <ActionButton href={links.trackBallot}>Track my ballot</ActionButton>
               </div>
             </div>
             <div className="rounded-lg border border-[var(--color-border)] p-4 space-y-3">
-              <h3 className="font-semibold text-[var(--color-navy)]">🏛️ Vote in person</h3>
+              <h3 className="font-semibold text-[var(--color-navy)]">{cms?.inPersonCardHeading ?? '🏛️ Vote in person'}</h3>
               <Deadline label="Election Day" value={`${ELECTION.dateLabel}, ${ELECTION.pollHours}`} />
               <p className="text-xs text-[var(--color-text-muted)]">Early in-person voting may also be available.</p>
               <div className="flex flex-wrap gap-2">
-                <ActionButton href={VOTE_LINKS.pollingPlace} primary>Find my polling place</ActionButton>
-                <ActionButton href={VOTE_LINKS.earlyVoting}>Early voting</ActionButton>
+                <ActionButton href={links.pollingPlace} primary>Find my polling place</ActionButton>
+                <ActionButton href={links.earlyVoting}>Early voting</ActionButton>
               </div>
             </div>
           </div>
         </StepCard>
 
-        <StepCard step={3} title="Know what's on your ballot">
+        <StepCard step={3} title={cms?.step3Title ?? "Know what's on your ballot"}>
           <p className="text-sm text-[var(--color-text)]">
-            See the Democratic candidates and endorsed races for your exact address, so you walk in ready.
+            {cms?.step3Body ?? 'See the Democratic candidates and endorsed races for your exact address, so you walk in ready.'}
           </p>
           <Link
             href={prefixHref('/voter-guide', basePath)}
@@ -125,9 +136,9 @@ export default async function PlanToVotePage() {
           </Link>
         </StepCard>
 
-        <StepCard step={4} title="Lock in your plan">
+        <StepCard step={4} title={cms?.step4Title ?? "Lock in your plan"}>
           <p className="text-sm text-[var(--color-text)]">
-            Decide <em>when</em> you&rsquo;ll vote and how you&rsquo;ll get there, then put these dates somewhere you&rsquo;ll see them.
+            {cms?.step4Body ?? 'Decide when you\u2019ll vote and how you\u2019ll get there, then put these dates somewhere you\u2019ll see them.'}
           </p>
           <ul className="text-sm space-y-1.5">
             <li><Deadline label="Register by" value={ELECTION.registrationDeadlineLabel} /></li>
@@ -141,7 +152,7 @@ export default async function PlanToVotePage() {
             >
               Help get out the vote →
             </Link>
-            <ActionButton href={VOTE_LINKS.electionCalendar}>Full election calendar</ActionButton>
+            <ActionButton href={links.electionCalendar}>Full election calendar</ActionButton>
           </div>
         </StepCard>
 
@@ -172,7 +183,7 @@ export default async function PlanToVotePage() {
         </section>
 
         <div className="bg-[var(--color-blue-light)] rounded-xl p-5 border border-[var(--color-border)]">
-          <h2 className="font-bold text-[var(--color-blue)] mb-1">Questions about voting?</h2>
+          <h2 className="font-bold text-[var(--color-blue)] mb-1">{cms?.helpHeading ?? 'Questions about voting?'}</h2>
           <p className="text-sm text-[var(--color-text-muted)]">
             Contact the Allegheny County Elections Division at{' '}
             <ExternalLink

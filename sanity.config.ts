@@ -206,6 +206,17 @@ export default defineConfig([
               S.documentTypeListItem('voterGuide')
                 .title('Voter Guides')
                 .icon(MasterDetailIcon),
+
+              S.listItem()
+                .title('Make a Plan to Vote')
+                .icon(CalendarIcon)
+                .id('planToVote')
+                .child(
+                  S.document()
+                    .schemaType('planToVote')
+                    .documentId('planToVote')
+                    .title('Make a Plan to Vote')
+                ),
   
               S.listItem()
                 .title('Candidate Finder')
