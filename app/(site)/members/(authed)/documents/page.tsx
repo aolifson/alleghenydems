@@ -41,7 +41,8 @@ export default async function MemberDocumentsPage() {
               {byCategory[category].map((doc) => (
                 <li key={doc._id}>
                   <a
-                    href={`/api/members/doc/${doc._id}`}
+                    href={doc.externalUrl ?? `/api/members/doc/${doc._id}`}
+                    {...(doc.externalUrl ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                     className="flex items-start gap-3 p-3 bg-white rounded-lg border border-[var(--color-border)] hover:border-[var(--color-blue-mid)] hover:shadow-sm transition-all group"
                   >
                     <span className="text-xl" aria-hidden="true">📄</span>
@@ -61,7 +62,9 @@ export default async function MemberDocumentsPage() {
                           .join(' · ')}
                       </p>
                     </div>
-                    <span className="text-[var(--color-text-muted)] text-sm shrink-0 mt-0.5">Download ↓</span>
+                    <span className="text-[var(--color-text-muted)] text-sm shrink-0 mt-0.5">
+                      {doc.externalUrl ? 'Open ↗' : 'Download ↓'}
+                    </span>
                   </a>
                 </li>
               ))}

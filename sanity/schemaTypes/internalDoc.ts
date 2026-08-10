@@ -17,6 +17,16 @@ export const internalDocType = defineType({
       title: 'File',
       type: 'file',
       description: 'The document itself (PDF, Word, etc.). Members download it through the secure members area.',
+      hidden: ({ parent }) => Boolean(parent?.externalUrl),
+    }),
+    defineField({
+      name: 'externalUrl',
+      title: 'External Link',
+      type: 'url',
+      description:
+        'Use this instead of File for documents that need real per-person access control (e.g. a Google Doc shared only with specific committee members) — Sanity datasets are project-wide, not per-document, so anything uploaded here is only as private as the whole project. Set sharing directly on the linked doc.',
+      validation: (r) => r.uri({ scheme: ['http', 'https'] }),
+      hidden: ({ parent }) => Boolean(parent?.file?.asset),
     }),
     defineField({
       name: 'category',
@@ -49,6 +59,14 @@ export const internalDocType = defineType({
       description: 'Turn off to hide this document from members without deleting it.',
     }),
   ],
+  validation: (Rule) =>
+    Rule.custom((doc) => {
+      const hasFile = Boolean(doc?.file && (doc.file as { asset?: unknown }).asset)
+      const hasLink = Boolean(doc?.externalUrl)
+      if (hasFile && hasLink) return 'Use either File or External Link, not both.'
+      if (!hasFile && !hasLink) return 'Add a File or an External Link.'
+      return true
+    }),
   preview: {
     select: { title: 'title', subtitle: 'category' },
     prepare({ title, subtitle }) {

@@ -785,14 +785,18 @@ export interface InternalDoc extends SanityDocument {
   publishedAt?: string
   fileName?: string
   fileExtension?: string
+  externalUrl?: string
 }
 
 // Deliberately never projects the file asset URL — Sanity CDN URLs are
 // unauthenticated, so downloads go through /api/members/doc/[id] instead.
+// externalUrl is fine to project directly: it points off-platform (e.g. a
+// Google Doc), where access is enforced by that doc's own sharing settings,
+// not by hiding the link.
 export async function getInternalDocs(): Promise<InternalDoc[]> {
   return client.withConfig({ useCdn: false }).fetch(
-    `*[_type == "internalDoc" && isActive == true && defined(file.asset)] | order(category asc, publishedAt desc, title asc) {
-      _id, _type, title, category, description, publishedAt,
+    `*[_type == "internalDoc" && isActive == true && (defined(file.asset) || defined(externalUrl))] | order(category asc, publishedAt desc, title asc) {
+      _id, _type, title, category, description, publishedAt, externalUrl,
       "fileName": file.asset->originalFilename,
       "fileExtension": file.asset->extension
     }`,
