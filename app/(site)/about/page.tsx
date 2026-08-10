@@ -8,7 +8,7 @@ import { getMunicipalitySlug } from '@/lib/tenant'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 
 export const metadata: Metadata = { title: 'About' }
-export const revalidate = 86400
+export const revalidate = 600
 
 export default async function AboutPage() {
   const municipalitySlug = await getMunicipalitySlug()

@@ -12,7 +12,7 @@ import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 // Purpose-built routes (/about, /contact, /voter-guide, …) are static and take
 // precedence over this dynamic segment automatically, so they are unaffected —
 // this only ever handles slugs nothing else claims.
-export const revalidate = 3600
+export const revalidate = 600
 
 // Page documents whose content is served by a purpose-built route at a
 // different path. Without these, this catch-all would expose a second,

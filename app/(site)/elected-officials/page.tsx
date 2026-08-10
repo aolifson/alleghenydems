@@ -3,7 +3,7 @@ import OfficialModalGrid from '@/components/official-modal-grid'
 import { getElectedOfficials, type CommitteeMember } from '@/sanity/lib/queries'
 
 export const metadata: Metadata = { title: 'Elected Officials' }
-export const revalidate = 86400
+export const revalidate = 600
 
 const CATEGORY_ORDER = [
   'U.S. Congress & Senate',

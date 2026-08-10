@@ -8,7 +8,7 @@ import { getMunicipalitySlug } from '@/lib/tenant'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 
 export const metadata: Metadata = { title: 'Run for Office' }
-export const revalidate = 86400
+export const revalidate = 600
 
 const RESOURCES = [
   {

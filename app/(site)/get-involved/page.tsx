@@ -9,7 +9,7 @@ import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 import { ACDC_DONATE_URL, ACDC_VOLUNTEER_URL } from '@/lib/links'
 
 export const metadata: Metadata = { title: 'Get Involved' }
-export const revalidate = 86400
+export const revalidate = 600
 
 export default async function GetInvolvedPage() {
   const municipalitySlug = await getMunicipalitySlug()

@@ -7,7 +7,7 @@ import { getPageBySlug, getSiteSettings, getMunicipalitySettings } from '@/sanit
 import { getMunicipalitySlug } from '@/lib/tenant'
 
 export const metadata: Metadata = { title: 'Contact' }
-export const revalidate = 86400
+export const revalidate = 600
 
 export default async function ContactPage() {
   const municipalitySlug = await getMunicipalitySlug()
