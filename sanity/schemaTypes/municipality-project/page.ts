@@ -61,8 +61,9 @@ export const pageType = defineType({
             defineField({ name: 'caption', title: 'Caption', type: 'string' }),
           ],
         },
+        { type: 'scheduledSection' },
       ],
-      description: 'The main content of the page. Use headings, paragraphs, bullet points, and images.',
+      description: 'The main content of the page. Use headings, paragraphs, bullet points, and images. Add a "Scheduled Section" for content that should only appear during a specific date range (e.g. seasonal notices).',
     }),
   ],
   preview: {

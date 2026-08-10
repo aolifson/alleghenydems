@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { PortableText } from '@portabletext/react'
 import PageHero from '@/components/page-hero'
+import { portableTextComponents } from '@/components/portable-text-components'
 import { stripDuplicatedHeroBlocks } from '@/sanity/lib/pageBody'
 import { getPageBySlug, getSiteSettings, getMunicipalitySettings } from '@/sanity/lib/queries'
 import { getMunicipalitySlug } from '@/lib/tenant'
@@ -38,7 +39,7 @@ export default async function ContactPage() {
 
       {body && (
         <div className="prose-content mb-8 max-w-3xl">
-          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} />
+          <PortableText value={body as Parameters<typeof PortableText>[0]['value']} components={portableTextComponents} />
         </div>
       )}
 

@@ -56,6 +56,36 @@ export function stripDuplicatedHeroBlocks(
   return start > 0 ? blocks.slice(start) : body
 }
 
+interface ScheduledSectionBlock {
+  _type?: string
+  publishFrom?: string
+  publishUntil?: string
+  content?: unknown[]
+}
+
+// A `scheduledSection` block wraps a chunk of page content with an optional
+// visibility window. Out-of-window sections are dropped; in-window ones are
+// flattened back into the surrounding body so PortableText renders them like
+// any other block — no custom renderer needed downstream.
+export function applyScheduledSections(body: unknown[] | undefined, now: Date = new Date()): unknown[] | undefined {
+  if (!Array.isArray(body) || body.length === 0) return body
+
+  const result: unknown[] = []
+  for (const item of body) {
+    const block = item as ScheduledSectionBlock
+    if (block?._type !== 'scheduledSection') {
+      result.push(item)
+      continue
+    }
+    const from = block.publishFrom ? new Date(block.publishFrom) : null
+    const until = block.publishUntil ? new Date(block.publishUntil) : null
+    if (from && now < from) continue
+    if (until && now >= until) continue
+    if (Array.isArray(block.content)) result.push(...block.content)
+  }
+  return result
+}
+
 export function stripShortcodeBlocks(
   body: unknown[] | undefined,
   shortcodes: string[]
