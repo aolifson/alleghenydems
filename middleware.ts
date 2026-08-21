@@ -18,61 +18,6 @@ const STUDIO_PREFIX = '/studio'
 // Routes that must never be tenant-scoped
 const BYPASS_PREFIXES = ['/api', '/_next', '/favicon.ico']
 
-function unauthorizedStudioResponse() {
-  return new NextResponse('Studio authentication required.', {
-    status: 401,
-    headers: {
-      'WWW-Authenticate': 'Basic realm="Allegheny Dems Studio"',
-      'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'no-store',
-    },
-  })
-}
-
-function studioAuthMisconfiguredResponse() {
-  return new NextResponse('Studio auth is not configured. Set STUDIO_USERNAME and STUDIO_PASSWORD.', {
-    status: 503,
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'no-store',
-    },
-  })
-}
-
-function isAuthorizedStudioRequest(request: NextRequest) {
-  const studioUsername = process.env.STUDIO_USERNAME
-  const studioPassword = process.env.STUDIO_PASSWORD
-
-  if (!studioUsername || !studioPassword) {
-    return { ok: false as const, misconfigured: true as const }
-  }
-
-  const authorization = request.headers.get('authorization')
-  if (!authorization?.startsWith('Basic ')) {
-    return { ok: false as const, misconfigured: false as const }
-  }
-
-  try {
-    const encodedCredentials = authorization.slice('Basic '.length)
-    const decodedCredentials = atob(encodedCredentials)
-    const separatorIndex = decodedCredentials.indexOf(':')
-
-    if (separatorIndex === -1) {
-      return { ok: false as const, misconfigured: false as const }
-    }
-
-    const username = decodedCredentials.slice(0, separatorIndex)
-    const password = decodedCredentials.slice(separatorIndex + 1)
-
-    return {
-      ok: username === studioUsername && password === studioPassword,
-      misconfigured: false as const,
-    }
-  } catch {
-    return { ok: false as const, misconfigured: false as const }
-  }
-}
-
 // ── Members-only area gating ────────────────────────────────────────────────
 // Cookie-signature check only — no Sanity round-trip per request. The
 // sensitive node routes (roster CSV, internal docs) re-verify isActive.
@@ -88,17 +33,13 @@ const MEMBERS_PUBLIC_API = /^\/api\/members\/(login|verify|preview-login)(\/|$)/
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // The Studio is a client-side app that ships no content of its own — Sanity
+  // authenticates every read and write against project membership, so there is
+  // nothing here for an edge password to protect. It previously sat behind a
+  // shared HTTP Basic login from the private-preview phase; that only added a
+  // second set of credentials for editors to keep track of. Skipped here so it
+  // never picks up tenant routing.
   if (pathname.startsWith(STUDIO_PREFIX)) {
-    const authState = isAuthorizedStudioRequest(request)
-
-    if (authState.misconfigured) {
-      return studioAuthMisconfiguredResponse()
-    }
-
-    if (!authState.ok) {
-      return unauthorizedStudioResponse()
-    }
-
     return NextResponse.next()
   }
 
